@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funcionando Django</title>
 <body style="background-color: red;">
-    
+    {% for news in noticias %}
+
+    {{ news.id_noticia}} - {{news.titulo_noticia}}<br>
+
+    {% endfor%}
 </body>
 </html>
