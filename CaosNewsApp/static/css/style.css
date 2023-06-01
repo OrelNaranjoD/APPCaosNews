@@ -1,0 +1,54 @@
+* {
+    margin: 0;
+    padding: 0;
+    
+}
+@font-face {
+    font-family: "Exo";
+    src: url(CaosNewsApp/static/webfonts/Exo-Regular.ttf) format('truerype');
+    font-weight: normal;
+}
+@font-face {
+    font-family: "Exo";
+    src: url(CaosNewsApp/static/webfonts/Exo-Bold.ttf) format('truerype');
+    font-weight: bold;
+}
+
+.header .col, .col-4  {
+    background-color: white;
+    margin-left: 0.75em;
+    margin-right: 0.75em;
+}
+
+p {
+  margin: 0;
+}
+ul {
+    margin: 0;
+}
+
+body {
+    font-family: 'Exo', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    background-color: gainsboro;
+}
+
+.carousel-inner video {
+    width: 100%;
+    max-height: 400px;
+    object-fit: fill;
+}
+
+.link {
+    text-decoration: none;
+    color: white;
+}
+.link-two {
+    text-decoration: none;
+    color: #1b1b1b;
+}
+
+.link:hover, .link-two:hover {
+    color: #c500cc;
+}
