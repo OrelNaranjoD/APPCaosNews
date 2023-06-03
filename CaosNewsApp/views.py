@@ -14,3 +14,6 @@ def home(request):
 
 def footer(request):
     return render(request, 'footer.html')
+
+def admin(request):
+    return render(request, 'admin/admin.html')
