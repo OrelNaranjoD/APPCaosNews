@@ -9,6 +9,12 @@ def index(request):
     context={"noticias":noticias}
     return render(request, 'index.html', context)
 
+def actualidad(request):
+    noticias = Noticia.objects.raw('SELECT * FROM CaosNewsAPP_Noticia')
+    print(noticias)
+    context={"noticias":noticias}
+    return render(request, 'actualidad.html', context)
+
 def home(request):
     return render(request, 'home.html')
 
