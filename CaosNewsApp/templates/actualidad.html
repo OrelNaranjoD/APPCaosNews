@@ -9,73 +9,33 @@
         </div>
     </div>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col">
-        <div class="card h-100">
-            <a href="noticia-2329877.html">
-            <img src="static/images/news/2329877.jpg" class="card-img-top" alt="Auto Volador">
-            </a>
-            <div class="card-body">
-            <h5 class="card-title">Auto volador tripulado, pilotado por primera vez en Japón</h5>
-            <p class="card-text">El martes tuvo lugar el primer vuelo exitoso en Japón de un auto volador manejado por
-                un piloto al aire libre. </p>
-            </div>
-            <div class="card-footer bg-transparent">
-            <div class="row">
-                <div class="col"><small class="text-muted">07 de Marzo de 2023</small></div>
-                <div class="col-auto text-end"><small>Tecnología</small></div>
-            </div>
-            </div>
-        </div>
-        </div>
-        <div class="col">
-        <div class="card h-100">
-            <img src="static/images/news/1081928.jpg" class="card-img-top" alt="Alexis Sanchez">
-            <div class="card-body">
-            <h5 class="card-title">Sinónimo de victoria, el salvador.</h5>
-            <p class="card-text">Alexis Sánchez nuevamente brilla en Francia. Su Olympique de Marsella derrotó 2-1 a
-                Auxerre y él hizo el gol del triunfo a los 77'.</p>
-            </div>
-            <div class="card-footer bg-transparent">
-            <div class="row">
-                <div class="col"><small class="text-muted">01 de Mayo de 2023</small></div>
-                <div class="col-auto text-end"><small>Deportes</small></div>
-            </div>
-            </div>
-        </div>
-        </div>
-        <div class="col">
-        <div class="card h-100">
-            <img src="static/images/news/8135314.jpg" class="card-img-top" alt="Dolar">
-            <div class="card-body">
-            <h5 class="card-title">Dólar cierra al alza en Chile</h5>
-            <p class="card-text">El dólar anotó una subida al cierre de sus operaciones de este viernes, dejando atrás
-                las caídas que venía mostrando en las últimas tres sesiones, en línea con la fortaleza global de la
-                divisa y los últimos datos de empleo publicados en Chile.</p>
-            </div>
-            <div class="card-footer bg-transparent">
-            <div class="row">
-                <div class="col"><small class="text-muted">28 de Abril de 2023</small></div>
-                <div class="col-auto text-end"><small>Economía</small></div>
-            </div>
-            </div>
-        </div>
-        </div>
-        <div class="col">
-        <div class="card h-100">
-            <img src="static/images/news/3456372.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-            <h5 class="card-title">Hijos de Shakira "no queremos estar con Clara Chía"</h5>
-            <p class="card-text">De acuerdo con el paparazzi Jordi Martin los pequeños no tienen el mínimo interés en
-                conocer a la nueva novia de su padre.</p>
-            </div>
-            <div class="card-footer bg-transparent">
-            <div class="row">
-                <div class="col"><small class="text-muted">01 de Mayo de 2023</small></div>
-                <div class="col-auto text-end"><small>Mundo</small></div>
-            </div>
-            </div>
-        </div>
-        </div>
+        {% for noticia in noticias %}
+            {% if noticia.activo %}
+                <div class="col">
+                    <div class="card h-100">
+                        <a href="{% url 'noticia_detalle' noticia.id_noticia %}">
+                            <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo_noticia }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ noticia.titulo_noticia }}</h5>
+                            <p class="card-text">
+                                {% if noticia.cuerpo_noticia|length > 150 %}
+                                    {{ noticia.cuerpo_noticia|slice:":150" }}... <a href="{% url 'noticia_detalle' noticia.id_noticia %}">Seguir leyendo</a>
+                                {% else %}
+                                    {{ noticia.cuerpo_noticia }}
+                                {% endif %}
+                            </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                            <div class="row">
+                                <div class="col"><small class="text-muted">{{ noticia.fecha_creacion|date:"d/m/Y" }}</small></div>
+                                <div class="col-auto text-end"><small>{{ noticia.id_categoria }}</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
     </main>
 {% endblock %}

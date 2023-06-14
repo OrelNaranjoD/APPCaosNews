@@ -1,0 +1,12 @@
+{% load static %}
+<h1>DETALLE {{ noticia.id_noticia}}</h1>
+
+
+{% block content %}
+    <h2>{{ noticia.titulo_noticia }}</h2>
+    <p>Autor: {{ noticia.id_usuario }}</p>
+    <p>Categoría: {{ noticia.id_categoria.nombre_categoria }}</p>
+    <p>Fecha de creación: {{ noticia.fecha_creacion|date:"d/m/Y" }}</p>
+    <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo_noticia }}">
+    <p>{{ noticia.cuerpo_noticia }}</p>
+{% endblock %}

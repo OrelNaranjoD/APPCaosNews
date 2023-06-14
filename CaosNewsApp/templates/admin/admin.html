@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="css/style.css" rel="stylesheet">
-    </head>
-    <body>
-    <H1>Pagina administracion</H1>
-    </body>
+<html>
+<head>
+  <title>Panel de administración</title>
+</head>
+<body>
+  <h1>Panel de administración</h1>
+  
+  <div class="sidebar">
+    <ul>
+      <li><a href="{% url 'admin_noticias' %}">Noticias</a></li>
+      <!-- Agrega aquí más enlaces según las páginas que hayas definido en urls.py -->
+    </ul>
+  </div>
+  
+  <div class="content">
+    {% block content %}
+    <!-- El contenido específico de cada página se rellenará en los templates derivados -->
+    {% endblock %}
+  </div>
+</body>
 </html>

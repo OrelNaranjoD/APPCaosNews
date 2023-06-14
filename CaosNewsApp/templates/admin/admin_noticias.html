@@ -1,0 +1,29 @@
+{% extends 'admin/admin.html' %}
+
+{% block content %}
+  <h2>Noticias</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Cuerpo</th>
+        <th>Categoría</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for noticia in noticias %}
+        <tr>
+          <td>{{ noticia.titulo_noticia }}</td>
+          <td>{{ noticia.cuerpo_noticia }}</td>
+          <td>{{ noticia.id_categoria }}</td>
+          <td>
+            <a href="{% url 'admin_editar_noticia' noticia.id_noticia %}">Editar</a>
+            <a href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'admin_crear_noticia' %}">Crear nueva noticia</a>
+{% endblock %}

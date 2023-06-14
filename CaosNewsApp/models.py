@@ -8,7 +8,7 @@ class Noticia(models.Model):
     cuerpo_noticia = models.TextField(blank=False, null=False, default='')
     id_categoria = models.ForeignKey('Categoria',on_delete=models.CASCADE, db_column='id_categoria')
     activo = models.BooleanField(("Activo"), default=True)
-    imagen = models.ImageField(upload_to='media', null=True, blank=True)
+    imagen = models.ImageField(upload_to='news', null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='id_usuario')
