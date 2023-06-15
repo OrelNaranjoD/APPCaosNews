@@ -26,52 +26,67 @@
             <div class="text-end"><p class="text-light" id="current_date"></p></div>
           </div>
           <div class="col-auto text-end">
-            <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>
+            {% if user.is_authenticated %}
+              <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
+              <a href="{% url 'admin' %}" class="link">Panel de control</a> |
+              <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
+            {% else %}
+              <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>
+            {% endif %}
           </div>
           <!-- ========== Modal Login ========== -->
           <div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header pb-0 pt-3">
-                  <h5>Iniciar Sesión</h5>
-                  <button type="button" class="btn-close mb-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content">
+                    <div class="modal-header pb-0 pt-3">
+                        <h5>Iniciar Sesión</h5>
+                        <button type="button" class="btn-close mb-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="px-4">
+                        <form id="loginForm" method="post" action="{% url 'login' %}">
+                          {% csrf_token %}
+                          <div class="row py-1">
+                            <label for="id_username" class="ps-0">Nombre de usuario:</label>
+                          </div>
+                          <div class="row">
+                            <input type="text" id="id_username" name="username" required>
+                            {% if form.errors.username %}
+                              <div class="invalid-feedback">{{ form.errors.username }}</div>
+                            {% endif %}
+                          </div>
+                          <div class="row py-1">
+                            <label for="id_password" class="ps-0">Contraseña:</label>
+                          </div>
+                          <div class="row">
+                            <input type="password" id="id_password" name="password" required>
+                            {% if form.errors.password %}
+                              <div class="invalid-feedback">{{ form.errors.password }}</div>
+                            {% endif %}
+                          </div>
+                          <div class="row w-50">
+                            <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
+                          </div>
+                          <div class="row mt-2">
+                            <div id="errorContainer"></div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row text-end">
+                            <h6>No te acuerdas de tu contraseña?</h6>
+                            <a href="registro.html" class="link-two" onclick="restablecerContrasena()">Restablecer Contraseña</a>
+                        </div>
+                        <div class="row text-end">
+                            <h6>No tienes una cuenta?</h6>
+                            <a href="registro.html" class="link-two">Registrarse</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                  <div class="px-4">
-                    <form onsubmit="return validarlogin()" method="post" action="{% url 'login' %}">
-                      {% csrf_token %}
-                      <div class="row py-1">
-                        <label for="id_username" class="ps-0">Nombre de usuario:</label>
-                      </div>
-                      <div class="row">
-                        <input type="name" id="id_username" name="username" required>
-                      </div>
-                      <div class="row py-1">
-                        <label for="id_password" class="ps-0">Contraseña:</label>
-                      </div>
-                      <div class="row">
-                        <input type="password" id="id_password" name="password" required>
-                      </div>
-                      <div class="row w-50">
-                        <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <div class="row text-end">
-                    <h6>No te acuerdas de tu contraseña?</h6>
-                    <a href="registro.html" class="link-two" onclick="restablecerContrasena()">Restablecer Contraseña</a>
-                  </div>
-                  <div class="row text-end">
-                    <h6>No tienes una cuenta?</h6>
-                    <a href="registro.html" class="link-two">Registrarse</a>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
+      </div>
         <div class="row header">
           <!-- ========== Logotipo ========== -->
           <div class="col">
@@ -98,20 +113,13 @@
     </main>
     <!-- ========== Pie de pagina ========== -->
         {% include 'footer.html' %}
-    <!-- ========== Librerias JS Bootstrap ========== -->
-        <script src="{% static 'js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'js/popper.min.js' %}"></script>
-    <!-- ========== Librerias JS jQuery ========== -->
-        <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
-        <!-- ========== Librerias JS Personalizada ========== -->
-        <script src="{% static 'js/custom.js' %}"></script>
     </div>
-{% comment %}
-        {% for news in noticias %}
-    
-        {{ news.id_noticia}} - {{news.titulo_noticia}}<br>
-    
-        {% endfor%}
-{% endcomment %}
+<!-- ========== Librerias JS jQuery ========== -->
+<script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+<!-- ========== Librerias JS Bootstrap ========== -->
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- ========== Librerias JS Personalizada ========== -->
+<script src="{% static 'js/custom.js' %}"></script>
  </body>
 </html>

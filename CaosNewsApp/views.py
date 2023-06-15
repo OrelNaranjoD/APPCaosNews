@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
+from django.contrib import messages
 from .models import Noticia
-from django.contrib.auth import authenticate, login
-from .forms import NoticiaForm
+from django.contrib.auth import authenticate, login, logout
+from .forms import NoticiaForm, LoginForm
+from django.http import JsonResponse
 
 def index(request):
     noticias = Noticia.objects.raw('SELECT * FROM CaosNewsAPP_Noticia')
@@ -31,19 +33,26 @@ def admin(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            # Redirigir al administrador personalizado
-            return redirect('/admin')
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return JsonResponse({'valid': True})
+            else:
+                return JsonResponse({'valid': False, 'username_error': True, 'password_error': False})
         else:
-            # El inicio de sesión falló, mostrar mensaje de error o realizar acciones adicionales
-            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
-    else:
-        return render(request, 'login.html')
+            return JsonResponse({'valid': False, 'username_error': False, 'password_error': False})
     
+    return JsonResponse({'valid': False, 'username_error': False, 'password_error': False})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home') 
+
 def mostrar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
     return render(request, 'detalle_noticia.html', {'noticia': noticia})
