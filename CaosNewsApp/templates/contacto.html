@@ -1,0 +1,64 @@
+{% extends './index.html' %}
+{% load static %}
+{% block body %}
+    <!-- ========== Cuerpo ========== -->
+    <main class="p-4 px-5">
+      <div class="row">
+        <div class="col">
+          <h2>Contacto</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <form id="contact-form">
+
+            <!-- Ventana emergente -->
+            <div id="success-modal" class="modal fade">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">¡Formulario enviado!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Gracias por enviar el formulario. Nos pondremos en contacto contigo pronto.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formulario Contacto -->
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+              <div class="invalid-feedback">
+                Por favor, ingrese su nombre.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo electrónico</label>
+              <input type="email" class="form-control" id="correo" placeholder="Ingrese su correo electrónico">
+              <div class="invalid-feedback">
+                Por favor, ingrese un correo electrónico válido.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="telefono" class="form-label">Número de teléfono</label>
+              <input type="tel" class="form-control" id="telefono" placeholder="Ingrese su número de teléfono">
+              <div class="invalid-feedback">
+                Por favor, ingrese un número de teléfono válido.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="mensaje" class="form-label">Mensaje</label>
+              <textarea class="form-control" id="mensaje" rows="5" placeholder="Ingrese su mensaje"></textarea>
+              <div class="invalid-feedback">
+                Por favor, ingrese un mensaje.
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </main>
+{% endblock %}

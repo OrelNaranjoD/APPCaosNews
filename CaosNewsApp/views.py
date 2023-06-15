@@ -20,6 +20,9 @@ def actualidad(request):
 def home(request):
     return render(request, 'home.html')
 
+def contacto(request):
+    return render(request, 'contacto.html')
+
 def footer(request):
     return render(request, 'footer.html')
 

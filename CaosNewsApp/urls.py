@@ -9,6 +9,7 @@ urlpatterns = [
     path('actualidad/', views.actualidad, name='actualidad'),
     path('login/', views.login_view, name='login'),
     path('', views.home, name='home'),
+    path('contacto/', views.contacto, name='contacto'),
     
     #Rutas de administrador
     path('admin/', views.admin, name='admin'),
