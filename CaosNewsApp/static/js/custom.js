@@ -1,3 +1,58 @@
+$(document).ready(function() {
+  // Validador del formulario de inicio de sesión
+  $('#loginForm').on('submit', function(event) {
+    event.preventDefault();
+    var username = $('#id_username').val();
+    var password = $('#id_password').val();
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+    var errorContainer = $('#errorContainer');
+    
+    // Vaciar el contenido anterior del contenedor de mensajes de error
+    errorContainer.empty();
+    
+    $.ajax({
+      url: '/login/',
+      method: 'POST',
+      data: {
+        'username': username,
+        'password': password,
+        'csrfmiddlewaretoken': csrfToken
+      },
+      success: function(data) {
+        if (data.valid) {
+          var successMessage = $('<div id="successAlert" class="alert alert-success text-center">Inicio de sesión exitoso.</div>');
+          errorContainer.html(successMessage);
+          setTimeout(function() {
+            successMessage.fadeOut(500, function() {
+              $(this).remove();
+              window.location.href = '/';
+            });
+          }, 2000);
+        } else {
+          if (data.username_error) {
+            var errorMessage = $('<div class="alert alert-danger text-center">El usuario no existe o la contraseña es incorrecta.</div>');
+            errorContainer.html(errorMessage);
+          } else {
+            var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
+            errorContainer.html(errorMessage);
+          }
+
+          setTimeout(function() {
+            errorMessage.fadeOut(500, function() {
+              $(this).remove();
+            });
+          }, 5000);
+        }
+      },
+      error: function(xhr, textStatus, error) {
+        errorContainer.html('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
+      }
+    });
+  });
+});
+
+
+
 /* ********* Obtener fecha actual ********* */
 function getFecha(){
   const Month = [
@@ -11,7 +66,6 @@ function getFecha(){
 
   document.getElementById("current_date").innerHTML = Day[date.getDay()] + " " + date.getDate() + " de " + Month[date.getMonth()] + " de " + date.getFullYear();
 }
-
 
 /* VALIDACIONES MUAJAJJA */
 function validarFormulario() {
