@@ -1,12 +1,26 @@
+{% extends './index.html' %}
 {% load static %}
-<h1>DETALLE {{ noticia.id_noticia}}</h1>
-
-
-{% block content %}
-    <h2>{{ noticia.titulo_noticia }}</h2>
-    <p>Autor: {{ noticia.id_usuario }}</p>
-    <p>Categoría: {{ noticia.id_categoria.nombre_categoria }}</p>
-    <p>Fecha de creación: {{ noticia.fecha_creacion|date:"d/m/Y" }}</p>
-    <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo_noticia }}">
-    <p>{{ noticia.cuerpo_noticia }}</p>
+{% block body %}
+    <!-- ========== Cuerpo ========== -->
+    <main class="p-4 px-5">
+        <div class="row">
+          <div class="col">
+            <h2>{{ noticia.titulo_noticia }}</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <h5> {{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor: {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}</h5>
+          </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4 pt-3">
+          <div class="col-md-6 h-100">
+            <p class="w-100">{{ noticia.cuerpo_noticia }}</p>
+          </div>
+          <div class="col-md-1 h-100"></div>
+          <div class="col-md-5 h-100">
+            <img src="{{ noticia.imagen.url }}" class="img-fluid rounded" alt="{{ noticia.titulo_noticia }}">
+          </div>
+        </div>
+      </main>
 {% endblock %}
