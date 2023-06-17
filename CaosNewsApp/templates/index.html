@@ -21,11 +21,12 @@
             <!-- ========== Encabezado ========== -->
     <header>
         <div class="row mx-0 py-1 bg-dark">
-          <div class="col"></div>
-          <div class="col-auto text-end">
-            <div class="text-end"><p class="text-light" id="current_date"></p></div>
+          <div class="col">
+            <div class="text-start"><p class="text-light" id="current_date">17/106/2023</p></div>
           </div>
-          <div class="col-auto text-end">
+          <div class="col-auto">
+          </div>
+          <div class="col text-end">
             {% if user.is_authenticated %}
               <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
               <a href="{% url 'admin' %}" class="link">Panel de control</a> |
@@ -80,30 +81,67 @@
                         </div>
                         <div class="row text-end">
                             <h6>No tienes una cuenta?</h6>
-                            <a href="registro.html" class="link-two">Registrarse</a>
+                            <a href="#register" class="link-two"  data-bs-toggle="modal" data-bs-dismiss="modal">Registrarse</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- ========== Fin Modal Login ========== -->
+        <!-- ========== Modal Register ========== -->
+        <div class="modal fade" id="register" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header pb-0 pt-3">
+                      <h5>Nuevo Usuario</h5>
+                  </div>
+                  <div class="modal-body">
+                    <div class="px-4">
+                      <form id="loginForm" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <div class="row py-1">
+                          <label for="id_username" class="ps-0">Nombre de usuario:</label>
+                        </div>
+                        <div class="row">
+                          <input type="text" id="id_username" name="username" required>
+                          {% if form.errors.username %}
+                            <div class="invalid-feedback">{{ form.errors.username }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row py-1">
+                          <label for="id_password" class="ps-0">Contraseña:</label>
+                        </div>
+                        <div class="row">
+                          <input type="password" id="id_password" name="password" required>
+                          {% if form.errors.password %}
+                            <div class="invalid-feedback">{{ form.errors.password }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row w-50">
+                          <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
+                          <a class="btn btn-primary" data-bs-toggle="modal" href="#login" role="button">Volver</a>
+                        </div>
+                        <div class="row mt-2">
+                          <div id="errorContainer"></div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+              </div>
+          </div>
       </div>
-        <div class="row header">
-          <!-- ========== Logotipo ========== -->
-          <div class="col">
-            <div class="container-fluid">
-              <a href="#">
-                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
-              </a>
-            </div>
-          </div>
-          <!-- ========== Buscador ========== -->
-          <div class="col-4">
-            <form class="d-flex">
-              <input class="form-control me-2" type="search" placeholder="Buscar aqui..." aria-label="Search">
-              <button class="btn btn-primary" type="submit">Buscar</button>
-            </form>
-          </div>
+      <!-- ========== Fin Modal LoginRegister ========== -->
+      </div>
+      <div class="container bg-light">
+        <!-- ========== Logotipo ========== -->
+        <div class="col">
+            <a href="#">
+              <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
+            </a>
         </div>
+        <div class="col-auto">
+        </div>
+      </div>
     <!-- ========== Barra de navegación ========== -->
         {% include 'navbar.html' %}
     <!-- ========== Cuerpo ========== -->
