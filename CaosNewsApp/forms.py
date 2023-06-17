@@ -13,12 +13,13 @@ class LoginForm(forms.Form):
 
 
 class RegisterForm(forms.Form):
+    first_name = forms.CharField(label='Nombre', max_length=100)
+    last_name = forms.CharField(label='Apellido', max_length=100)
     username = forms.CharField(label='Nombre de usuario', max_length=100)
     email = forms.CharField(label='Correo electrónico', max_length=100, validators=[EmailValidator()])
     password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirmar contraseña', widget=forms.PasswordInput)
-    phone_number = forms.CharField(label='Número telefónico', max_length=15, validators=[RegexValidator(r'^\+?1?\d{9,15}$', message="El número telefónico debe tener un formato válido.")])
-
+    
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
