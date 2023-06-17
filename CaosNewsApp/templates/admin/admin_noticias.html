@@ -1,29 +1,37 @@
 {% extends 'admin/admin.html' %}
 
-{% block content %}
-  <h2>Noticias</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Título</th>
-        <th>Cuerpo</th>
-        <th>Categoría</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for noticia in noticias %}
-        <tr>
-          <td>{{ noticia.titulo_noticia }}</td>
-          <td>{{ noticia.cuerpo_noticia }}</td>
-          <td>{{ noticia.id_categoria }}</td>
-          <td>
-            <a href="{% url 'admin_editar_noticia' noticia.id_noticia %}">Editar</a>
-            <a href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <a href="{% url 'admin_crear_noticia' %}">Crear nueva noticia</a>
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Lista de Noticias</h1>
+    </div>
+    <div class="col-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Título</th>
+            <th scope="col">Cuerpo</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for noticia in noticias %}
+          <tr>
+            <td>{{ noticia.titulo_noticia }}</td>
+            <td>{{ noticia.cuerpo_noticia }}</td>
+            <td>{{ noticia.id_categoria }}</td>
+            <td>
+              <a href="{% url 'admin_editar_noticia' noticia.id_noticia %}">Editar</a>
+              <a href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <a href="{% url 'admin_crear_noticia' %}">Crear nueva noticia</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

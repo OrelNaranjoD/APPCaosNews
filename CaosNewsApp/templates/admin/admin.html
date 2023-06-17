@@ -1,22 +1,38 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Panel de administración</title>
-</head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ========== Favicon ========== -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" sizes="any">
+    <!-- ========== CSS FontAwesome ========== -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/solid.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/brands.min.css' %}" />
+    <!-- ========== CSS Bootstrap ========== -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- ========== CSS Personalizado ========== -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
 <body>
-  <h1>Panel de administración</h1>
-  
-  <div class="sidebar">
-    <ul>
-      <li><a href="{% url 'admin_noticias' %}">Noticias</a></li>
-      <!-- Agrega aquí más enlaces según las páginas que hayas definido en urls.py -->
-    </ul>
-  </div>
-  
-  <div class="content">
-    {% block content %}
-    <!-- El contenido específico de cada página se rellenará en los templates derivados -->
-    {% endblock %}
-  </div>
+  <div class="container">
+    <header>
+    <!-- ========== Barra de navegación ========== -->
+    {% include 'admin/navbar.html' %}
+    <!-- ========== Cuerpo ========== -->
+    </header>
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+    <!-- ========== Pie de pagina ========== -->
+        {% include 'admin/footer.html' %}
+    </div>
+  <!-- ========== JS Bootstrap ========== -->
+  <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <!-- ========== JS Personalizado ========== -->
+  <script src="{% static 'js/custom.js' %}"></script>
 </body>
 </html>

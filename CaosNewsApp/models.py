@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from datetime import datetime
+from django.contrib.auth.models import AbstractUser
 
 class Noticia(models.Model):
     id_noticia  = models.AutoField(db_column='id_noticia', primary_key=True) 
@@ -22,3 +23,21 @@ class Categoria(models.Model):
 
     def __str__(self):
         return str(self.nombre_categoria)
+    
+class Profile(models.Model):
+    ROLES = (
+        ('administrador', 'Administrador'),
+        ('editor', 'Editor'),
+        ('periodista', 'Periodista'),
+        ('lector', 'Lector'),
+    )
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    role = models.CharField(max_length=15, choices=ROLES, default='lector')
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = 'Perfil'
+        verbose_name_plural = 'Perfiles'

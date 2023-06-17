@@ -60,7 +60,10 @@ def mostrar_noticia(request, noticia_id):
     
 #Vistas de Administrador
 def admin_noticias(request):
-    noticias = Noticia.objects.all()
+    if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.all()
+    else:
+        noticias = Noticia.objects.filter(id_usuario=request.user.id)
     return render(request, 'admin/admin_noticias.html', {'noticias': noticias})
 
 def admin_crear_noticia(request):
