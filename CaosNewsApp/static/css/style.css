@@ -50,3 +50,14 @@ body {
 .link:hover, .link-two:hover {
     color: #c500cc;
 }
+
+.weather {
+    background-image: linear-gradient(to top, rgba(0, 198, 251,.7) 0%, rgba(0, 91, 234,.7) 100%);
+    color: white;
+    text-align: center;
+}
+.weather-icon {
+    width: 100px;
+    height: 100%;
+    margin: 0 auto;
+}

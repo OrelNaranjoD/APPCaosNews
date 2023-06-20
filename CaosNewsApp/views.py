@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import NoticiaForm, LoginForm, RegisterForm
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+import requests
 
 
 
@@ -17,14 +18,55 @@ def index(request):
     context={"noticias":noticias}
     return render(request, 'index.html', context)
 
-def actualidad(request):
-    noticias = Noticia.objects.all()
-    print(noticias)
-    context={"noticias":noticias}
-    return render(request, 'actualidad.html', context)
+def noticias(request, categoria):
+    if categoria == 'Ultima Hora':
+        noticias = Noticia.objects.order_by('-fecha_creacion')[:10]
+    else:
+        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria).order_by('-fecha_creacion')
+    context={"noticias":noticias, "categoria": categoria}
+    return render(request, 'noticia.html', context)
+
+def mostrar_noticia(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    return render(request, 'detalle_noticia.html', {'noticia': noticia})
+
+def obtener_tiempo_chile():
+    url = 'http://api.openweathermap.org/data/2.5/weather?'
+    api_key = 'cda050505a9bfed7a75a0663acda7e5a'
+    ciudades_chile = ['Santiago', 'Antofagasta', 'Vina del Mar', 'Concepcion', 'Temuco'] 
+
+    resultados = []
+
+    for ciudad in ciudades_chile:
+        params = {
+            'appid': api_key,
+            'q': ciudad + ',cl',
+            'units': 'metric',
+            'lang': 'es',
+        }
+
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            ciudad_info = {
+                'ciudad': data['name'],
+                'temperatura': data['main']['temp'],
+                'temperatura_min': data['main']['temp_min'],
+                'temperatura_max': data['main']['temp_max'],
+                'tiempo': data['weather'][0]['description'],
+                'icono': data['weather'][0]['icon']
+            }
+            resultados.append(ciudad_info)
+        else:
+            print(f"Error en la solicitud para la ciudad {ciudad}: {response.status_code}")
+
+    return resultados
 
 def home(request):
-    return render(request, 'home.html')
+    resultados_tiempo_chile = obtener_tiempo_chile()
+    context = {'resultados_tiempo_chile': resultados_tiempo_chile}  
+    return render(request, 'home.html', context)
 
 def contacto(request):
     return render(request, 'contacto.html')
@@ -97,10 +139,6 @@ def register(request):
 def logout_view(request):
     logout(request)
     return redirect('home') 
-
-def mostrar_noticia(request, noticia_id):
-    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
-    return render(request, 'detalle_noticia.html', {'noticia': noticia})
     
     
 #Vistas de Administrador
@@ -140,4 +178,3 @@ def admin_eliminar_noticia(request, noticia_id):
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
-

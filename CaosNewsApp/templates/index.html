@@ -118,10 +118,10 @@
               {% endif %}
             </div>
             <div class="row py-1">
-              <label for="id_username" class="ps-0">Nombre de usuario:</label>
+              <label for="id_username_reg" class="ps-0">Nombre de usuario:</label>
             </div>
             <div class="row">
-              <input type="text" id="id_username" name="username" required>
+              <input type="text" id="id_username_reg" name="username" required>
               {% if form.errors.username %}
                 <div class="invalid-feedback">{{ form.errors.username }}</div>
               {% endif %}
@@ -136,10 +136,10 @@
               {% endif %}
             </div>
             <div class="row py-1">
-              <label for="id_password" class="ps-0">Contraseña:</label>
+              <label for="id_password_reg" class="ps-0">Contraseña:</label>
             </div>
             <div class="row">
-              <input type="password" id="id_password" name="password" required>
+              <input type="password" id="id_password_reg" name="password" required>
               {% if form.errors.password %}
                 <div class="invalid-feedback">{{ form.errors.password }}</div>
               {% endif %}
