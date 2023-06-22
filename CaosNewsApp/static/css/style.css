@@ -61,3 +61,38 @@ body {
     height: 100%;
     margin: 0 auto;
 }
+
+
+
+
+
+/* Admin Styles */
+
+.user-pic {
+    max-width: 150px;
+    height: 100%;
+}
+
+.custom-hr {
+    border-top: 3px solid white;
+}
+
+.icon-spacer {
+    margin-right: 0.5rem;
+}
+
+.w-date {
+    width: 100px;
+}
+.w-action {
+    width: 100px;
+}
+
+.table-link {
+    text-decoration: none;
+    color: #1b1b1b;
+}
+
+.table-link:hover {
+    color: #900000;
+}

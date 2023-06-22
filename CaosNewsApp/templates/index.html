@@ -29,7 +29,7 @@
           <div class="col text-end">
             {% if user.is_authenticated %}
               <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
-              <a href="{% url 'admin' %}" class="link">Panel de control</a> |
+              <a href="{% url 'admin_home' %}" class="link">Panel de control</a> |
               <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
             {% else %}
               <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>

@@ -74,8 +74,7 @@ def contacto(request):
 def footer(request):
     return render(request, 'footer.html')
 
-def admin(request):
-    return render(request, 'admin/admin.html')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -142,6 +141,9 @@ def logout_view(request):
     
     
 #Vistas de Administrador
+def admin_home(request):
+    return render(request, 'admin/admin_home.html')
+
 def admin_noticias(request):
     if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.all()
@@ -178,3 +180,7 @@ def admin_eliminar_noticia(request, noticia_id):
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
+
+#Testing
+def test(request):
+    return render(request, 'test.html')

@@ -1,36 +1,35 @@
 {% extends 'admin/admin.html' %}
-
+{% load static %}
 {% block body %}
-<div class="container">
-  <div class="row">
+<div class="col py-3">
+  <div class="row px-4">
     <div class="col-12">
-      <h1>Lista de Noticias</h1>
+      <h2>Lista de Noticias</h2>
     </div>
-    <div class="col-12">
-      <table class="table">
+    <div class="col-12 table-responsive">
+      <table class="table table-striped">
         <thead>
           <tr>
+            <th scope="col" class="w-date">Fecha</th>
             <th scope="col">Título</th>
-            <th scope="col">Cuerpo</th>
-            <th scope="col">Categoría</th>
-            <th scope="col">Acciones</th>
+            <th scope="col" class="text-center">Categoría</th>
+            <th scope="col" class="w-action text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {% for noticia in noticias %}
           <tr>
+            <td>{{ noticia.fecha_creacion|date:"SHORT_DATE_FORMAT" }}</td>
             <td>{{ noticia.titulo_noticia }}</td>
-            <td>{{ noticia.cuerpo_noticia }}</td>
-            <td>{{ noticia.id_categoria }}</td>
-            <td>
-              <a href="{% url 'admin_editar_noticia' noticia.id_noticia %}">Editar</a>
-              <a href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
+            <td class="text-center">{{ noticia.id_categoria }}</td>
+            <td class="text-center">
+              <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}"><i class="fa-solid fa-pen-to-square"></i></a>
+              <a class="table-link" href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}"><i class="fa-solid fa-trash"></i></a>
             </td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
-      <a href="{% url 'admin_crear_noticia' %}">Crear nueva noticia</a>
     </div>
   </div>
 </div>

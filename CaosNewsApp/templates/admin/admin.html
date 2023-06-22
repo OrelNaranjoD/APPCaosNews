@@ -19,15 +19,27 @@
 <body>
   <div class="container">
     <header>
-    <!-- ========== Barra de navegación ========== -->
-    {% include 'admin/navbar.html' %}
-    <!-- ========== Cuerpo ========== -->
+      <div class="container bg-light p-4">
+        <!-- ========== Logotipo ========== -->
+        <div class="col">
+            <a href="#">
+              <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
+            </a>
+        </div>
+        <div class="col-auto">
+        </div>
+      </div>
     </header>
     <main>
+      <div class="row d-flex">
+        <!-- ========== Barra de navegación ========== -->
+        {% include 'admin/navbar.html' %}
+        <!-- ========== Cuerpo ========== -->
         {% block body %}{% endblock %}
+      </div>
     </main>
-    <!-- ========== Pie de pagina ========== -->
-        {% include 'admin/footer.html' %}
+      <!-- ========== Pie de pagina ========== -->
+      {% include 'admin/footer.html' %}
     </div>
   <!-- ========== JS Bootstrap ========== -->
   <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
