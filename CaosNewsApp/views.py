@@ -97,7 +97,7 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-# Obtener los datos del formulario
+            # Obtener los datos del formulario
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
@@ -134,7 +134,6 @@ def register(request):
     
     return render(request, 'index.html', {'form': form})
 
-
 def logout_view(request):
     logout(request)
     return redirect('home') 
@@ -156,7 +155,7 @@ def admin_crear_noticia(request):
         form = NoticiaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_noticias')
+            return redirect('admin/admin_noticias')
     else:
         form = NoticiaForm()
     return render(request, 'admin/admin_crear_noticia.html', {'form': form})
@@ -172,14 +171,32 @@ def admin_editar_noticia(request, noticia_id):
         form = NoticiaForm(instance=noticia)
     return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id})
 
+
 def admin_eliminar_noticia(request, noticia_id):
-    noticia = Noticia.objects.get(id=noticia_id)
+    noticia = Noticia.objects.get(id_noticia=noticia_id)
     noticia.delete()
     return redirect('admin/admin_noticias')
 
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
+
+def admin_guardar_noticia(request, noticia_id=None):
+    if noticia_id:
+        noticia = Noticia.objects.get(id=noticia_id)
+    else:
+        noticia = None
+
+    if request.method == 'POST':
+        form = NoticiaForm(request.POST, instance=noticia)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_noticia')
+    else:
+        form = NoticiaForm(instance=noticia)
+
+    context = {'form': form}
+    return render(request, 'admin/admin_editar_noticia.html', context)
 
 #Testing
 def test(request):

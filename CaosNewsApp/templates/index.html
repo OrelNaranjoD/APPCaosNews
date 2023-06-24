@@ -16,13 +16,13 @@
     <!-- ========== CSS Personalizado ========== -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
-<body>
+<body onload="getFecha()">
     <div class="container">
             <!-- ========== Encabezado ========== -->
     <header>
         <div class="row mx-0 py-1 bg-dark">
           <div class="col">
-            <div class="text-start"><p class="text-light" id="current_date">17/106/2023</p></div>
+            <div class="text-start"><p class="text-light" id="current_date"></p></div>
           </div>
           <div class="col-auto">
           </div>

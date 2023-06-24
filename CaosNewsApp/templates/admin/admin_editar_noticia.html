@@ -1,10 +1,18 @@
 {% extends 'admin/admin.html' %}
-
-{% block content %}
-  <h2>Editar noticia</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar cambios</button>
-  </form>
+{% load static %}
+{% block body %}
+<div class="col py-3">
+  <div class="row px-4">
+    <div class="col-12">
+      <h2>Editar Noticia</h2>
+    </div>
+    <div class="col-12">
+      <form method="POST" action="{% url 'admin_guardar_noticia' noticia_id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
