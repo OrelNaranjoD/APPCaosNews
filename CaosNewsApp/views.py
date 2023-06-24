@@ -166,7 +166,7 @@ def admin_editar_noticia(request, noticia_id):
         form = NoticiaForm(request.POST, instance=noticia)
         if form.is_valid():
             form.save()
-            return redirect('admin_noticias')
+            return redirect('admin/admin_noticias')
     else:
         form = NoticiaForm(instance=noticia)
     return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id})
@@ -191,7 +191,7 @@ def admin_guardar_noticia(request, noticia_id=None):
         form = NoticiaForm(request.POST, instance=noticia)
         if form.is_valid():
             form.save()
-            return redirect('admin_noticia')
+            return redirect('admin/admin_noticia')
     else:
         form = NoticiaForm(instance=noticia)
 
