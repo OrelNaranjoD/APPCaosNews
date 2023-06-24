@@ -67,39 +67,106 @@ function getFecha(){
   document.getElementById("current_date").innerHTML = Day[date.getDay()] + " " + date.getDate() + " de " + Month[date.getMonth()] + " de " + date.getFullYear();
 }
 
-/* VALIDACIONES MUAJAJJA */
-function validarFormulario() {
-  console.log("validando formulario");
-  // Validar que los campos obligatorios estén completos
-  const nombre = document.getElementById("nombre").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const telefono = document.getElementById("phone").value.trim();
-  
-  if (nombre === "" || email === "" || telefono === "") {
-    alert("Por favor, complete todos los campos obligatorios.");
-    return false;
+document.addEventListener('DOMContentLoaded', function() {
+  // Obtener referencias a los elementos del formulario
+  var form = document.getElementById('contact-form');
+  var nombreInput = document.getElementById('nombre');
+  var correoInput = document.getElementById('correo');
+  var telefonoInput = document.getElementById('telefono');
+  var mensajeInput = document.getElementById('mensaje');
+
+  // Agregar un evento de escucha al enviar el formulario
+  form.addEventListener('submit', function (event) {
+      // Detener el envío del formulario
+      event.preventDefault();
+
+      // Validar los campos del formulario
+      var nombreValido = validarNombre();
+      var correoValido = validarCorreo();
+      var telefonoValido = validarTelefono();
+      var mensajeValido = validarMensaje();
+
+      // Verificar si todos los campos son válidos antes de enviar el formulario
+      if (nombreValido && correoValido && telefonoValido && mensajeValido) {
+          enviarFormulario();
+      }
+  });
+
+  // Función para validar el campo de nombre
+  function validarNombre() {
+      var nombre = nombreInput.value.trim();
+      var nombreRegExp = /^[a-zA-Z\s]+$/;
+
+      if (nombre === '' || !nombreRegExp.test(nombre)) {
+          nombreInput.classList.add('is-invalid');
+          nombreInput.nextElementSibling.style.display = 'block';
+          return false;
+      } else {
+          nombreInput.classList.remove('is-invalid');
+          nombreInput.nextElementSibling.style.display = 'none';
+          return true;
+      }
   }
 
+  // Función para validar el campo de correo electrónico
+  function validarCorreo() {
+      var correo = correoInput.value.trim();
+      var correoRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
-
-  // Validar el formato del correo electrónico
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    alert("Por favor, ingrese una dirección de correo electrónico válida.");
-    return false;
+      if (correo === '' || !correoRegExp.test(correo)) {
+          correoInput.classList.add('is-invalid');
+          correoInput.nextElementSibling.style.display = 'block';
+          return false;
+      } else {
+          correoInput.classList.remove('is-invalid');
+          correoInput.nextElementSibling.style.display = 'none';
+          return true;
+      }
   }
 
-  // Validar el formato del número de teléfono
-  const telefonoRegex = /^\d{9}$/;
-  if (!telefonoRegex.test(telefono)) {
-    alert("Por favor, ingrese un número de teléfono válido.");
-    return false;
+  // Función para validar el campo de número de teléfono
+  function validarTelefono() {
+      var telefono = telefonoInput.value.trim();
+      var telefonoRegExp = /^\d+$/;
+
+      if (telefono === '' || !telefonoRegExp.test(telefono)) {
+          telefonoInput.classList.add('is-invalid');
+          telefonoInput.nextElementSibling.style.display = 'block';
+          return false;
+      } else {
+          telefonoInput.classList.remove('is-invalid');
+          telefonoInput.nextElementSibling.style.display = 'none';
+          return true;
+      }
   }
 
-  // Si todas las validaciones han pasado, se puede enviar el formulario
-  return true;
-}
+  // Función para validar el campo de mensaje
+  function validarMensaje() {
+      if (mensajeInput.value.trim() === '') {
+          mensajeInput.classList.add('is-invalid');
+          mensajeInput.nextElementSibling.style.display = 'block';
+          return false;
+      } else {
+          mensajeInput.classList.remove('is-invalid');
+          mensajeInput.nextElementSibling.style.display = 'none';
+          return true;
+      }
+  }
+
+  // Función para enviar el formulario
+  function enviarFormulario() {
+      // Aquí puedes realizar la lógica para enviar el formulario
+      // Por ejemplo, puedes mostrar un mensaje de éxito y reiniciar el formulario
+
+      // Mostrar la ventana emergente de éxito
+      var successModal = document.getElementById('success-modal');
+      var modal = new bootstrap.Modal(successModal);
+      modal.show();
+
+      // Reiniciar el formulario
+      form.reset();
+  }
+});
 
 
 //VALIDACIONES PARA EL LOGIN MUAJAJJA //
