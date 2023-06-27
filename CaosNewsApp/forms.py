@@ -1,5 +1,6 @@
 from django import forms
-from django.core.validators import EmailValidator, RegexValidator
+from django.core.validators import EmailValidator
+from django.forms import ValidationError
 from .models import Noticia
 
 class NoticiaForm(forms.ModelForm):
@@ -10,7 +11,6 @@ class NoticiaForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(label='Nombre de usuario', max_length=100)
     password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
-
 
 class RegisterForm(forms.Form):
     first_name = forms.CharField(label='Nombre', max_length=100)

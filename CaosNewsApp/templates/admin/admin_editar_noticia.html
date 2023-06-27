@@ -1,5 +1,6 @@
 {% extends 'admin/admin.html' %}
 {% load static %}
+
 {% block body %}
 <div class="col py-3">
   <div class="row px-4">
@@ -7,10 +8,41 @@
       <h2>Editar Noticia</h2>
     </div>
     <div class="col-12">
-      <form method="POST" action="{% url 'admin_guardar_noticia' noticia_id %}">
+      <form method="POST" action="{% url 'admin_editar_noticia' noticia_id %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <input type="hidden" id="id_usuario" name="id_usuario" value="{{ form.id_usuario.value }}">
+        <div class="mb-3">
+          <label for="id_titulo_noticia" class="form-label">Título de la noticia:</label>
+          <input type="text" id="id_titulo_noticia" name="titulo_noticia" value="{{ form.titulo_noticia.value }}" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="id_cuerpo_noticia" class="form-label">Cuerpo de la noticia:</label>
+          <textarea id="id_cuerpo_noticia" name="cuerpo_noticia" class="form-control" required>{{ form.cuerpo_noticia.value }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="id_categoria" class="form-label">Categoría:</label>
+          <select id="id_categoria" name="id_categoria" class="form-select" required>
+            {% for categoria in categorias %}
+              <option value="{{ categoria.id_categoria }}" {% if categoria.id_categoria == form.id_categoria.value %}selected{% endif %}>{{ categoria.nombre_categoria }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="id_activo" class="form-label">Activo:</label>
+          <input type="checkbox" id="id_activo" name="activo" class="form-check-input" {% if form.activo.value %}checked{% endif %}>
+        </div>
+        <div class="mb-3">
+          <label for="imagen" class="form-label">Nueva imagen:</label>
+          <input type="file" id="imagen" name="imagen" class="form-control">
+        </div>
+        {% if form.imagen.value %}
+        <div class="mb-3">
+          <label>Imagen actual:</label>
+          <br>
+          <img src="{% get_media_prefix %}{{ form.imagen.value }}" alt="Imagen actual" width="300" class="img-fluid">
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
       </form>
     </div>
   </div>

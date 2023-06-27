@@ -1,18 +1,84 @@
 {% extends 'admin/admin.html' %}
 {% load static %}
+
 {% block body %}
 <div class="col py-3">
   <div class="row px-4">
-    <div class="col-12">
+    <div class="col-md-8">
       <h2>Crear Noticia</h2>
-    </div>
-    <div class="col-12">
-      <form method="POST" action="{% url 'admin_guardar_noticia' %}">
+      <form method="POST" action="{% url 'admin_crear_noticia' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar</button>
-      </form>
+        <input type="hidden" id="id_usuario" name="id_usuario" value="{{ request.user.id }}">
+        <div class="row">
+          <div class="col-3">
+            <div class="mb-3">
+              <label for="titulo_noticia" class="form-label">Titulo noticia:</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <input type="text" id="titulo_noticia" name="titulo_noticia" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <div class="mb-3">
+              <label for="cuerpo_noticia" class="form-label">Cuerpo noticia:</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <textarea id="cuerpo_noticia" name="cuerpo_noticia" class="form-control" required  rows="8"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <div class="mb-3">
+              <label for="id_categoria" class="form-label">Categoria:</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <select id="id_categoria" name="id_categoria" class="form-select" required>
+                <option value="" selected disabled>Selecciona una categoría</option>
+                {% for categoria in categorias %}
+                  <option value="{{ categoria.id_categoria }}">{{ categoria.nombre_categoria }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <div class="mb-3">
+              <label for="id_activo" class="form-label">Activo:</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <input type="checkbox" id="id_activo" name="activo" class="form-check-input" checked>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-3">
+            <div class="mb-3">
+              <label for="id_imagen" class="form-label">Imagen:</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <input type="file" id="id_imagen" name="imagen" class="form-control">
+            </div>
+          </div>
+        </div>
     </div>
+    <div class="col-8 text-center">
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+    </form>
   </div>
 </div>
 {% endblock %}

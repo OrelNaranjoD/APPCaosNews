@@ -7,12 +7,15 @@
       <h2>Lista de Noticias</h2>
     </div>
     <div class="col-12 table-responsive">
+      
+
       <table class="table table-striped">
         <thead>
           <tr>
             <th scope="col" class="w-date">Fecha</th>
             <th scope="col">Título</th>
             <th scope="col" class="text-center">Categoría</th>
+            <th scope="col" class="text-center">Imagen</th>
             <th scope="col" class="w-action text-center">Acciones</th>
           </tr>
         </thead>
@@ -23,8 +26,33 @@
             <td>{{ noticia.titulo_noticia }}</td>
             <td class="text-center">{{ noticia.id_categoria }}</td>
             <td class="text-center">
+              {% if noticia.imagen %}
+              <img src="{{ noticia.imagen.url }}" alt="Imagen" width="50">
+              {% else %}
+              Sin imagen
+              {% endif %}
+            </td>
+            <td class="text-center">
               <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}"><i class="fa-solid fa-pen-to-square"></i></a>
-              <a class="table-link" href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}"><i class="fa-solid fa-trash"></i></a>
+              <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#confirmacionModal{{noticia.id_noticia}}"><i class="fa-solid fa-trash"></i></a>
+              <!-- Modal de Confirmación -->
+              <div class="modal fade" id="confirmacionModal{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="confirmacionModal{{noticia.id_noticia}}Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="confirmacionModal{{noticia.id_noticia}}Label">Confirmar Eliminación</h5>
+                    </div>
+                    <div class="modal-body">
+                      ¿Estás seguro de que deseas eliminar la noticia "{{ noticia.titulo_noticia }}"?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <a class="btn btn-danger" href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Fin Modal de Confirmación -->
             </td>
           </tr>
         {% endfor %}

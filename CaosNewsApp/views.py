@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
 from django.contrib import messages
-from .models import Noticia, Profile
-from django.contrib.auth import authenticate, login, logout
+from .models import Noticia, Profile, Categoria
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import NoticiaForm, LoginForm, RegisterForm
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-import requests
+import requests, sys
+from django.forms.models import model_to_dict
 
 
 
@@ -147,56 +148,48 @@ def admin_noticias(request):
     if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.all()
     else:
-        noticias = Noticia.objects.filter(id_usuario=request.user.id)
+        noticias = Noticia.objects.filter(id_usuario=request.user.id,delete=False)
     return render(request, 'admin/admin_noticias.html', {'noticias': noticias})
 
 def admin_crear_noticia(request):
+    categorias = Categoria.objects.all()
     if request.method == 'POST':
-        form = NoticiaForm(request.POST)
+        form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('admin/admin_noticias')
+            noticia = form.save(commit=False)
+            noticia.borrado = False
+            noticia.save()
+
+            return redirect('admin_noticias')
     else:
         form = NoticiaForm()
-    return render(request, 'admin/admin_crear_noticia.html', {'form': form})
+    return render(request, 'admin/admin_crear_noticia.html', {'form': form, 'categorias': categorias})
 
 def admin_editar_noticia(request, noticia_id):
-    noticia = Noticia.objects.get(id_noticia=noticia_id)
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    categorias = Categoria.objects.all()
     if request.method == 'POST':
-        form = NoticiaForm(request.POST, instance=noticia)
+        form = NoticiaForm(request.POST, request.FILES, instance=noticia)
         if form.is_valid():
             form.save()
-            return redirect('admin/admin_noticias')
+            print("Actualización exitosa")
+            return redirect('admin_noticias')
+        else:
+            print("Formulario no válido:", form.errors)
     else:
         form = NoticiaForm(instance=noticia)
-    return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id})
+    return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id, 'categorias': categorias})
 
 
 def admin_eliminar_noticia(request, noticia_id):
-    noticia = Noticia.objects.get(id_noticia=noticia_id)
-    noticia.delete()
-    return redirect('admin/admin_noticias')
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    noticia.delete = True
+    noticia.save()
+    return redirect('admin_noticias')
 
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
-
-def admin_guardar_noticia(request, noticia_id=None):
-    if noticia_id:
-        noticia = Noticia.objects.get(id=noticia_id)
-    else:
-        noticia = None
-
-    if request.method == 'POST':
-        form = NoticiaForm(request.POST, instance=noticia)
-        if form.is_valid():
-            form.save()
-            return redirect('admin/admin_noticia')
-    else:
-        form = NoticiaForm(instance=noticia)
-
-    context = {'form': form}
-    return render(request, 'admin/admin_editar_noticia.html', context)
 
 #Testing
 def test(request):
