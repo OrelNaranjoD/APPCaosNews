@@ -1,0 +1,17 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block body %}
+<div class="col py-3">
+    <div class="row px-4">
+        <div class="col-md-8">
+            <h2>Editar perfil</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

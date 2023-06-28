@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
 from django.contrib import messages
-from .models import Noticia, Profile, Categoria
+from .models import Noticia, Usuario, Categoria
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from .forms import NoticiaForm, LoginForm, RegisterForm
+from .forms import NoticiaForm, LoginForm, RegisterForm, UserProfileForm
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 import requests, sys
 from django.forms.models import model_to_dict
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -190,6 +191,23 @@ def admin_eliminar_noticia(request, noticia_id):
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
+
+@login_required
+def admin_edit_profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_perfil')
+    else:
+        form = UserProfileForm(instance=request.user)
+    
+    return render(request, 'admin/admin_edit_profile.html', {'form': form})
+
+@login_required
+def admin_view_profile(request):
+    return render(request, 'admin/admin_view_profile.html')
+
 
 #Testing
 def test(request):

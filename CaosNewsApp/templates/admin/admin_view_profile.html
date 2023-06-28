@@ -1,0 +1,24 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block body %}
+<div class="col py-3">
+    <div class="row px-4">
+        <div class="col-md-8">
+            <h2>Perfil del usuario</h2>
+            <p>Imagen: <img src="{{ request.user.profile.imagen.url }}" alt="Imagen de perfil"></p>
+            <p>Nombre de usuario: {{ request.user.username }}</p>
+            <p>Nombre: {{ request.user.first_name }}</p>
+            <p>Apellido: {{ request.user.last_name }}</p>
+            <p>Correo electrónico: {{ request.user.email }}</p>
+            <p>Perfiles:
+                {% for group in request.user.groups.all %}
+                    {{ group.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    Sin perfil
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

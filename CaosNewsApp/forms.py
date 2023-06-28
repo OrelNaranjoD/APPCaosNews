@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.forms import ValidationError
-from .models import Noticia
+from .models import Noticia, Usuario
 
 class NoticiaForm(forms.ModelForm):
     class Meta:
@@ -29,3 +29,9 @@ class RegisterForm(forms.Form):
             raise forms.ValidationError('Las contraseñas no coinciden.')
 
         return cleaned_data
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = '__all__'
+        

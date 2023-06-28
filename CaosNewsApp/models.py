@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from datetime import datetime
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -42,7 +42,7 @@ class Categoria(models.Model):
         return str(self.nombre_categoria)
 
 
-class Profile(models.Model):
+class Usuario(AbstractUser):
     ROLES = (
         ('administrador', 'Administrador'),
         ('editor', 'Editor'),
@@ -50,12 +50,12 @@ class Profile(models.Model):
         ('lector', 'Lector'),
     )
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     role = models.CharField(max_length=15, choices=ROLES, default='lector')
 
     def __str__(self):
-        return self.user.username
+        return self.username
 
     class Meta:
-        verbose_name = 'Perfil'
-        verbose_name_plural = 'Perfiles'
+        swappable = 'AUTH_USER_MODEL'
+        verbose_name = 'Usuario'
+        verbose_name_plural = 'Usuarios'
