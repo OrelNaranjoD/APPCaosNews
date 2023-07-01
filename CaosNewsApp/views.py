@@ -29,9 +29,9 @@ def index(request):
 
 def noticias(request, categoria):
     if categoria == 'Ultima Hora':
-        noticias = Noticia.objects.filter(delete=False, activo=True).order_by('-fecha_creacion')[:10]
+        noticias = Noticia.objects.filter(eliminado=False, activo=True).order_by('-fecha_creacion')[:10]
     else:
-        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, delete=False, activo=True).order_by('-fecha_creacion')
+        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False, activo=True).order_by('-fecha_creacion')
     context = {"noticias": noticias, "categoria": categoria}
     return render(request, 'noticia.html', context)
 
@@ -73,8 +73,9 @@ def obtener_tiempo_chile():
     return resultados
 
 def home(request):
+    noticias = Noticia.objects.filter(eliminado=False, activo=True).order_by('-fecha_creacion')[:3]
     resultados_tiempo_chile = obtener_tiempo_chile()
-    context = {'resultados_tiempo_chile': resultados_tiempo_chile}  
+    context = {"noticias": noticias,'resultados_tiempo_chile': resultados_tiempo_chile}  
     return render(request, 'home.html', context)
 
 def contacto(request):
