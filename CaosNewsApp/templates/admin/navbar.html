@@ -11,8 +11,10 @@
           <img class="image-fluid user-pic" src="{% static 'images/perfil.png' %}" alt="perfil">
         </li>
         <li class="nav-item text-center">
+          <a class="nav-link py-0" href="{% url 'admin_perfil' %}">
+            {{ user.username }}
+          </a>
           <a class="nav-link" href="{% url 'admin_perfil' %}">
-            <i class="fa-solid fa-user-pen fa-2xs icon-spacer"></i>
             {{ user.first_name }} {{ user.last_name }}
           </a>
         </li>
@@ -35,6 +37,11 @@
             <li class="nav-item">
               <a href="{% url 'admin_noticias' %}" class="nav-link">
                 <i class="fa-solid fa-list icon-spacer"></i>Lista
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'admin_noticias_borradores' %}" class="nav-link">
+                <i class="fa-solid fa-list icon-spacer"></i>Borradores
               </a>
             </li>
           </ul>

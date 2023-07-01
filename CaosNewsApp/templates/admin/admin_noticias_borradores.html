@@ -4,7 +4,7 @@
 <div class="col py-3">
   <div class="row px-4">
     <div class="col-12">
-      <h2>Lista de Noticias</h2>
+      <h2>Lista de Noticias Eliminadas o Desactivadas</h2>
     </div>
     <div class="col-12 table-responsive">
       
@@ -35,9 +35,9 @@
             <td class="text-center">
               <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}"><i class="fa-solid fa-pen-to-square"></i></a>
               {% if noticia.eliminado %}
-                <i class="fa-solid fa-trash text-danger"></i>
+              <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#confirmacionModal{{noticia.id_noticia}}"><i class="fa-solid fa-trash text-danger"></i></a>
                 {% else %}
-                <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#confirmacionModal{{noticia.id_noticia}}"><i class="fa-solid fa-trash"></i></a>
+                <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#confirmacionModal1{{noticia.id_noticia}}"><i class="fa-solid fa-trash"></i></a>
               {% endif %}
               <!-- Modal de Confirmación -->
               <div class="modal fade" id="confirmacionModal{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="confirmacionModal{{noticia.id_noticia}}Label" aria-hidden="true">
@@ -45,6 +45,24 @@
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="confirmacionModal{{noticia.id_noticia}}Label">Confirmar Eliminación</h5>
+                    </div>
+                    <div class="modal-body">
+                      ¿Estás seguro de que deseas eliminar la noticia "{{ noticia.titulo_noticia }}" esta acción no se podra recuperar?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <a class="btn btn-danger" href="{% url 'admin_delete_noticia' noticia.id_noticia %}">Eliminar</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Fin Modal de Confirmación -->
+              <!-- Modal de Confirmación1 -->
+              <div class="modal fade" id="confirmacionModal1{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="confirmacionModal1{{noticia.id_noticia}}Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="confirmacionModal1{{noticia.id_noticia}}Label">Confirmar Eliminación</h5>
                     </div>
                     <div class="modal-body">
                       ¿Estás seguro de que deseas eliminar la noticia "{{ noticia.titulo_noticia }}"?

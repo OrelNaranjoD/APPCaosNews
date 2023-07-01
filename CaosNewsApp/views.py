@@ -10,22 +10,29 @@ from django.contrib.auth.models import User
 import requests, sys
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
-
+import os
+from django.contrib.auth.models import Group
 
 
 
 def index(request):
-    noticias = Noticia.objects.raw('SELECT * FROM CaosNewsAPP_Noticia')
-    print(noticias)
-    context={"noticias":noticias}
+    noticias = Noticia.objects.all()
+    if request.user.is_authenticated:
+        is_lector = request.user.groups.filter(name='Lector').exists()
+    else:
+        is_lector = False
+    context = {
+        'noticias': noticias,
+        'is_lector': is_lector,
+    }
     return render(request, 'index.html', context)
 
 def noticias(request, categoria):
     if categoria == 'Ultima Hora':
-        noticias = Noticia.objects.order_by('-fecha_creacion')[:10]
+        noticias = Noticia.objects.filter(delete=False, activo=True).order_by('-fecha_creacion')[:10]
     else:
-        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria).order_by('-fecha_creacion')
-    context={"noticias":noticias, "categoria": categoria}
+        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, delete=False, activo=True).order_by('-fecha_creacion')
+    context = {"noticias": noticias, "categoria": categoria}
     return render(request, 'noticia.html', context)
 
 def mostrar_noticia(request, noticia_id):
@@ -99,14 +106,12 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            # Obtener los datos del formulario
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
-
-            # Validar los campos individualmente
+            
             errors = {}
             if User.objects.filter(username=username).exists():
                 errors['username_error'] = True
@@ -114,21 +119,15 @@ def register(request):
                 errors['password_error'] = True
 
             if errors:
-                # Hay errores, enviar la respuesta JSON con los errores
                 return JsonResponse({'valid': False, **errors})
             else:
-                # No hay errores, crear el usuario y guardarlo en la base de datos
                 user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, email=email, )
                 user.save()
-                
-                # Crear el perfil del usuario y guardarlo
+        
                 profile = Profile(user=user, role='lector')
                 profile.save()
-
-                # Enviar la respuesta JSON indicando que el registro fue exitoso
                 return redirect('home')
         else:
-            # El formulario no es válido, enviar la respuesta JSON con los errores del formulario
             form_errors = form.errors.as_json()
             return JsonResponse({'valid': False, 'form_errors': form_errors})
     else:
@@ -147,10 +146,21 @@ def admin_home(request):
 
 def admin_noticias(request):
     if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
-        noticias = Noticia.objects.all()
+        noticias = Noticia.objects.filter(eliminado=False, activo=True)
+        is_admin = True
     else:
-        noticias = Noticia.objects.filter(id_usuario=request.user.id,delete=False)
-    return render(request, 'admin/admin_noticias.html', {'noticias': noticias})
+        is_admin = False
+        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, activo=True)
+    return render(request, 'admin/admin_noticias.html', {'noticias': noticias, 'is_admin': is_admin})
+
+def admin_noticias_borradores(request):
+    if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.filter(eliminado=True) | Noticia.objects.filter(activo=False)
+        is_admin = True 
+    else:
+        is_admin = False
+        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=True) | Noticia.objects.filter(id_usuario=request.user.id, activo=False)
+    return render(request, 'admin/admin_noticias_borradores.html', {'noticias': noticias, 'is_admin': is_admin})
 
 def admin_crear_noticia(request):
     categorias = Categoria.objects.all()
@@ -158,8 +168,15 @@ def admin_crear_noticia(request):
         form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
             noticia = form.save(commit=False)
-            noticia.borrado = False
+            noticia.id_usuario = request.user  
             noticia.save()
+            
+            imagen = request.FILES.get('imagen')
+            if imagen:
+                extension = os.path.splitext(imagen.name)[-1]
+                nombre_archivo = f'{noticia.id_noticia}{extension}'
+                noticia.imagen.name = f'news/{nombre_archivo}'
+                noticia.save()
 
             return redirect('admin_noticias')
     else:
@@ -181,12 +198,16 @@ def admin_editar_noticia(request, noticia_id):
         form = NoticiaForm(instance=noticia)
     return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id, 'categorias': categorias})
 
-
 def admin_eliminar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
-    noticia.delete = True
+    noticia.eliminado = True
     noticia.save()
     return redirect('admin_noticias')
+
+def admin_delete_noticia(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    noticia.delete()
+    return redirect('admin_noticias_borradores')
 
 def admin_categoria(request):
     noticias = Noticia.objects.all()
@@ -207,7 +228,6 @@ def admin_edit_profile(request):
 @login_required
 def admin_view_profile(request):
     return render(request, 'admin/admin_view_profile.html')
-
 
 #Testing
 def test(request):

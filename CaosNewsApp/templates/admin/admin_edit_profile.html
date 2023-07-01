@@ -5,12 +5,48 @@
 <div class="col py-3">
     <div class="row px-4">
         <div class="col-md-8">
-            <h2>Editar perfil</h2>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Guardar cambios</button>
-            </form>
+            <h2>Editar perfil del usuario</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{% url 'admin_editar_perfil' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ request.user.username }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ request.user.first_name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ request.user.last_name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ request.user.email }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </form>
+                </div>
+            </div>
+            {% comment %} <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Cambiar contraseña</h5>
+                    <form method="post" action="{% url 'admin_guardar_perfil' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="new_password1" class="form-label">Nueva contraseña</label>
+                            <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password2" class="form-label">Confirmar nueva contraseña</label>
+                            <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+                    </form>
+                </div>
+            </div> {% endcomment %}
         </div>
     </div>
 </div>

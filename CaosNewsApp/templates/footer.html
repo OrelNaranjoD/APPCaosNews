@@ -3,31 +3,31 @@
     <div class="row">
       <div class="col-6 col-md-2">
         <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Ultimas Noticias</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Actualidad</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Sociedad</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Politica</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Entretenimiento</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Ultima Hora' %}" class="nav-link p-0 text-muted">Ultimas Noticias</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Actualidad' %}" class="nav-link p-0 text-muted">Actualidad</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Sociedad' %}" class="nav-link p-0 text-muted">Sociedad</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Politica' %}" class="nav-link p-0 text-muted">Politica</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Entretenimiento' %}" class="nav-link p-0 text-muted">Entretenimiento</a></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2">
         <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Economia</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Deportes</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Mundo</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Nacional</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Cultura</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Economia' %}" class="nav-link p-0 text-muted">Economia</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Deporte' %}" class="nav-link p-0 text-muted">Deportes</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Mundo' %}" class="nav-link p-0 text-muted">Mundo</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Nacional' %}" class="nav-link p-0 text-muted">Nacional</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Cultura' %}" class="nav-link p-0 text-muted">Cultura</a></li>
         </ul>
       </div>
 
       <div class="col-6 col-md-2">
         <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Arte</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Vida</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Cine</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Tecnología</a></li>
-          <li class="nav-item pb-2"><a href="#" class="nav-link p-0 text-muted">Contacto</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Arte' %}" class="nav-link p-0 text-muted">Arte</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Vida' %}" class="nav-link p-0 text-muted">Vida</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Cine' %}" class="nav-link p-0 text-muted">Cine</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Tecnología' %}" class="nav-link p-0 text-muted">Tecnología</a></li>
+          <li class="nav-item pb-2"><a href="{% url 'contacto' %}" class="nav-link p-0 text-muted">Contacto</a></li>
         </ul>
       </div>
 

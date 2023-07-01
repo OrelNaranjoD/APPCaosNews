@@ -34,41 +34,46 @@
       </div>
       <div class="container">
         <div class="row">
-          <div class="col-md-9">
+          <div class="col-9">
             <!-- Contenido principal -->
           </div>
-          <div class="col-md-3">
-            <h2>Temperatura Actual</h2>
-            <div class="row">
-              {% for resultado in resultados_tiempo_chile %}
-                <div class="col-12 mb-4">
+          <div class="col-3 d-none d-lg-block">
+            <div class="weather-main border-secondary p-3 m-2">
+              <div class="row">
+                <h2 class="text-center">Tiempo Hoy</h2>
+              </div>
+              <div class="row row-cols-1">
+                {% for resultado in resultados_tiempo_chile %}
+                <div class="col mb-3">
                   <div class="card weather">
                     <div class="card-body">
-                      <h4 class="card-title">{{ resultado.ciudad|capfirst }}</h4>
-                      <div class="row d-flex align-items-center">
-                        <div class="col-7">
-                          <div class="row">
-                            <img src="https://openweathermap.org/img/wn/{{ resultado.icono }}@2x.png" alt=""
-                            class="weather-icon">
-                          </div>
-                          <div class="row ">
-                            <h5 class="text-center" >{{ resultado.tiempo|capfirst }}</h5>
-                          </div>
-                        </div>
-                        <div class="col-5">
-                          <h3 class="card-text text-center text-wrap"><span>{{ resultado.temperatura|floatformat:1 }}  °C</span></h3>
-                        </div>
-                      </div>
-                      <div class="row pt-2">
-                        <p class="card-text text-sm">Temperatura minima: {{ resultado.temperatura_min|floatformat:1 }}  °C</p>
-                      </div>
+                      <h6 class="card-title mb-0">{{ resultado.ciudad|capfirst }}</h6>
+                      <hr class="my-2">
                       <div class="row">
-                        <p class="card-text text-sm">Temperatura maxima: {{ resultado.temperatura_max|floatformat:1 }}  °C</p>
+                        <p class="text-center text-sm text-break">{{ resultado.tiempo|capfirst }}</p>
+                      </div>
+                      <div class="row align-items-center">
+                        <div class="col">
+                          <div class="row text-center">
+                            <img src="https://openweathermap.org/img/wn/{{ resultado.icono }}@2x.png" alt=""
+                              class="weather-icon">
+                          </div>
+                        </div>
+                        <div class="col">
+                          <h4 class="card-text text-center text-nowrap mb-2">{{ resultado.temperatura|floatformat:1 }} °C</h4>
+                          <div class="row">
+                            <div class="col-12">
+                              <p class="card-text small-txt text-nowrap"><i class="fa-solid fa-temperature-low pe-2"></i>{{ resultado.temperatura_min|floatformat:1 }} °C</p>
+                              <p class="card-text small-txt text-nowrap"><i class="fa-solid fa-temperature-high pe-2"></i>{{ resultado.temperatura_max|floatformat:1 }} °C</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              {% endfor %}
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>

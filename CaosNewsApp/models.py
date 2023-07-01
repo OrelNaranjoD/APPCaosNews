@@ -5,6 +5,9 @@ from django.contrib.auth.models import AbstractUser, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 class Noticia(models.Model):
     id_noticia = models.AutoField(db_column='id_noticia', primary_key=True)
@@ -21,18 +24,21 @@ class Noticia(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='id_usuario')
-    delete = models.BooleanField(("Borrado"), default=False)
+    eliminado = models.BooleanField(("Borrado"), default=False)
     
     def __str__(self):
         return self.titulo_noticia
 
-
 @receiver(post_save, sender=Noticia)
 def generate_image_filename(sender, instance, created, **kwargs):
-    if created:
-        instance.imagen.name = f"news/{instance.id_noticia}.{instance.imagen.name.split('.')[-1]}"
+    if created and instance.imagen:
+        current_path = instance.imagen.path
+        extension = os.path.splitext(current_path)[-1]
+        new_filename = f"{instance.id_noticia}{extension}"
+        new_path = os.path.join(os.path.dirname(current_path), new_filename)
+        os.rename(current_path, new_path)
+        instance.imagen.name = f"news/{new_filename}"
         instance.save()
-
 
 class Categoria(models.Model):
     id_categoria = models.AutoField(db_column='id_categoria', primary_key=True)

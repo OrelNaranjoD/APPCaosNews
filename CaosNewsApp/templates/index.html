@@ -29,7 +29,11 @@
           <div class="col text-end">
             {% if user.is_authenticated %}
               <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
-              <a href="{% url 'admin_home' %}" class="link">Panel de control</a> |
+              {% for group in request.user.groups.all %}
+                {% if not group.name == 'Lector' %}
+                  <a href="{% url 'admin_home' %}" class="link">Panel de control</a>
+                {% endif %}
+              {% endfor%}
               <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
             {% else %}
               <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>

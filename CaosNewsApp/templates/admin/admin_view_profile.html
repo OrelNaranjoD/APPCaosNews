@@ -6,18 +6,22 @@
     <div class="row px-4">
         <div class="col-md-8">
             <h2>Perfil del usuario</h2>
-            <p>Imagen: <img src="{{ request.user.profile.imagen.url }}" alt="Imagen de perfil"></p>
-            <p>Nombre de usuario: {{ request.user.username }}</p>
-            <p>Nombre: {{ request.user.first_name }}</p>
-            <p>Apellido: {{ request.user.last_name }}</p>
-            <p>Correo electrónico: {{ request.user.email }}</p>
-            <p>Perfiles:
-                {% for group in request.user.groups.all %}
-                    {{ group.name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    Sin perfil
-                {% endfor %}
-            </p>
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text"><strong>Nombre de usuario:</strong> {{ request.user.username }}</p>
+                    <p class="card-text"><strong>Nombre:</strong> {{ request.user.first_name }}</p>
+                    <p class="card-text"><strong>Apellido:</strong> {{ request.user.last_name }}</p>
+                    <p class="card-text"><strong>Correo electrónico:</strong> {{ request.user.email }}</p>
+                    <p class="card-text"><strong>Privilegio:</strong>
+                        {% for group in request.user.groups.all %}
+                            <span class="badge bg-secondary">{{ group.name }}</span>{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <span class="badge bg-secondary">Sin perfil</span>
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+            <a href="{% url 'admin_editar_perfil' %}" class="btn btn-primary mt-2"><i class="fa-solid fa-user-pen fa-2xs icon-spacer"></i>Editar perfil</a>
         </div>
     </div>
 </div>

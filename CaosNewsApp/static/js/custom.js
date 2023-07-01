@@ -23,11 +23,11 @@ $(document).ready(function() {
           var successMessage = $('<div id="successAlert" class="alert alert-success text-center">Inicio de sesión exitoso.</div>');
           errorContainer.html(successMessage);
           setTimeout(function() {
-            successMessage.fadeOut(500, function() {
+            successMessage.fadeOut(300, function() {
               $(this).remove();
               window.location.href = '/';
             });
-          }, 2000);
+          }, 500);
         } else {
           if (data.username_error) {
             var errorMessage = $('<div class="alert alert-danger text-center">El usuario no existe o la contraseña es incorrecta.</div>');
@@ -38,10 +38,10 @@ $(document).ready(function() {
           }
 
           setTimeout(function() {
-            errorMessage.fadeOut(500, function() {
+            errorMessage.fadeOut(300, function() {
               $(this).remove();
             });
-          }, 5000);
+          }, 500);
         }
       },
       error: function(xhr, textStatus, error) {
@@ -155,8 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Función para enviar el formulario
   function enviarFormulario() {
-      // Aquí puedes realizar la lógica para enviar el formulario
-      // Por ejemplo, puedes mostrar un mensaje de éxito y reiniciar el formulario
+
 
       // Mostrar la ventana emergente de éxito
       var successModal = document.getElementById('success-modal');
