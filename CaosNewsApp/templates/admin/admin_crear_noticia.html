@@ -9,10 +9,11 @@
       <form method="POST" action="{% url 'admin_crear_noticia' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" id="id_usuario" name="id_usuario" value="{{ request.user.id }}">
+        <input type="hidden" id="activo" name="activo" class="form-check-input">
         <div class="row">
           <div class="col-3">
             <div class="mb-3">
-              <label for="titulo_noticia" class="form-label">Titulo noticia:</label>
+              <label for="titulo_noticia" class="form-label">Título de la Noticia:</label>
             </div>
           </div>
           <div class="col">
@@ -24,19 +25,19 @@
         <div class="row">
           <div class="col-3">
             <div class="mb-3">
-              <label for="cuerpo_noticia" class="form-label">Cuerpo noticia:</label>
+              <label for="cuerpo_noticia" class="form-label">Cuerpo de la Noticia:</label>
             </div>
           </div>
           <div class="col">
             <div class="mb-3">
-              <textarea id="cuerpo_noticia" name="cuerpo_noticia" class="form-control" required  rows="8"></textarea>
+              <textarea id="cuerpo_noticia" name="cuerpo_noticia" class="form-control" required rows="8"></textarea>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-3">
             <div class="mb-3">
-              <label for="id_categoria" class="form-label">Categoria:</label>
+              <label for="id_categoria" class="form-label">Categoría:</label>
             </div>
           </div>
           <div class="col">
@@ -53,24 +54,29 @@
         <div class="row">
           <div class="col-3">
             <div class="mb-3">
-              <label for="id_activo" class="form-label">Activo:</label>
+              <label for="id_pais" class="form-label">País:</label>
             </div>
           </div>
           <div class="col">
             <div class="mb-3">
-              <input type="checkbox" id="id_activo" name="activo" class="form-check-input" checked>
+              <select id="id_pais" name="id_pais" class="form-select">
+                <option value="" selected disabled>Seleccione un país</option>
+                {% for pais in paises %}
+                  <option value="{{ pais.id_pais }}">{{ pais.pais }}</option>
+                {% endfor %}
+              </select>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-3">
             <div class="mb-3">
-              <label for="imagen" class="form-label">Imagen:</label>
+              <label for="imagenes" class="form-label">Imágenes:</label>
             </div>
           </div>
           <div class="col">
             <div class="mb-3">
-              <input type="file" id="imagen" name="imagen" class="form-control">
+              <input type="file" id="imagenes" name="imagenes" class="form-control" multiple>
             </div>
           </div>
         </div>
@@ -80,6 +86,7 @@
           </div>
         </div>
       </form>
+    </div>
   </div>
 </div>
 {% endblock %}
