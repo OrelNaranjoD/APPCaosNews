@@ -148,39 +148,34 @@ def login_view(request):
 
     return JsonResponse({'valid': False, 'error_message': 'Método de solicitud no válido.'})
 
-
-def register(request):
+def register_view(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            email = form.cleaned_data['email']
-            
-            errors = {}
-            if User.objects.filter(username=username).exists():
-                errors['username_error'] = True
-            if len(password) < 6:
-                errors['password_error'] = True
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
 
-            if errors:
-                return JsonResponse({'valid': False, **errors})
-            else:
-                user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, email=email, )
-                user.save()
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'valid': False, 'error_message': 'El nombre de usuario ya está en uso.'})
+
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'valid': False, 'error_message': 'El correo electrónico ya está registrado.'})
+
+        if password != confirm_password:
+            return JsonResponse({'valid': False, 'error_message': 'Las contraseñas no coinciden.'})
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
         
-                profile = Profile(user=user, role='lector')
-                profile.save()
-                return redirect('home')
-        else:
-            form_errors = form.errors.as_json()
-            return JsonResponse({'valid': False, 'form_errors': form_errors})
-    else:
-        form = RegisterForm()
-    
-    return render(request, 'index.html', {'form': form})
+        login(request, user)
+
+        return JsonResponse({'valid': True, 'success_message': 'Registro exitoso. Inicie sesión para continuar.'})
+
+    return JsonResponse({'valid': False, 'error_message': 'Método de solicitud no válido.'})
 
 def logout_view(request):
     logout(request)

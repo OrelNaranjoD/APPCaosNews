@@ -20,7 +20,7 @@ $(document).ready(function() {
                   var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>');
                   errorContainer.html(successMessage);
                   setTimeout(function() {
-                      successMessage.fadeOut(200, function() {
+                      successMessage.fadeOut(300, function() {
                           $(this).remove();
                           window.location.href = '/';
                       });
@@ -34,6 +34,50 @@ $(document).ready(function() {
           },
           error: function(xhr, textStatus, error) {
               var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
+              errorContainer.html(errorMessage);
+          }
+      });
+  });
+});
+
+$(document).ready(function() {
+  /* ********* Mensajes Registro de usuario ********* */
+  $('#registerForm').on('submit', function(event) {
+      event.preventDefault();
+      var form = $(this);
+      var errorContainer = $('#registerErrorContainer');
+      var usernameError = $('#regUsernameError');
+      var emailError = $('#regEmailError');
+      var passwordError = $('#regPasswordError');
+
+      errorContainer.empty();
+      usernameError.empty();
+      emailError.empty();
+      passwordError.empty();
+
+      $.ajax({
+          url: form.attr('action'),
+          method: 'POST',
+          data: form.serialize(),
+          success: function(data) {
+              if (data.valid) {
+                  var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>');
+                  errorContainer.html(successMessage);
+                  setTimeout(function() {
+                      successMessage.fadeOut(300, function() {
+                          $(this).remove();
+                          window.location.href = '/';
+                      });
+                  }, 500);
+              } else {
+                  if (data.error_message) {
+                      var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>');
+                      errorContainer.html(errorMessage);
+                  }
+              }
+          },
+          error: function(xhr, textStatus, error) {
+              var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el registro. Inténtalo de nuevo más tarde.</div>');
               errorContainer.html(errorMessage);
           }
       });
