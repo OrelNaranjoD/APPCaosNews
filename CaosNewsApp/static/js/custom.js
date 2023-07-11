@@ -1,56 +1,44 @@
 $(document).ready(function() {
-  // Validador del formulario de inicio de sesión
+  /* ********* Mensajes Inicio de sesión ********* */
   $('#loginForm').on('submit', function(event) {
-    event.preventDefault();
-    var username = $('#id_username').val();
-    var password = $('#id_password').val();
-    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-    var errorContainer = $('#errorContainer');
-    
-    // Vaciar el contenido anterior del contenedor de mensajes de error
-    errorContainer.empty();
-    
-    $.ajax({
-      url: '/login/',
-      method: 'POST',
-      data: {
-        'username': username,
-        'password': password,
-        'csrfmiddlewaretoken': csrfToken
-      },
-      success: function(data) {
-        if (data.valid) {
-          var successMessage = $('<div id="successAlert" class="alert alert-success text-center">Inicio de sesión exitoso.</div>');
-          errorContainer.html(successMessage);
-          setTimeout(function() {
-            successMessage.fadeOut(300, function() {
-              $(this).remove();
-              window.location.href = '/';
-            });
-          }, 500);
-        } else {
-          if (data.username_error) {
-            var errorMessage = $('<div class="alert alert-danger text-center">El usuario no existe o la contraseña es incorrecta.</div>');
-            errorContainer.html(errorMessage);
-          } else {
-            var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
-            errorContainer.html(errorMessage);
-          }
+      event.preventDefault();
+      var form = $(this);
+      var errorContainer = $('#errorContainer');
+      var emailError = $('#emailError');
+      var passwordError = $('#passwordError');
 
-          setTimeout(function() {
-            errorMessage.fadeOut(300, function() {
-              $(this).remove();
-            });
-          }, 500);
-        }
-      },
-      error: function(xhr, textStatus, error) {
-        errorContainer.html('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
-      }
-    });
+      errorContainer.empty();
+      emailError.empty();
+      passwordError.empty();
+
+      $.ajax({
+          url: form.attr('action'),
+          method: 'POST',
+          data: form.serialize(),
+          success: function(data) {
+              if (data.valid) {
+                  var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>');
+                  errorContainer.html(successMessage);
+                  setTimeout(function() {
+                      successMessage.fadeOut(200, function() {
+                          $(this).remove();
+                          window.location.href = '/';
+                      });
+                  }, 500);
+              } else {
+                  if (data.error_message) {
+                      var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>');
+                      errorContainer.html(errorMessage);
+                  }
+              }
+          },
+          error: function(xhr, textStatus, error) {
+              var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>');
+              errorContainer.html(errorMessage);
+          }
+      });
   });
 });
-
 
 
 /* ********* Obtener fecha actual ********* */

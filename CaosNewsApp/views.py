@@ -11,7 +11,7 @@ import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.db import models
+from django.db.models import Q
 
 
 
@@ -107,11 +107,11 @@ def home(request):
 def busqueda(request):
     query = request.GET.get('q')
     noticias = Noticia.objects.filter(
-        models.Q(titulo_noticia__icontains=query) | 
-        models.Q(cuerpo_noticia__icontains=query) |
-        models.Q(id_usuario__first_name__icontains=query) |
-        models.Q(id_usuario__last_name__icontains=query) |
-        models.Q(id_categoria__nombre_categoria__icontains=query)
+        Q(titulo_noticia__icontains=query) | 
+        Q(cuerpo_noticia__icontains=query) |
+        Q(id_usuario__first_name__icontains=query) |
+        Q(id_usuario__last_name__icontains=query) |
+        Q(id_categoria__nombre_categoria__icontains=query)
     )
     context = {
         'query': query,
@@ -125,25 +125,29 @@ def contacto(request):
 def footer(request):
     return render(request, 'footer.html')
 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.http import JsonResponse
+
 def login_view(request):
     if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                user = None
-                return JsonResponse({'valid': False, 'email_error': True, 'password_error': False})
-            if user is not None and user.check_password(password):
-                # La contraseña es válida
+        identifier = request.POST.get('identifier')
+        password = request.POST.get('password')
+        if not identifier or not password:
+            return JsonResponse({'valid': False, 'error_message': 'Por favor, complete todos los campos.'})
+        user = User.objects.filter(Q(email=identifier) | Q(username=identifier)).first()
+        if user is not None:
+            if user.check_password(password):
                 login(request, user)
-                return JsonResponse({'valid': False, 'email_error': False, 'password_error': True})
-        
+                return JsonResponse({'valid': True, 'success_message': 'Inicio de sesión exitoso.'})
+            else:
+                return JsonResponse({'valid': False, 'error_message': 'Contraseña no válida.'})
         else:
-            return JsonResponse({'valid': False, 'email_error': False, 'password_error': False})
-    return JsonResponse({'valid': True})
+            return JsonResponse({'valid': False, 'error_message': 'Correo electrónico o usuario no válido.'})
+
+    return JsonResponse({'valid': False, 'error_message': 'Método de solicitud no válido.'})
+
 
 def register(request):
     if request.method == 'POST':
