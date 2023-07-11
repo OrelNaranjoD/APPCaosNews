@@ -40,9 +40,15 @@ body {
 .carousel-item {
     color: white;
 }
+
 .carousel-item a.no-link {
     text-decoration: none;
     color: inherit;
+}
+
+.carousel-item img {
+    max-height: 350px; 
+    width: auto;
 }
 
 @media (max-width: 768px) {

@@ -1,26 +1,51 @@
 {% extends './index.html' %}
 {% load static %}
 {% block body %}
-    <!-- ========== Cuerpo ========== -->
-    <main class="p-4 px-5">
-        <div class="row">
-          <div class="col">
-            <h2>{{ noticia.titulo_noticia }}</h2>
-          </div>
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+      <div class="carousel-indicators">
+        {% for imagen in imagenes %}
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
+      </div>
+      <div class="carousel-inner">
+        {% for imagen in imagenes %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <img src="{{ imagen.imagen.url }}" class="d-block w-100" alt="Imagen {{ forloop.counter }}">
         </div>
-        <div class="row">
-          <div class="col">
-            <h5> {{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor: {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}</h5>
-          </div>
-        </div>
-        <div class="row row-cols-1 row-cols-md-2 g-4 pt-3">
-          <div class="col-md-6 h-100">
-            <p class="w-100">{{ noticia.cuerpo_noticia }}</p>
-          </div>
-          <div class="col-md-1 h-100"></div>
-          <div class="col-md-5 h-100">
-            <img src="{{ noticia.imagen.url }}" class="img-fluid rounded" alt="{{ noticia.titulo_noticia }}">
-          </div>
-        </div>
-      </main>
+        {% endfor %}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col-md-1"></div>
+  <div class="col-md-10">
+    <h2>{{ noticia.titulo_noticia }}</h2>
+  </div>
+  <div class="col-md-1"></div>
+</div>
+<div class="row">
+  <div class="col-md-1"></div>
+  <div class="col-md-10">
+    <h5>{{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor: {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}{% if noticia.id_pais %} - Ubicación: {{ noticia.id_pais.pais }}{% endif %}</h5>
+  </div>
+  <div class="col-md-1"></div>
+</div>
+<div class="row row-cols-1 row-cols-md-2 g-4 pt-3">
+  <div class="col-md-1"></div>
+  <div class="col-md-10 h-100">
+    <p class="w-100">{{ noticia.cuerpo_noticia }}</p>
+  </div>
+  <div class="col-md-1"></div>
+</div>
 {% endblock %}

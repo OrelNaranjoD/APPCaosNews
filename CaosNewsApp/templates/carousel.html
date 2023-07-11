@@ -27,10 +27,15 @@
                 <div class="container" style="padding-bottom: 58px">
                     <div class="row align-items-center">
                         <div class="col-md-4 d-none d-md-flex justify-content-end">
-                            <div class="circle">
-                            <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo_noticia }}"
-                                class="img-fluid h-100">
-                            </div>
+                          <div class="circle">
+                            {% if noticia.imagenes.exists %}
+                              {% with imagen_destacada=noticia.imagenes.first %}
+                                <img src="{{ imagen_destacada.imagen.url }}" class="img-fluid h-100" alt="{{ noticia.titulo_noticia }}">
+                              {% endwith %}
+                            {% else %}
+                              <p>No hay imagen para esta noticia destacada.</p>
+                            {% endif %}
+                          </div>                          
                         </div>
                         <div class="col-md-7 pb-auto">
                             <h2 class="mb-4">{{ noticia.titulo_noticia }}</h2>

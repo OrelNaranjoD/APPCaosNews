@@ -5,7 +5,7 @@
       aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/"><i class="fa-solid fa-house"></i></a>
@@ -35,6 +35,10 @@
           <a class="nav-link" href="{% url 'contacto' %}">CONTACTO</a>
         </li>
       </ul>
+      <form class="d-flex" method="GET" action="{% url 'busqueda' %}">
+        <input class="form-control me-2" type="search" placeholder="Buscar noticia..." aria-label="Buscar" name="q" value="{{ request.GET.q }}">
+        <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-search"></i></button>
+      </form>
     </div>
   </div>
 </nav>

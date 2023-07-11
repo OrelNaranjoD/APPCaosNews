@@ -13,10 +13,12 @@
         <div class="col">
             <div class="card h-100">
                 <a href="{% url 'noticia_detalle' noticia.id_noticia %}">
-                    {% if noticia.imagen and noticia.imagen.url %}
-                        <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo_noticia }}">
+                    {% if noticia.imagenes.exists %}
+                        {% with imagen_noticia=noticia.imagenes.first %}
+                        <img src="{{ imagen_noticia.imagen.url }}" class="img-fluid rounded-top" alt="{{ noticia.titulo_noticia }}">
+                        {% endwith %}
                     {% else %}
-                        <p>No hay imagen disponible</p>
+                        <p>No hay imagen para esta noticia.</p>
                     {% endif %}
                 </a>
                 <div class="card-body">

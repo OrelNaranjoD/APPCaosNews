@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import loader
 from django.contrib import messages
-from .models import Noticia, Usuario, Categoria
+from .models import Noticia, Usuario, Categoria, ImagenNoticia, Pais
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import NoticiaForm, LoginForm, RegisterForm, UserProfileForm
 from django.http import JsonResponse
@@ -11,6 +11,7 @@ import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.db import models
 
 
 
@@ -31,16 +32,23 @@ def noticias(request, categoria):
         noticias = Noticia.objects.filter(eliminado=False, activo=True).order_by('-fecha_creacion')[:10]
     else:
         noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False, activo=True).order_by('-fecha_creacion')
-    context = {"noticias": noticias, "categoria": categoria}
+    context = {
+        "noticias": noticias,
+        "categoria": categoria
+    }
     return render(request, 'noticia.html', context)
 
 def mostrar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
-    return render(request, 'detalle_noticia.html', {'noticia': noticia})
+    imagenes = noticia.imagenes.all()
+    context = {
+        'noticia': noticia,
+        'imagenes': imagenes,
+    }
+    return render(request, 'detalle_noticia.html', context)
 
 # Diccionario para almacenar en caché los datos del clima
 cache_clima = {}
-
 def obtener_tiempo_chile():
     url = 'http://api.openweathermap.org/data/2.5/weather?'
     api_key = 'cda050505a9bfed7a75a0663acda7e5a'
@@ -82,13 +90,34 @@ def obtener_tiempo_chile():
 def home(request):
     noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True).order_by('-fecha_creacion')
     noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True).order_by('-fecha_creacion')[:3]
+
+    imagenes_destacadas = [noticia.imagenes.first() for noticia in noticias_destacadas]
+    imagenes_recientes = [noticia.imagenes.first() for noticia in noticias_recientes]
+
     resultados_tiempo_chile = obtener_tiempo_chile()
     context = {
         "noticias_destacadas": noticias_destacadas,
         "noticias_recientes": noticias_recientes,
-        "resultados_tiempo_chile": resultados_tiempo_chile
+        "resultados_tiempo_chile": resultados_tiempo_chile,
+        "imagenes_destacadas": imagenes_destacadas,
+        "imagenes_recientes": imagenes_recientes,
     }
     return render(request, 'home.html', context)
+
+def busqueda(request):
+    query = request.GET.get('q')
+    noticias = Noticia.objects.filter(
+        models.Q(titulo_noticia__icontains=query) | 
+        models.Q(cuerpo_noticia__icontains=query) |
+        models.Q(id_usuario__first_name__icontains=query) |
+        models.Q(id_usuario__last_name__icontains=query) |
+        models.Q(id_categoria__nombre_categoria__icontains=query)
+    )
+    context = {
+        'query': query,
+        'noticias': noticias
+    }
+    return render(request, 'busqueda.html', context)
 
 def contacto(request):
     return render(request, 'contacto.html')

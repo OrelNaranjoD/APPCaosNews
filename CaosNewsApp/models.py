@@ -9,19 +9,19 @@ import os
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
+def get_image_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    path = f"news/{instance.noticia.id_noticia}.{ext}"
+    return path
+
 class Noticia(models.Model):
     id_noticia = models.AutoField(db_column='id_noticia', primary_key=True)
     titulo_noticia = models.CharField(max_length=100, blank=False, null=False)
     cuerpo_noticia = models.TextField(blank=False, null=False, default='')
     id_categoria = models.ForeignKey('Categoria', on_delete=models.PROTECT, db_column='id_categoria')
+    id_pais = models.ForeignKey('Pais', on_delete=models.PROTECT, db_column='id_pais', null=True)
     activo = models.BooleanField(("Activo"), default=True)
     destacada = models.BooleanField(("Destacada"), default=False)
-    
-    def get_image_upload_path(instance, filename):
-        extension = filename.split('.')[-1]
-        return f"news/{instance.id_noticia}.{extension}"
-    
-    imagen = models.ImageField(upload_to=get_image_upload_path, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='id_usuario')
@@ -30,16 +30,20 @@ class Noticia(models.Model):
     def __str__(self):
         return self.titulo_noticia
 
-@receiver(post_save, sender=Noticia)
-def generate_image_filename(sender, instance, created, **kwargs):
-    if created and instance.imagen:
-        current_path = instance.imagen.path
-        extension = os.path.splitext(current_path)[-1]
-        new_filename = f"{instance.id_noticia}{extension}"
-        new_path = os.path.join(os.path.dirname(current_path), new_filename)
-        os.rename(current_path, new_path)
-        instance.imagen.name = f"news/{new_filename}"
-        instance.save()
+class ImagenNoticia(models.Model):
+    id_imagen = models.AutoField(db_column='id_imagen', primary_key=True)
+    noticia = models.ForeignKey(Noticia, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to=get_image_upload_path, null=True, blank=True)
+
+    def __str__(self):
+        return f'Imagen {self.id_imagen} - Noticia: {self.noticia.titulo_noticia}'
+
+class Pais(models.Model):
+    id_pais = models.AutoField(db_column='id_pais', primary_key=True)
+    pais = models.CharField(max_length=20, blank=True, null=False)
+    
+    def __str__(self):
+        return self.pais
 
 class Categoria(models.Model):
     id_categoria = models.AutoField(db_column='id_categoria', primary_key=True)

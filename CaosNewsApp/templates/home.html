@@ -15,7 +15,7 @@
                 </div>
                 <div class="row">
                   <div class="col">
-                    <p class="small-txt">{{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor:{{ noticia.destacada }} {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}</p>
+                    <p class="small-txt">{{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor: {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}</p>
                   </div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4 pt-3">
@@ -24,7 +24,13 @@
                   </div>
                   <div class="col-md-1 h-100"></div>
                   <div class="col-md-5 h-100">
-                    <img src="{{ noticia.imagen.url }}" class="img-fluid rounded" alt="{{ noticia.titulo_noticia }}">
+                    {% if noticia.imagenes.exists %}
+                      {% with imagen_reciente=noticia.imagenes.first %}
+                        <img src="{{ imagen_reciente.imagen.url }}" class="img-fluid rounded" alt="{{ noticia.titulo_noticia }}">
+                      {% endwith %}
+                    {% else %}
+                      <p>No hay imagen para esta noticia reciente.</p>
+                    {% endif %}
                   </div>
                 </div>
                 <hr>
