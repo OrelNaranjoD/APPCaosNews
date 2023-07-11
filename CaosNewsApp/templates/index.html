@@ -16,183 +16,58 @@
     <!-- ========== CSS Personalizado ========== -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
-<body onload="getFecha()">
+<body onload="getFecha()" class="d-flex flex-column min-vh-100">
+  <!-- ========== Header ========== -->
+  <header>
     <div class="container">
-            <!-- ========== Encabezado ========== -->
-    <header>
-        <div class="row mx-0 py-1 bg-dark">
+      <div class="row bg-dark py-2">
+        <div class="col">
+          <div class="text-start"><p class="text-light mb-0" id="current_date"></p></div>
+        </div>
+        <div class="col text-end">
+          {% if user.is_authenticated %}
+            <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
+            {% for group in request.user.groups.all %}
+              {% if not group.name == 'Lector' %}
+                <a href="{% url 'admin_home' %}" class="link">Panel de control</a>
+              {% endif %}
+            {% endfor%}
+            <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
+          {% else %}
+            <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <!-- ========== Logotipo ========== -->
+        <div class="bg-light py-3">
           <div class="col">
-            <div class="text-start"><p class="text-light" id="current_date"></p></div>
+              <a href="#">
+                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
+              </a>
           </div>
           <div class="col-auto">
           </div>
-          <div class="col text-end">
-            {% if user.is_authenticated %}
-              <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
-              {% for group in request.user.groups.all %}
-                {% if not group.name == 'Lector' %}
-                  <a href="{% url 'admin_home' %}" class="link">Panel de control</a>
-                {% endif %}
-              {% endfor%}
-              <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
-            {% else %}
-              <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>
-            {% endif %}
-          </div>
-          <!-- ========== Modal Login ========== -->
-          <div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header pb-0 pt-3">
-                        <h5>Iniciar Sesión</h5>
-                        <button type="button" class="btn-close mb-1" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="px-4">
-                        <form id="loginForm" method="post" action="{% url 'login' %}">
-                          {% csrf_token %}
-                          <div class="row py-1">
-                            <label for="id_username" class="ps-0">Nombre de usuario:</label>
-                          </div>
-                          <div class="row">
-                            <input type="text" id="id_username" name="username" required>
-                            {% if form.errors.username %}
-                              <div class="invalid-feedback">{{ form.errors.username }}</div>
-                            {% endif %}
-                          </div>
-                          <div class="row py-1">
-                            <label for="id_password" class="ps-0">Contraseña:</label>
-                          </div>
-                          <div class="row">
-                            <input type="password" id="id_password" name="password" required>
-                            {% if form.errors.password %}
-                              <div class="invalid-feedback">{{ form.errors.password }}</div>
-                            {% endif %}
-                          </div>
-                          <div class="row w-50">
-                            <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
-                          </div>
-                          <div class="row mt-2">
-                            <div id="errorContainer"></div>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="row text-end">
-                            <h6>No te acuerdas de tu contraseña?</h6>
-                            <a href="registro.html" class="link-two" onclick="restablecerContrasena()">Restablecer Contraseña</a>
-                        </div>
-                        <div class="row text-end">
-                            <h6>No tienes una cuenta?</h6>
-                            <a href="#register" class="link-two"  data-bs-toggle="modal" data-bs-dismiss="modal">Registrarse</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-        <!-- ========== Fin Modal Login ========== -->
-<!-- ========== Modal Register ========== -->
-<div class="modal fade" id="register" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header pb-0 pt-3">
-        <h5>Nuevo Usuario</h5>
+        <!-- ========== Ventanas Modales ========== -->
+        {% include 'modals.html' %}
       </div>
-      <div class="modal-body">
-        <div class="px-4">
-          <form id="registerForm" method="post" action="{% url 'register' %}">
-            {% csrf_token %}
-            <div class="row py-1">
-              <label for="id_first_name" class="ps-0">Nombre:</label>
-            </div>
-            <div class="row">
-              <input type="text" id="id_first_name" name="first_name" required>
-              {% if form.errors.first_name %}
-                <div class="invalid-feedback">{{ form.errors.first_name }}</div>
-              {% endif %}
-            </div>
-            <div class="row py-1">
-              <label for="id_last_name" class="ps-0">Apellido:</label>
-            </div>
-            <div class="row">
-              <input type="text" id="id_last_name" name="last_name" required>
-              {% if form.errors.last_name %}
-                <div class="invalid-feedback">{{ form.errors.last_name }}</div>
-              {% endif %}
-            </div>
-            <div class="row py-1">
-              <label for="id_username_reg" class="ps-0">Nombre de usuario:</label>
-            </div>
-            <div class="row">
-              <input type="text" id="id_username_reg" name="username" required>
-              {% if form.errors.username %}
-                <div class="invalid-feedback">{{ form.errors.username }}</div>
-              {% endif %}
-            </div>
-            <div class="row py-1">
-              <label for="id_email" class="ps-0">Correo electrónico:</label>
-            </div>
-            <div class="row">
-              <input type="email" id="id_email" name="email" required>
-              {% if form.errors.email %}
-                <div class="invalid-feedback">{{ form.errors.email }}</div>
-              {% endif %}
-            </div>
-            <div class="row py-1">
-              <label for="id_password_reg" class="ps-0">Contraseña:</label>
-            </div>
-            <div class="row">
-              <input type="password" id="id_password_reg" name="password" required>
-              {% if form.errors.password %}
-                <div class="invalid-feedback">{{ form.errors.password }}</div>
-              {% endif %}
-            </div>
-            <div class="row py-1">
-              <label for="id_confirm_password" class="ps-0">Confirmar contraseña:</label>
-            </div>
-            <div class="row">
-              <input type="password" id="id_confirm_password" name="confirm_password" required>
-              {% if form.errors.confirm_password %}
-                <div class="invalid-feedback">{{ form.errors.confirm_password }}</div>
-              {% endif %}
-            </div>
-            <div class="row w-50">
-              <input type="submit" class="btn btn-primary ms-auto mt-2" value="Registrarse">
-              <a class="btn btn-primary" data-bs-toggle="modal" href="#login" role="button">Volver</a>
-            </div>
-            <div class="row mt-2">
-              <div id="errorContainer"></div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- ========== Fin Modal Register ========== -->
-
-      </div>
-      <div class="container bg-light">
-        <!-- ========== Logotipo ========== -->
-        <div class="col">
-            <a href="#">
-              <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
-            </a>
-        </div>
-        <div class="col-auto">
-        </div>
-      </div>
-    <!-- ========== Barra de navegación ========== -->
+      <div class="row">
+        <!-- ========== Barra de navegación ========== -->
         {% include 'navbar.html' %}
-    <!-- ========== Cuerpo ========== -->
-    </header>
-    <main>
-        {% block body %}{% endblock %}
-    </main>
-    <!-- ========== Pie de pagina ========== -->
-        {% include 'footer.html' %}
+      </div>
     </div>
+  </header>
+  <!-- ========== Cuerpo ========== -->
+  <main>
+    <div class="container bg-body p-4">
+      {% block body %}
+
+      {% endblock %}
+    </div>
+  </main>
+  <!-- ========== Pie de pagina ========== -->
+  {% include 'footer.html' %}
 <!-- ========== Librerias JS jQuery ========== -->
 <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
 <!-- ========== Librerias JS Bootstrap ========== -->
@@ -200,5 +75,5 @@
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <!-- ========== Librerias JS Personalizada ========== -->
 <script src="{% static 'js/custom.js' %}"></script>
- </body>
+</body>
 </html>

@@ -1,0 +1,55 @@
+{% load static %}
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
+        {% for noticia in noticias_destacadas %}
+        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter }}"></li>
+        {% endfor %}
+    </ol>
+    <div class="carousel-inner carousel-container p-4">
+        <div class="carousel-item active">
+          <div class="d-flex flex-nowrap overflow-hidden">
+            <div class="col-md justify-content-start">
+              <video class="img-fluid w-100 video-item" autoplay loop muted>
+                <source src="{% static 'components/noticias-banner.mp4' %}" type="video/mp4" />
+              </video>
+            </div>
+            <div class="col-md justify-content-end">
+              <video class="img-fluid w-100 video-item" autoplay loop muted>
+                <source src="{% static 'components/noticias-vivo-banner.mp4' %}" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </div>
+        {% for noticia in noticias_destacadas %}
+        <div class="carousel-item">
+            <a href="{% url 'noticia_detalle' noticia.id_noticia %}" class="no-link">
+                <div class="container" style="padding-bottom: 58px">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 d-none d-md-flex justify-content-end">
+                            <div class="circle">
+                            <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo_noticia }}"
+                                class="img-fluid h-100">
+                            </div>
+                        </div>
+                        <div class="col-md-7 pb-auto">
+                            <h2 class="mb-4">{{ noticia.titulo_noticia }}</h2>
+                            <p>{{ noticia.cuerpo_noticia|slice:":300" }}...</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+      data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+      data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+</div>

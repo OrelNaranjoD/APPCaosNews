@@ -1,7 +1,6 @@
 * {
     margin: 0;
     padding: 0;
-    
 }
 @font-face {
     font-family: "Exo";
@@ -14,17 +13,6 @@
     font-weight: bold;
 }
 
-main {
-    background-color: white;
-}
-
-p {
-  margin: 0;
-}
-ul {
-    margin: 0;
-}
-
 body {
     font-family: 'Exo', sans-serif;
     font-size: 1rem;
@@ -32,12 +20,65 @@ body {
     background-color: gainsboro;
 }
 
-.carousel-inner video {
-    width: 100%;
-    max-height: 400px;
-    object-fit: fill;
+.bg-body {
+    background-color: whitesmoke;
 }
 
+/*Carousel*/
+.carousel-container {
+    background-color: #2B547E;
+    border-radius: 10px;
+  }
+
+ 
+  .circle img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+.carousel-item {
+    color: white;
+}
+.carousel-item a.no-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+@media (max-width: 768px) {
+    .carousel-item .text {
+        margin: 0 auto;
+    }
+}
+.carousel-item .circle {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+  }
+
+  .video-item {
+    max-height: auto;
+  }
+
+  .carousel-item .circle img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-item .col-md-4 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+
+/*Navbar*/
 .link {
     text-decoration: none;
     color: white;
@@ -51,6 +92,7 @@ body {
     color: #c500cc;
 }
 
+/*Tiempo*/
 .weather {
     background-image: linear-gradient(to top, rgba(0, 198, 251,.7) 0%, rgba(0, 91, 234,.7) 100%);
     color: white;
@@ -70,7 +112,6 @@ body {
 
 
 /* Admin Styles */
-
 .user-pic {
     max-width: 150px;
     height: 100%;

@@ -1,45 +1,43 @@
 {% extends './index.html' %}
 {% load static %}
+{% block title %}Caos News - {{ categoria }}{% endblock %}
 {% block body %}
-<!-- ========== Cuerpo ========== -->
-<main class="p-4 px-5">
-    <div class="row">
-        <div class="col">
-        <h2>{{ categoria_actual }}</h2>
-        </div>
+<div class="row">
+    <div class="col">
+        <h2>Noticias de {{ categoria }}</h2>
     </div>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for noticia in noticias %}
-            {% if noticia.activo %}
-                <div class="col">
-                    <div class="card h-100">
-                        <a href="{% url 'noticia_detalle' noticia.id_noticia %}">
-                            {% if noticia.imagen and noticia.imagen.url %}
-                                <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo_noticia }}">
-                            {% else %}
-                                <p>No hay imagen disponible</p>
-                            {% endif %}
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ noticia.titulo_noticia }}</h5>
-                            <p class="card-text">
-                                {% if noticia.cuerpo_noticia|length > 150 %}
-                                    {{ noticia.cuerpo_noticia|slice:":150" }}... <a href="{% url 'noticia_detalle' noticia.id_noticia %}">Seguir leyendo</a>
-                                {% else %}
-                                    {{ noticia.cuerpo_noticia }}
-                                {% endif %}
-                            </p>
-                            </div>
-                            <div class="card-footer bg-transparent">
-                            <div class="row">
-                                <div class="col"><small class="text-muted">{{ noticia.fecha_creacion|date:"d/m/Y" }}</small></div>
-                                <div class="col-auto text-end"><small>{{ noticia.id_categoria }}</small></div>
-                            </div>
-                        </div>
+</div>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for noticia in noticias %}
+        {% if noticia.activo %}
+        <div class="col">
+            <div class="card h-100">
+                <a href="{% url 'noticia_detalle' noticia.id_noticia %}">
+                    {% if noticia.imagen and noticia.imagen.url %}
+                        <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo_noticia }}">
+                    {% else %}
+                        <p>No hay imagen disponible</p>
+                    {% endif %}
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{ noticia.titulo_noticia }}</h5>
+                    <p class="card-text">
+                        {% if noticia.cuerpo_noticia|length > 150 %}
+                            {{ noticia.cuerpo_noticia|slice:":150" }}... <a href="{% url 'noticia_detalle' noticia.id_noticia %}">Seguir leyendo</a>
+                        {% else %}
+                            {{ noticia.cuerpo_noticia }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col"><small class="text-muted">{{ noticia.fecha_creacion|date:"d/m/Y" }}</small></div>
+                        <div class="col-auto text-end"><small>{{ noticia.id_categoria }}</small></div>
                     </div>
                 </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    </main>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
 {% endblock %}

@@ -15,6 +15,7 @@ class Noticia(models.Model):
     cuerpo_noticia = models.TextField(blank=False, null=False, default='')
     id_categoria = models.ForeignKey('Categoria', on_delete=models.PROTECT, db_column='id_categoria')
     activo = models.BooleanField(("Activo"), default=True)
+    destacada = models.BooleanField(("Destacada"), default=False)
     
     def get_image_upload_path(instance, filename):
         extension = filename.split('.')[-1]

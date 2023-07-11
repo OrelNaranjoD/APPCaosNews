@@ -7,10 +7,9 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import NoticiaForm, LoginForm, RegisterForm, UserProfileForm
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-import requests, sys
+import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
-import os
 from django.contrib.auth.models import Group
 
 
@@ -39,43 +38,56 @@ def mostrar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
     return render(request, 'detalle_noticia.html', {'noticia': noticia})
 
+# Diccionario para almacenar en caché los datos del clima
+cache_clima = {}
+
 def obtener_tiempo_chile():
     url = 'http://api.openweathermap.org/data/2.5/weather?'
     api_key = 'cda050505a9bfed7a75a0663acda7e5a'
-    ciudades_chile = ['Santiago', 'Antofagasta', 'Vina del Mar', 'Concepcion', 'Temuco'] 
+    ciudades_chile = ['Santiago', 'Antofagasta', 'Vina del Mar', 'Concepcion', 'Temuco']
 
     resultados = []
 
     for ciudad in ciudades_chile:
-        params = {
-            'appid': api_key,
-            'q': ciudad + ',cl',
-            'units': 'metric',
-            'lang': 'es',
-        }
-
-        response = requests.get(url, params=params)
-
-        if response.status_code == 200:
-            data = response.json()
-            ciudad_info = {
-                'ciudad': data['name'],
-                'temperatura': data['main']['temp'],
-                'temperatura_min': data['main']['temp_min'],
-                'temperatura_max': data['main']['temp_max'],
-                'tiempo': data['weather'][0]['description'],
-                'icono': data['weather'][0]['icon']
-            }
+        if ciudad in cache_clima:
+            ciudad_info = cache_clima[ciudad]
             resultados.append(ciudad_info)
         else:
-            print(f"Error en la solicitud para la ciudad {ciudad}: {response.status_code}")
+            params = {
+                'appid': api_key,
+                'q': ciudad + ',cl',
+                'units': 'metric',
+                'lang': 'es',
+            }
+
+            response = requests.get(url, params=params)
+
+            if response.status_code == 200:
+                data = response.json()
+                ciudad_info = {
+                    'ciudad': data['name'],
+                    'temperatura': data['main']['temp'],
+                    'temperatura_min': data['main']['temp_min'],
+                    'temperatura_max': data['main']['temp_max'],
+                    'tiempo': data['weather'][0]['description'],
+                    'icono': data['weather'][0]['icon']
+                }
+                resultados.append(ciudad_info)
+                cache_clima[ciudad] = ciudad_info
+            else:
+                print(f"Error en la solicitud para la ciudad {ciudad}: {response.status_code}")
 
     return resultados
 
 def home(request):
-    noticias = Noticia.objects.filter(eliminado=False, activo=True).order_by('-fecha_creacion')[:3]
+    noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True).order_by('-fecha_creacion')
+    noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True).order_by('-fecha_creacion')[:3]
     resultados_tiempo_chile = obtener_tiempo_chile()
-    context = {"noticias": noticias,'resultados_tiempo_chile': resultados_tiempo_chile}  
+    context = {
+        "noticias_destacadas": noticias_destacadas,
+        "noticias_recientes": noticias_recientes,
+        "resultados_tiempo_chile": resultados_tiempo_chile
+    }
     return render(request, 'home.html', context)
 
 def contacto(request):
@@ -84,24 +96,25 @@ def contacto(request):
 def footer(request):
     return render(request, 'footer.html')
 
-
-
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+                return JsonResponse({'valid': False, 'email_error': True, 'password_error': False})
+            if user is not None and user.check_password(password):
+                # La contraseña es válida
                 login(request, user)
-                return JsonResponse({'valid': True})
-            else:
-                return JsonResponse({'valid': False, 'username_error': True, 'password_error': False})
+                return JsonResponse({'valid': False, 'email_error': False, 'password_error': True})
+        
         else:
-            return JsonResponse({'valid': False, 'username_error': False, 'password_error': False})
-    
-    return JsonResponse({'valid': False, 'username_error': False, 'password_error': False})
+            return JsonResponse({'valid': False, 'email_error': False, 'password_error': False})
+    return JsonResponse({'valid': True})
 
 def register(request):
     if request.method == 'POST':

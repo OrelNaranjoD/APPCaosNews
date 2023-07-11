@@ -1,0 +1,135 @@
+<!-- ========== Modal Login ========== -->
+<div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header pb-0 pt-3">
+                <h5>Iniciar Sesión</h5>
+                <button type="button" class="btn-close mb-1" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="px-4">
+                    <form id="loginForm" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="row py-1">
+                        <label for="id_email" class="ps-0">Correo del usuario:</label>
+                    </div>
+                    <div class="row">
+                        <input type="email" id="id_email" name="email" required>
+                        {% if form.errors.email %}
+                        <div class="invalid-feedback">{{ form.errors.email }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row py-1">
+                        <label for="id_password" class="ps-0">Contraseña:</label>
+                    </div>
+                    <div class="row">
+                        <input type="password" id="id_password" name="password" required>
+                        {% if form.errors.password %}
+                        <div class="invalid-feedback">{{ form.errors.password }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row w-50">
+                        <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
+                    </div>
+                    <div class="row mt-2">
+                        <div id="errorContainer"></div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row text-end">
+                    <h6>No te acuerdas de tu contraseña?</h6>
+                    <a href="registro.html" class="link-two" onclick="restablecerContrasena()">Restablecer Contraseña</a>
+                </div>
+                <div class="row text-end">
+                    <h6>No tienes una cuenta?</h6>
+                    <a href="#register" class="link-two" data-bs-toggle="modal" data-bs-dismiss="modal">Registrarse</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ========== Fin Modal Login ========== -->
+
+<!-- ========== Modal Register ========== -->
+<div class="modal fade" id="register" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header pb-0 pt-3">
+                <h5>Nuevo Usuario</h5>
+            </div>
+            <div class="modal-body">
+                <div class="px-4">
+                    <form id="registerForm" method="post" action="{% url 'register' %}">
+                    {% csrf_token %}
+                        <div class="row py-1">
+                            <label for="id_first_name" class="ps-0">Nombre:</label>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="id_first_name" name="first_name" required>
+                            {% if form.errors.first_name %}
+                                <div class="invalid-feedback">{{ form.errors.first_name }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row py-1">
+                            <label for="id_last_name" class="ps-0">Apellido:</label>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="id_last_name" name="last_name" required>
+                            {% if form.errors.last_name %}
+                                <div class="invalid-feedback">{{ form.errors.last_name }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row py-1">
+                            <label for="id_username_reg" class="ps-0">Nombre de usuario:</label>
+                        </div>
+                        <div class="row">
+                            <input type="text" id="id_username_reg" name="username" required>
+                            {% if form.errors.username %}
+                                <div class="invalid-feedback">{{ form.errors.username }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row py-1">
+                            <label for="id_email" class="ps-0">Correo electrónico:</label>
+                        </div>
+                        <div class="row">
+                            <input type="email" id="id_email" name="email" required>
+                            {% if form.errors.email %}
+                                <div class="invalid-feedback">{{ form.errors.email }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row py-1">
+                            <label for="id_password_reg" class="ps-0">Contraseña:</label>
+                        </div>
+                        <div class="row">
+                            <input type="password" id="id_password_reg" name="password" required>
+                            {% if form.errors.password %}
+                                <div class="invalid-feedback">{{ form.errors.password }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row py-1">
+                            <label for="id_confirm_password" class="ps-0">Confirmar contraseña:</label>
+                        </div>
+                        <div class="row">
+                            <input type="password" id="id_confirm_password" name="confirm_password" required>
+                            {% if form.errors.confirm_password %}
+                                <div class="invalid-feedback">{{ form.errors.confirm_password }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="row mt-2">
+                            <div id="errorContainer"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row w-50">
+                    <input type="submit" class="btn btn-primary ms-auto mt-2" value="Registrarse">
+                    <a class="btn btn-primary" data-bs-toggle="modal" href="#login" role="button">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ========== Fin Modal Register ========== -->

@@ -9,7 +9,7 @@ class NoticiaForm(forms.ModelForm):
         fields = '__all__'
         
 class LoginForm(forms.Form):
-    username = forms.CharField(label='Nombre de usuario', max_length=100)
+    email = forms.EmailField(label='Correo del usuario', max_length=100)
     password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
 
 class RegisterForm(forms.Form):
