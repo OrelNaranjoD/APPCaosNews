@@ -39,4 +39,6 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = '__all__'
-        
+        widgets = {
+            'role': forms.Select(choices=Usuario.ROLES)
+        }

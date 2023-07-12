@@ -29,6 +29,8 @@ urlpatterns = [
     path('admin/categorias/', views.admin_categoria, name='admin_categorias'),
     path('admin/perfil/editar/', views.admin_edit_profile, name='admin_editar_perfil'),
     path('admin/perfil/', views.admin_view_profile, name='admin_perfil'),
+    path('admin/usuarios/', views.admin_user_priv, name='admin_user_priv'),
+    
     
     #Ruta de testing
     path('test', views.test, name='test'),

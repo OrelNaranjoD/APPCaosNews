@@ -179,6 +179,8 @@ def logout_view(request):
     
 #Vistas de Administrador
 #Autorizacion de usuarios
+def es_admin(user):
+    return user.groups.filter(name__in=['Administrador']).exists()
 def es_admin_periodista_o_editor(user):
     return user.groups.filter(name__in=['Administrador', 'Periodista', 'Editor']).exists()
 
@@ -361,6 +363,26 @@ def admin_edit_profile(request):
 @user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_view_profile(request):
     return render(request, 'admin/admin_view_profile.html')
+
+@user_passes_test(es_admin, login_url='home')
+def admin_user_priv(request):
+    Usuario = get_user_model()
+    lista_usuarios = Usuario.objects.all()
+
+    for usuario in lista_usuarios:
+        if request.method == 'POST':
+            form = UserProfileForm(request.POST, instance=usuario)
+            if form.is_valid():
+                form.save()
+        else:
+            form = UserProfileForm(instance=usuario)
+
+        usuario.form = form
+
+    context = {
+        'lista_usuarios': lista_usuarios,
+    }
+    return render(request, 'admin/admin_user_priv.html', context)
 
 #Testing
 def test(request):

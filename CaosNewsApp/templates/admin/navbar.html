@@ -56,15 +56,15 @@
                     <i class="fa-solid fa-list icon-spacer"></i>Rechazadas
                   </a>
                 </li>
+              </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin_user_priv' %}">
+                  <i class="fa-solid fa-gear icon-spacer"></i>Configuración
+                </a>
+              </li>
               {% endif %}
             {% endfor %}
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin_crear_noticia' %}">
-            <i class="fa-solid fa-gear icon-spacer"></i>Configuración
-          </a>
-        </li>
         <hr class="my-1 custom-hr">
         <li class="nav-item">
           <a class="nav-link" href="{% url 'logout' %}">

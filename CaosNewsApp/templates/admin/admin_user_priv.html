@@ -1,0 +1,43 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+{% block body %}
+
+<div class="col py-3">
+    <div class="row px-4">
+      <div class="col-12">
+        <h2>Lista de usuarios</h2>
+      </div>
+      <div class="col-12 table-responsive">
+        <form method="POST">
+          {% csrf_token %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col" class="text-center">Usuario</th>
+                <th scope="col" class="text-center">Nombre</th>
+                <th scope="col" class="text-center">Apellido</th>
+                <th scope="col" class="text-center">Correo Electrónico</th>
+                <th scope="col" class="text-center">Privilegio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in lista_usuarios %}
+              <tr>
+                <td class="text-center">{{ usuario.username }}</td>
+                <td class="text-center">{{ usuario.first_name }}</td>
+                <td class="text-center">{{ usuario.last_name }}</td>
+                <td class="text-center">{{ usuario.email }}</td>
+                <td class="text-center">
+                  {{ usuario.form.role }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
