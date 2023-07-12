@@ -11,9 +11,11 @@ import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Value
+from django.db.models.functions import Concat
 from datetime import datetime
 from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
 
 def index(request):
     noticias = Noticia.objects.filter(detalle__publicada=True)
@@ -101,13 +103,16 @@ def home(request):
 
 def busqueda(request):
     query = request.GET.get('q')
-    noticias = Noticia.objects.filter(
-        Q(titulo_noticia__icontains=query) | 
-        Q(cuerpo_noticia__icontains=query) |
-        Q(id_usuario__first_name__icontains=query) |
-        Q(id_usuario__last_name__icontains=query) |
-        Q(id_categoria__nombre_categoria__icontains=query)
-    )
+    terms = query.split()
+
+    q_objects = Q()
+
+    for term in terms:
+        q_objects |= Q(id_usuario__first_name__icontains=term) | Q(id_usuario__last_name__icontains=term)
+
+    q_objects |= Q(id_categoria__nombre_categoria__icontains=query) | Q(titulo_noticia__icontains=query) | Q(cuerpo_noticia__icontains=query)
+
+    noticias = Noticia.objects.filter(q_objects)
     context = {
         'query': query,
         'noticias': noticias
@@ -173,9 +178,18 @@ def logout_view(request):
     
     
 #Vistas de Administrador
+#Autorizacion de usuarios
+def es_admin_periodista_o_editor(user):
+    return user.groups.filter(name__in=['Administrador', 'Periodista', 'Editor']).exists()
+
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_home(request):
-    num_noticias_publicadas = Noticia.objects.filter(id_usuario=request.user, activo=True, detalle__publicada=True).count()
-    num_noticias_pendientes = Noticia.objects.filter(id_usuario=request.user, detalle__publicada__isnull=True).count()
+    if request.user.groups.filter(name='Administrador').exists():
+        num_noticias_publicadas = Noticia.objects.filter(activo=True, detalle__publicada=True).count()
+        num_noticias_pendientes = Noticia.objects.filter(detalle__publicada=False, detalle__estado__isnull=True).count()
+    else:
+        num_noticias_publicadas = Noticia.objects.filter(id_usuario=request.user, activo=True, detalle__publicada=True).count()
+        num_noticias_pendientes = Noticia.objects.filter(id_usuario=request.user, detalle__publicada=False, detalle__estado__isnull=True).count()
 
     context = {
         'num_noticias_publicadas': num_noticias_publicadas,
@@ -183,6 +197,7 @@ def admin_home(request):
     }
     return render(request, 'admin/admin_home.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_noticias(request):
     if request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.filter(eliminado=False, activo=True, detalle__publicada=True, detalle__estado='A')
@@ -196,6 +211,7 @@ def admin_noticias(request):
     }
     return render(request, 'admin/admin_noticias.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_noticias_borradores(request):
     if request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.filter(eliminado=False, detalle__estado__isnull=True)
@@ -211,6 +227,7 @@ def admin_noticias_borradores(request):
     
     return render(request, 'admin/admin_noticias_borradores.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_noticias_eliminadas(request):
     if request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.filter(eliminado=True)
@@ -222,6 +239,7 @@ def admin_noticias_eliminadas(request):
     }
     return render(request, 'admin/admin_noticias_eliminadas.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_noticias_rechazadas(request):
     if request.user.groups.filter(name='Administrador').exists():
         noticias = Noticia.objects.filter(eliminado=False, detalle__estado='R')
@@ -236,6 +254,7 @@ def admin_noticias_rechazadas(request):
     }
     return render(request, 'admin/admin_noticias_rechazadas.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_crear_noticia(request):
     categorias = Categoria.objects.all()
     paises = Pais.objects.all()
@@ -249,7 +268,7 @@ def admin_crear_noticia(request):
             for imagen in request.FILES.getlist('imagenes'):
                     ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
             form.save_m2m()
-            return redirect('admin_noticias')
+            return redirect('admin_noticias_borradores')
     else:
         form = NoticiaForm()
     
@@ -261,6 +280,7 @@ def admin_crear_noticia(request):
     
     return render(request, 'admin/admin_crear_noticia.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_editar_noticia(request, noticia_id):
     noticia = Noticia.objects.get(id_noticia=noticia_id)
     categorias = Categoria.objects.all()
@@ -272,7 +292,7 @@ def admin_editar_noticia(request, noticia_id):
         detalle_form = DetalleNoticiaForm(request.POST, instance=noticia.detalle)
         if form.is_valid() and detalle_form.is_valid():
             noticia = form.save(commit=False)
-            noticia.id_usuario = request.user
+            noticia.id_usuario = form.cleaned_data['id_usuario']
             noticia.save()
             form.save_m2m()
 
@@ -286,7 +306,7 @@ def admin_editar_noticia(request, noticia_id):
             for imagen in request.FILES.getlist('imagenes'):
                 ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
 
-            return redirect('admin_editar_noticia', noticia_id=noticia_id)
+            return redirect('admin_noticias_borradores')
     else:
         form = NoticiaForm(instance=noticia)
         detalle_form = DetalleNoticiaForm(instance=noticia.detalle)
@@ -302,29 +322,31 @@ def admin_editar_noticia(request, noticia_id):
 
     return render(request, 'admin/admin_editar_noticia.html', context)
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_eliminar_imagen_noticia(request, imagen_id):
     imagen = get_object_or_404(ImagenNoticia, id_imagen=imagen_id)
     imagen.delete()
     return redirect('admin_editar_noticia', noticia_id=imagen.noticia.id_noticia)
 
-
-
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_eliminar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
     noticia.eliminado = True
     noticia.save()
     return redirect('admin_noticias')
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_delete_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
     noticia.delete()
     return redirect('admin_noticias_borradores')
 
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_categoria(request):
     noticias = Noticia.objects.all()
     return render(request, 'admin/admin_categorias.html', {'noticias': noticias})
 
-@login_required
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_edit_profile(request):
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=request.user)
@@ -336,7 +358,7 @@ def admin_edit_profile(request):
     
     return render(request, 'admin/admin_edit_profile.html', {'form': form})
 
-@login_required
+@user_passes_test(es_admin_periodista_o_editor, login_url='home')
 def admin_view_profile(request):
     return render(request, 'admin/admin_view_profile.html')
 

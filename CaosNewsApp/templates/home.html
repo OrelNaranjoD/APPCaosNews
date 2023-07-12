@@ -15,7 +15,15 @@
                 </div>
                 <div class="row">
                   <div class="col">
-                    <p class="small-txt">{{ noticia.id_categoria.nombre_categoria }} - {{ noticia.fecha_creacion|date:"d/m/Y" }} - Autor: {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}</p>
+                    <p class="small-txt">
+                      <a href="{% url 'noticias' categoria=noticia.id_categoria.nombre_categoria %}">
+                        {{ noticia.id_categoria.nombre_categoria }}
+                      </a>
+                       - {{ noticia.fecha_creacion|date:"d/m/Y" }} - 
+                      <a href="{% url 'busqueda' %}?q={{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}">
+                        {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}
+                      </a>
+                    </p>
                   </div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4 pt-3">
