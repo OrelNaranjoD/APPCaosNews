@@ -11,19 +11,14 @@ import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.db.models import Q
+from django.db.models import Q, Count
 from datetime import datetime
 from django.utils import timezone
 
 def index(request):
-    noticias = Noticia.objects.all()
-    if request.user.is_authenticated:
-        is_lector = request.user.groups.filter(name='Lector').exists()
-    else:
-        is_lector = False
+    noticias = Noticia.objects.filter(detalle__publicada=True)
     context = {
         'noticias': noticias,
-        'is_lector': is_lector,
     }
     return render(request, 'index.html', context)
 
@@ -34,7 +29,7 @@ def noticias(request, categoria):
         noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False,  activo=True, detalle__publicada=True).order_by('-fecha_creacion')
     context = {
         "noticias": noticias,
-        "categoria": categoria
+        "categoria": categoria,
     }
     return render(request, 'noticia.html', context)
 
@@ -125,11 +120,6 @@ def contacto(request):
 def footer(request):
     return render(request, 'footer.html')
 
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.http import JsonResponse
-
 def login_view(request):
     if request.method == 'POST':
         identifier = request.POST.get('identifier')
@@ -184,7 +174,14 @@ def logout_view(request):
     
 #Vistas de Administrador
 def admin_home(request):
-    return render(request, 'admin/admin_home.html')
+    num_noticias_publicadas = Noticia.objects.filter(id_usuario=request.user, activo=True, detalle__publicada=True).count()
+    num_noticias_pendientes = Noticia.objects.filter(id_usuario=request.user, detalle__publicada__isnull=True).count()
+
+    context = {
+        'num_noticias_publicadas': num_noticias_publicadas,
+        'num_noticias_pendientes': num_noticias_pendientes,
+    }
+    return render(request, 'admin/admin_home.html', context)
 
 def admin_noticias(request):
     if request.user.groups.filter(name='Administrador').exists():
@@ -214,6 +211,30 @@ def admin_noticias_borradores(request):
     
     return render(request, 'admin/admin_noticias_borradores.html', context)
 
+def admin_noticias_eliminadas(request):
+    if request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.filter(eliminado=True)
+    for noticia in noticias:
+        noticia.primer_imagen = noticia.imagenes.first()
+        
+    context = {
+    'noticias': noticias
+    }
+    return render(request, 'admin/admin_noticias_eliminadas.html', context)
+
+def admin_noticias_rechazadas(request):
+    if request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.filter(eliminado=False, detalle__estado='R')
+    else:
+        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, detalle__publicada=True, detalle__estado='R')
+    
+    for noticia in noticias:
+        noticia.primer_imagen = noticia.imagenes.first()
+    
+    context = {
+        'noticias': noticias
+    }
+    return render(request, 'admin/admin_noticias_rechazadas.html', context)
 
 def admin_crear_noticia(request):
     categorias = Categoria.objects.all()

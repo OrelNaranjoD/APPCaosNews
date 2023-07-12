@@ -4,7 +4,7 @@
 <div class="col py-3">
   <div class="row px-4">
     <div class="col-12">
-      <h2>Lista de noticias publicadas</h2>
+      <h2>Lista de noticias rechazadas</h2>
     </div>
     <div class="col-12 table-responsive">
       
@@ -17,12 +17,8 @@
             <th scope="col" class="text-center">Categoría</th>
             <th scope="col" class="text-center">Imagen</th>
             <th scope="col" class="text-center">Comentario</th>
-            <th scope="col" class="text-center">Aprobada por</th>
-            {% for group in request.user.groups.all %}
-              {% if group.name == 'Administrador' %}
-                <th scope="col" class="w-action text-center">Acciones</th>
-              {% endif %}
-            {% endfor %}
+            <th scope="col" class="text-center">Rechazada por</th>
+            <th scope="col" class="w-action text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -40,9 +36,9 @@
             </td>
             <td class="text-center">
               {% if noticia.detalle.publicada %}
-                {{ noticia.detalle.comentario|default:"Sin comentario" }}
+                  {{ noticia.detalle.comentario }}
               {% else %}
-                Sin comentario
+                  Sin aprobación
               {% endif %}
             </td>
             <td class="text-center">
@@ -50,8 +46,6 @@
                     {{ noticia.detalle.id_usuario.first_name }} {{ noticia.detalle.id_usuario.last_name }}
                 {% endif %}
             </td>
-            {% for group in request.user.groups.all %}
-              {% if group.name == 'Administrador' %}
               <td class="text-center">
                 <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}">
                   <i class="fa-solid fa-pen-to-square"></i>
@@ -80,8 +74,6 @@
                 </div>
                 <!-- Fin Modal de Confirmación -->
               </td>
-              {% endif %}
-            {% endfor %}
           </tr>
         {% endfor %}
         </tbody>
