@@ -4,7 +4,7 @@
 <div class="col py-3">
   <div class="row px-4">
     <div class="col-12">
-      <h2>Lista de Noticias Eliminadas o Desactivadas</h2>
+      <h2>Lista de noticias por aprobar</h2>
     </div>
     <div class="col-12 table-responsive">
       
@@ -26,10 +26,10 @@
             <td>{{ noticia.titulo_noticia }}</td>
             <td class="text-center">{{ noticia.id_categoria }}</td>
             <td class="text-center">
-              {% if noticia.imagen %}
-              <img src="{{ noticia.imagen.url }}" alt="Imagen" width="50">
+              {% if noticia.primer_imagen %}
+                  <img src="{{ noticia.primer_imagen.imagen.url }}" alt="Imagen" width="50">
               {% else %}
-              Sin imagen
+                  Sin imagen
               {% endif %}
             </td>
             <td class="text-center">

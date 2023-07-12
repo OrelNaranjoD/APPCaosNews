@@ -1,11 +1,16 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.forms import ValidationError
-from .models import Noticia, Usuario
+from .models import Noticia, Usuario, DetalleNoticia
 
 class NoticiaForm(forms.ModelForm):
     class Meta:
         model = Noticia
+        fields = '__all__'
+        
+class DetalleNoticiaForm(forms.ModelForm):
+    class Meta:
+        model = DetalleNoticia
         fields = '__all__'
         
 class LoginForm(forms.Form):

@@ -11,6 +11,7 @@
       <form method="POST" action="{% url 'admin_editar_noticia' noticia_id %}" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" id="id_usuario" name="id_usuario" value="{{ form.id_usuario.value }}">
+        <input type="hidden" id="noticia" name="noticia" value="{{ detalle_form.noticia.value }}">
         <div class="mb-3">
           <label for="id_titulo_noticia" class="form-label">Título de la noticia:</label>
           <input type="text" id="id_titulo_noticia" name="titulo_noticia" value="{{ form.titulo_noticia.value }}" class="form-control" required>
@@ -28,20 +29,68 @@
           </select>
         </div>
         <div class="mb-3">
-          <label for="id_activo" class="form-label">Activo:</label>
-          <input type="checkbox" id="id_activo" name="activo" class="form-check-input" {% if form.activo.value %}checked{% endif %}>
+          <label for="id_pais" class="form-label">Ubicación:</label>
+          <select id="id_pais" name="id_pais" class="form-select" required>
+            {% for pais in paises %}
+              <option value="{{ pais.id_pais }}" {% if pais.id_pais == form.id_pais.value %}selected{% endif %}>{{ pais.pais }}</option>
+            {% endfor %}
+          </select>
         </div>
         <div class="mb-3">
-          <label for="imagen" class="form-label">Nueva imagen:</label>
-          <input type="file" id="imagen" name="imagen" class="form-control">
+          <label for="imagenes" class="form-label">Nueva imagen:</label>
+          <input type="file" id="imagenes" name="imagenes" class="form-control" multiple>
         </div>
-        {% if form.imagen.value %}
+        {% if imagenes %}
         <div class="mb-3">
-          <label>Imagen actual:</label>
-          <br>
-          <img src="{% get_media_prefix %}{{ form.imagen.value }}" alt="Imagen actual" width="300" class="img-fluid">
+          <label>Imágenes actuales:</label>
+        </div>
+        <div class="mb-3">
+          {% for imagen in imagenes %}
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-2">
+                <img src="{{ imagen.imagen.url }}" class="img-fluid img-thumbnail" style="max-width: 80px;">
+              </div>
+              <div class="col">
+                <a href="{% url 'admin_eliminar_imagen' imagen.id_imagen %}" class="table-link">
+                  <i class="fa-solid fa-trash text-danger"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
         </div>
         {% endif %}
+        {% for group in request.user.groups.all %}
+          {% if group.name == 'Administrador' %}
+            <div class="mb-3">
+              <h5>Solo Administrador</h5>
+            </div>
+            <div class="mb-3">
+              <label for="id_destacada" class="form-label">Destacada:</label>
+              <input type="checkbox" id="id_destacada" name="destacada" class="form-check-input" {% if form.destacada.value %}checked{% endif %}>
+            </div>
+            <div class="mb-3">
+              <label for="id_activo" class="form-label">Activo:</label>
+              <input type="checkbox" id="id_activo" name="activo" class="form-check-input" {% if form.activo.value %}checked{% endif %}>
+            </div>
+            <div class="mb-3">
+              <label for="id_estado" class="form-label">Estado:</label>
+              <select id="id_estado" name="estado" class="form-select">
+                <option value="" {% if detalle_form.estado.value is None %}selected{% endif %}>---------</option>
+                {% for choice in detalle_form.estado.field.choices %}
+                  <option value="{{ choice.0 }}" {% if choice.0 == detalle_form.estado.value %}selected{% endif %}>{{ choice.1 }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="id_comentario" class="form-label">Comentario:</label>
+              <textarea id="id_comentario" name="comentario" class="form-control">{{ detalle_form.comentario.value }}</textarea>
+            </div>
+            <div class="mb-3">
+              <label for="id_publicada" class="form-label">Revisado:</label>
+              <input type="checkbox" id="id_publicada" name="publicada" class="form-check-input" {% if detalle_form.publicada.value %}checked{% endif %}>
+            </div>
+          {% endif %}
+        {% endfor %}
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
       </form>
     </div>

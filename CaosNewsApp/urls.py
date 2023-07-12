@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/noticias/editar/<int:noticia_id>/', views.admin_editar_noticia, name='admin_editar_noticia'),
     path('admin/noticias/eliminar/<int:noticia_id>/', views.admin_eliminar_noticia, name='admin_eliminar_noticia'),
     path('admin/noticias/delete/<int:noticia_id>/', views.admin_delete_noticia, name='admin_delete_noticia'),
+    path('admin/noticias/imagen/eliminar/<int:imagen_id>/', views.admin_eliminar_imagen_noticia, name='admin_eliminar_imagen'),
     path('admin/categorias/', views.admin_categoria, name='admin_categorias'),
     path('admin/perfil/editar/', views.admin_edit_profile, name='admin_editar_perfil'),
     path('admin/perfil/', views.admin_view_profile, name='admin_perfil'),

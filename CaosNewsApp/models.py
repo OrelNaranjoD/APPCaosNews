@@ -10,9 +10,11 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
 def get_image_upload_path(instance, filename):
-    ext = filename.split('.')[-1]
-    path = f"news/{instance.noticia.id_noticia}.{ext}"
-    return path
+    base_path = 'news'
+    news_id = instance.noticia.id_noticia
+    existing_images = instance.noticia.imagenes.count()
+    new_filename = f"{news_id}-{existing_images + 1}{os.path.splitext(filename)[1]}"
+    return os.path.join(base_path, str(news_id), new_filename)
 
 class Noticia(models.Model):
     id_noticia = models.AutoField(db_column='id_noticia', primary_key=True)
@@ -29,6 +31,28 @@ class Noticia(models.Model):
     
     def __str__(self):
         return self.titulo_noticia
+
+class DetalleNoticia(models.Model):
+    id_detalle = models.AutoField(db_column='id_detalle', primary_key=True)
+    noticia = models.OneToOneField(Noticia, on_delete=models.CASCADE, related_name='detalle')
+    comentario = models.TextField(blank=True, null=True)
+    ESTADO_CHOICES = (
+        ('A', 'Aprobado'),
+        ('R', 'Rechazado'),
+    )
+    estado = models.CharField(max_length=1, choices=ESTADO_CHOICES, blank=True, null=True)
+    id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    publicacion = models.DateTimeField(blank=True, null=True, default=None)
+    publicada = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Detalle {self.id_detalle} - Noticia: {self.noticia.titulo_noticia}'
+
+    
+@receiver(post_save, sender=Noticia)
+def create_detalle_noticia(sender, instance, created, **kwargs):
+    if created:
+        DetalleNoticia.objects.create(noticia=instance)
 
 class ImagenNoticia(models.Model):
     id_imagen = models.AutoField(db_column='id_imagen', primary_key=True)

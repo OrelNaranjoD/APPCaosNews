@@ -4,7 +4,7 @@ from django.template import loader
 from django.contrib import messages
 from .models import Noticia, Usuario, Categoria, ImagenNoticia, Pais
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from .forms import NoticiaForm, LoginForm, RegisterForm, UserProfileForm
+from .forms import NoticiaForm, LoginForm, RegisterForm, UserProfileForm, DetalleNoticiaForm
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 import requests, sys, os
@@ -12,8 +12,8 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.db.models import Q
-
-
+from datetime import datetime
+from django.utils import timezone
 
 def index(request):
     noticias = Noticia.objects.all()
@@ -29,9 +29,9 @@ def index(request):
 
 def noticias(request, categoria):
     if categoria == 'Ultima Hora':
-        noticias = Noticia.objects.filter(eliminado=False, activo=True).order_by('-fecha_creacion')[:10]
+        noticias = Noticia.objects.filter(eliminado=False,  activo=True, detalle__publicada=True).order_by('-fecha_creacion')[:10]
     else:
-        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False, activo=True).order_by('-fecha_creacion')
+        noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False,  activo=True, detalle__publicada=True).order_by('-fecha_creacion')
     context = {
         "noticias": noticias,
         "categoria": categoria
@@ -88,8 +88,8 @@ def obtener_tiempo_chile():
     return resultados
 
 def home(request):
-    noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True).order_by('-fecha_creacion')
-    noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True).order_by('-fecha_creacion')[:3]
+    noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True, detalle__publicada=True).order_by('-fecha_creacion')
+    noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True, detalle__publicada=True).order_by('-fecha_creacion')[:3]
 
     imagenes_destacadas = [noticia.imagenes.first() for noticia in noticias_destacadas]
     imagenes_recientes = [noticia.imagenes.first() for noticia in noticias_recientes]
@@ -187,58 +187,106 @@ def admin_home(request):
     return render(request, 'admin/admin_home.html')
 
 def admin_noticias(request):
-    if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
-        noticias = Noticia.objects.filter(eliminado=False, activo=True)
-        is_admin = True
+    if request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.filter(eliminado=False, activo=True, detalle__publicada=True, detalle__estado='A')
     else:
-        is_admin = False
-        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, activo=True)
-    return render(request, 'admin/admin_noticias.html', {'noticias': noticias, 'is_admin': is_admin})
+        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, activo=True, detalle__publicada=True, detalle__estado='A')
+    for noticia in noticias:
+        noticia.primer_imagen = noticia.imagenes.first()
+        
+        context = {
+        'noticias': noticias
+    }
+    return render(request, 'admin/admin_noticias.html', context)
 
 def admin_noticias_borradores(request):
-    if request.user.groups.exists() and request.user.groups.filter(name='Administrador').exists():
-        noticias = Noticia.objects.filter(eliminado=True) | Noticia.objects.filter(activo=False)
-        is_admin = True 
+    if request.user.groups.filter(name='Administrador').exists():
+        noticias = Noticia.objects.filter(eliminado=False, detalle__estado__isnull=True)
     else:
-        is_admin = False
-        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=True) | Noticia.objects.filter(id_usuario=request.user.id, activo=False)
-    return render(request, 'admin/admin_noticias_borradores.html', {'noticias': noticias, 'is_admin': is_admin})
+        noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, detalle__publicada=False)
+    
+    for noticia in noticias:
+        noticia.primer_imagen = noticia.imagenes.first()
+    
+    context = {
+        'noticias': noticias
+    }
+    
+    return render(request, 'admin/admin_noticias_borradores.html', context)
+
 
 def admin_crear_noticia(request):
     categorias = Categoria.objects.all()
+    paises = Pais.objects.all()
+    
     if request.method == 'POST':
         form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
             noticia = form.save(commit=False)
-            noticia.id_usuario = request.user  
+            noticia.id_usuario = request.user
             noticia.save()
-            
-            imagen = request.FILES.get('imagen')
-            if imagen:
-                extension = os.path.splitext(imagen.name)[-1]
-                nombre_archivo = f'{noticia.id_noticia}{extension}'
-                noticia.imagen.name = f'news/{nombre_archivo}'
-                noticia.save()
-
+            for imagen in request.FILES.getlist('imagenes'):
+                    ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
+            form.save_m2m()
             return redirect('admin_noticias')
     else:
         form = NoticiaForm()
-    return render(request, 'admin/admin_crear_noticia.html', {'form': form, 'categorias': categorias})
+    
+    context = {
+        'form': form,
+        'categorias': categorias,
+        'paises': paises
+    }
+    
+    return render(request, 'admin/admin_crear_noticia.html', context)
 
 def admin_editar_noticia(request, noticia_id):
-    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    noticia = Noticia.objects.get(id_noticia=noticia_id)
     categorias = Categoria.objects.all()
+    paises = Pais.objects.all()
+    imagenes = ImagenNoticia.objects.filter(noticia=noticia_id)
+
     if request.method == 'POST':
         form = NoticiaForm(request.POST, request.FILES, instance=noticia)
-        if form.is_valid():
-            form.save()
-            print("Actualización exitosa")
-            return redirect('admin_noticias')
-        else:
-            print("Formulario no válido:", form.errors)
+        detalle_form = DetalleNoticiaForm(request.POST, instance=noticia.detalle)
+        if form.is_valid() and detalle_form.is_valid():
+            noticia = form.save(commit=False)
+            noticia.id_usuario = request.user
+            noticia.save()
+            form.save_m2m()
+
+            if request.user.groups.filter(name='Administrador').exists():
+                detalle = detalle_form.save(commit=False)
+                detalle.noticia = noticia
+                if detalle_form.cleaned_data['publicada']:
+                    detalle.id_usuario = request.user
+                    detalle.save()
+
+            for imagen in request.FILES.getlist('imagenes'):
+                ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
+
+            return redirect('admin_editar_noticia', noticia_id=noticia_id)
     else:
         form = NoticiaForm(instance=noticia)
-    return render(request, 'admin/admin_editar_noticia.html', {'form': form, 'noticia_id': noticia_id, 'categorias': categorias})
+        detalle_form = DetalleNoticiaForm(instance=noticia.detalle)
+
+    context = {
+        'form': form,
+        'detalle_form': detalle_form,
+        'categorias': categorias,
+        'paises': paises,
+        'noticia_id': noticia_id,
+        'imagenes': imagenes
+    }
+
+    return render(request, 'admin/admin_editar_noticia.html', context)
+
+def admin_eliminar_imagen_noticia(request, imagen_id):
+    imagen = get_object_or_404(ImagenNoticia, id_imagen=imagen_id)
+    imagen.delete()
+    return redirect('admin_editar_noticia', noticia_id=imagen.noticia.id_noticia)
+
+
 
 def admin_eliminar_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id_noticia=noticia_id)

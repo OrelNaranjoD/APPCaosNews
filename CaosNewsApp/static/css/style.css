@@ -146,3 +146,7 @@ body {
 .table-link:hover {
     color: #900000;
 }
+
+.custom-image {
+    max-height: 80px;
+  }
