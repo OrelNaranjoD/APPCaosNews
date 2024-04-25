@@ -13,8 +13,9 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('', views.home, name='home'),
     path('contacto/', views.contacto, name='contacto'),
-    
-    
+    path('shop/', views.shop, name='shop'),
+
+
     #Rutas de administrador
     path('admin/', views.admin_home, name='admin_home'),
     path('admin/noticias/', views.admin_noticias, name='admin_noticias'),
@@ -30,8 +31,8 @@ urlpatterns = [
     path('admin/perfil/editar/', views.admin_edit_profile, name='admin_editar_perfil'),
     path('admin/perfil/', views.admin_view_profile, name='admin_perfil'),
     path('admin/usuarios/', views.admin_user_priv, name='admin_user_priv'),
-    
-    
+
+
     #Ruta de testing
     path('test', views.test, name='test'),
 ]

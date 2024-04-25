@@ -125,6 +125,9 @@ def contacto(request):
 def footer(request):
     return render(request, 'footer.html')
 
+def shop(request):
+    return render(request, 'shop.html')
+
 def login_view(request):
     if request.method == 'POST':
         identifier = request.POST.get('identifier')
@@ -165,7 +168,7 @@ def register_view(request):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-        
+
         login(request, user)
 
         return JsonResponse({'valid': True, 'success_message': 'Registro exitoso. Inicie sesión para continuar.'})
@@ -174,9 +177,9 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home') 
-    
-    
+    return redirect('home')
+
+
 #Vistas de Administrador
 #Autorizacion de usuarios
 def es_admin(user):
@@ -207,7 +210,7 @@ def admin_noticias(request):
         noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, activo=True, detalle__publicada=True, detalle__estado='A')
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
-        
+
         context = {
         'noticias': noticias
     }
@@ -219,14 +222,14 @@ def admin_noticias_borradores(request):
         noticias = Noticia.objects.filter(eliminado=False, detalle__estado__isnull=True)
     else:
         noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, detalle__publicada=False)
-    
+
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
-    
+
     context = {
         'noticias': noticias
     }
-    
+
     return render(request, 'admin/admin_noticias_borradores.html', context)
 
 @user_passes_test(es_admin_periodista_o_editor, login_url='home')
@@ -235,7 +238,7 @@ def admin_noticias_eliminadas(request):
         noticias = Noticia.objects.filter(eliminado=True)
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
-        
+
     context = {
     'noticias': noticias
     }
@@ -247,10 +250,10 @@ def admin_noticias_rechazadas(request):
         noticias = Noticia.objects.filter(eliminado=False, detalle__estado='R')
     else:
         noticias = Noticia.objects.filter(id_usuario=request.user.id, eliminado=False, detalle__publicada=True, detalle__estado='R')
-    
+
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
-    
+
     context = {
         'noticias': noticias
     }
@@ -260,7 +263,7 @@ def admin_noticias_rechazadas(request):
 def admin_crear_noticia(request):
     categorias = Categoria.objects.all()
     paises = Pais.objects.all()
-    
+
     if request.method == 'POST':
         form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
@@ -273,13 +276,13 @@ def admin_crear_noticia(request):
             return redirect('admin_noticias_borradores')
     else:
         form = NoticiaForm()
-    
+
     context = {
         'form': form,
         'categorias': categorias,
         'paises': paises
     }
-    
+
     return render(request, 'admin/admin_crear_noticia.html', context)
 
 @user_passes_test(es_admin_periodista_o_editor, login_url='home')
@@ -357,7 +360,7 @@ def admin_edit_profile(request):
             return redirect('admin_perfil')
     else:
         form = UserProfileForm(instance=request.user)
-    
+
     return render(request, 'admin/admin_edit_profile.html', {'form': form})
 
 @user_passes_test(es_admin_periodista_o_editor, login_url='home')
