@@ -20,6 +20,7 @@
     <!-- ========== CSS Personalizado ========== -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
+</head>
 <body onload="getFecha()" class="d-flex flex-column min-vh-100">
   <!-- ========== Header ========== -->
   <header>
@@ -47,7 +48,7 @@
         <div class="bg-light py-3">
           <div class="col">
               <a href="{% url 'home' %}">
-                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
+                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid" style="width: 400px;" alt="Caos News">
               </a>
           </div>
           <div class="col-auto">
@@ -64,7 +65,7 @@
   </header>
   <!-- ========== Cuerpo ========== -->
   <main>
-    <div class="container bg-body p-4">
+    <div class="container bg-body p-4" style="min-height: calc(100vh - (40px + 146.48px + 80px + 318.14px));">
       {% block body %}
 
       {% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'index.html' %} {% load static tz %} {% block title %}Caos News - Tienda{% endblock %} {% block body %}
+<div class="row d-flex justify-content-center align-items-center">
+  <div class="col-auto m-3">
+    <div class="card">
+      <div class="card-header">
+        {% if response.status == "AUTHORIZED" %}
+        <h4 class="text-center text-success">¡Tu pago fue realizado con exito!</h4>
+        {% else %}
+        <h4 class="text-center text-danger">¡Tu pago fallo, reintenta la operación!</h4>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <div class="alert alert-primary" role="alert">
+          <h3>Detalles de la transacción</h3>
+          <table class="table">
+            <tr>
+              <th>Orden de Compra</th>
+              <td>{{ response.buy_order }}</td>
+            </tr>
+            <tr>
+              <th>Código de Autorización</th>
+              <td>{{ response.authorization_code }}</td>
+            </tr>
+            <tr>
+              <th>Monto</th>
+              <td>
+                <script>
+                  var amount = '{{ response.amount }}'
+                  var formattedAmount = parseFloat(amount).toLocaleString('es-Cl', { style: 'currency', currency: 'CLP' })
+                  document.write(formattedAmount)
+                </script>
+              </td>
+            </tr>
+            <tr>
+              <th>Estado</th>
+              <td>
+                {% if response.status == "AUTHORIZED" %}
+                  Autorizado
+                {% else %}
+                  Fallido
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>Fecha de Transacción</th>
+              <td>
+                <script>
+                  var transactionDate = '{{ response.transaction_date }}'
+                  var formattedDate = new Date(transactionDate)
+                  var day = ('0' + formattedDate.getDate()).slice(-2)
+                  var month = ('0' + (formattedDate.getMonth() + 1)).slice(-2)
+                  var year = formattedDate.getFullYear()
+                  var hours = ('0' + formattedDate.getHours()).slice(-2)
+                  var minutes = ('0' + formattedDate.getMinutes()).slice(-2)
+                  var seconds = ('0' + formattedDate.getSeconds()).slice(-2)
+                  document.write(day + '-' + month + '-' + year + ' a las ' + hours + ':' + minutes + ' hrs')
+                </script>
+              </td>
+            </tr>
+            <tr>
+              <th>Tarjeta número</th>
+              <td>XXXX-XXXX-XXXX-{{ response.card_detail.card_number }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div class="text-center">
+      <a href="/" class="btn btn-secondary">Continuar</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

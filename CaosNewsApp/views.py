@@ -16,6 +16,9 @@ from django.db.models.functions import Concat
 from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+import random
 
 def index(request):
     noticias = Noticia.objects.filter(detalle__publicada=True)
@@ -127,6 +130,8 @@ def footer(request):
 
 def shop(request):
     return render(request, 'shop.html')
+
+from django.http import JsonResponse
 
 def login_view(request):
     if request.method == 'POST':
@@ -390,3 +395,54 @@ def admin_user_priv(request):
 #Testing
 def test(request):
     return render(request, 'test.html')
+
+#Transbank
+from transbank.error.transbank_error import TransbankError
+from transbank.error.transaction_commit_error import TransactionCommitError
+from transbank.webpay.webpay_plus.transaction import Transaction
+import random
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def webpay_plus_create(request):
+    print("Webpay Plus Transaction.create")
+    buy_order = str(random.randrange(1000000, 99999999))
+    session_id = str(random.randrange(1000000, 99999999))
+    amount = request.POST.get('amount')
+    subscription_type = request.POST.get('subscription_type')
+    return_url = request.build_absolute_uri(reverse('webpay-plus-commit'))
+
+    create_request = {
+        "buy_order": buy_order,
+        "session_id": session_id,
+        "amount": amount,
+        "return_url": return_url
+    }
+
+    response = (Transaction()).create(buy_order, session_id, amount, return_url)
+
+    print(response)
+
+    return render(request, 'webpay/plus/create.html', {
+        'request': create_request,
+        'response': response,
+        'amount': amount,
+        'subscription_type': subscription_type
+    })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def webpay_plus_commit(request):
+    token = request.GET.get('token_ws') or request.GET.get('TBK_TOKEN')
+    print("commit for token: {}".format(token))
+    try:
+        response = (Transaction()).commit(token=token)
+        print("response: {}".format(response))
+    except TransactionCommitError as e:
+        print("Error al confirmar la transacción: {}".format(e))
+        return render(request, 'webpay/plus/error.html', {'message': str(e)})
+
+    return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})

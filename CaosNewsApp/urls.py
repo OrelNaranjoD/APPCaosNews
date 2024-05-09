@@ -14,6 +14,8 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('contacto/', views.contacto, name='contacto'),
     path('shop/', views.shop, name='shop'),
+    path('webpay/plus/commit/', views.webpay_plus_commit, name='webpay-plus-commit'),
+    path('webpay/plus/create/', views.webpay_plus_create, name='webpay-plus-create'),
 
 
     #Rutas de administrador

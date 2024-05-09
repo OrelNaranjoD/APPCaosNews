@@ -1,0 +1,43 @@
+{% extends 'index.html' %} {% load static %} {% block title %}Caos News - Confirmación de pago{% endblock %} {% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="text-center">¡Listo para realizar tu pago!</h4>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            ¡Estás a punto de realizar un pago de
+            <strong>
+              <script>
+                var amount = '{{ amount }}'
+                var formattedAmount = parseFloat(amount).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
+                document.write(formattedAmount)
+              </script>
+            </strong>
+            por la suscripción {{ subscription_type }}!
+          </p>
+          {% if user.is_authenticated %}
+          <p class="card-text">{{ user.first_name }} {{ user.last_name }} la suscripción sera asociada a tu cuenta.</p>
+          {% else %}
+          <p class="card-text">Tu suscripción se activara en tu cuenta, tienes que estar registrado  y tener tu sesión inciada.</p>
+          {% endif %}
+          <form action="{{ response.url }}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="token_ws" value="{{ response.token }}" />
+            <div class="text-center">
+              {% if user.is_authenticated %}
+              <button type="submit" class="btn btn-primary">¡Vamos a pagar ahora!</button>
+              {% else %}
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#login">Iniciar sesión</button>
+              {% endif %}
+              <a href="/shop/" class="btn btn-secondary">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
