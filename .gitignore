@@ -1,5 +1,19 @@
-CaosNews/__pycache__/*
-CaosNewsApp/migrations/__pycache__/*
-CaosNewsApp/__pycache__/*
-CaosNewsApp/__pycache__/*.*
-CaosNews/Lib/**
+# Ignore database file
+db.sqlite3
+
+# Ignore all cache files
+__pycache__/
+CaosNews/__pycache__/
+CaosNewsApp/__pycache__/
+
+# Ignore all .pyc files
+*.pyc
+
+# Ignore environment file
+.env
+
+# Ignore all .DS_Store files
+.DS_Store
+
+# Ignore folder where the virtual environment is located
+venv/**
