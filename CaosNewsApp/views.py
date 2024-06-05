@@ -29,7 +29,7 @@ def index(request):
 
 def noticias(request, categoria):
     if categoria == 'Ultima Hora':
-        noticias = Noticia.objects.filter(eliminado=False,  activo=True, detalle__publicada=True).order_by('-fecha_creacion')[:10]
+        noticias = Noticia.objects.filter(eliminado=False,  activo=True, detalle__publicada=True).exclude(id_categoria=14).order_by('-fecha_creacion')[:10]
     else:
         noticias = Noticia.objects.filter(id_categoria__nombre_categoria=categoria, eliminado=False,  activo=True, detalle__publicada=True).order_by('-fecha_creacion')
     context = {
@@ -88,8 +88,8 @@ def obtener_tiempo_chile():
     return resultados
 
 def home(request):
-    noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True, detalle__publicada=True).order_by('-fecha_creacion')
-    noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True, detalle__publicada=True).order_by('-fecha_creacion')[:3]
+    noticias_destacadas = Noticia.objects.filter(destacada=True, eliminado=False, activo=True, detalle__publicada=True).exclude(id_categoria=14).order_by('-fecha_creacion')
+    noticias_recientes = Noticia.objects.filter(destacada=False, eliminado=False, activo=True, detalle__publicada=True).exclude(id_categoria=14).order_by('-fecha_creacion')[:5]
 
     imagenes_destacadas = [noticia.imagenes.first() for noticia in noticias_destacadas]
     imagenes_recientes = [noticia.imagenes.first() for noticia in noticias_recientes]
@@ -446,3 +446,35 @@ def webpay_plus_commit(request):
         return render(request, 'webpay/plus/error.html', {'message': str(e)})
 
     return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+
+#API REST
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated
+from .serializers import NoticiaSerializer
+from rest_framework.response import Response
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_noticia(request):
+    serializer = NoticiaSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+from rest_framework.views import exception_handler
+
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+
+    if response is not None:
+        detail = response.data.get('detail')
+        if detail == 'Las credenciales de autenticación no se proveyeron.':
+            response.data['error'] = 'Las credenciales de autenticación no fueron incluidas.'
+        elif detail == 'Token inválido.':
+            response.data['error'] = 'El Token proporcionado es incorrecto.'
+        else:
+            response.data['error'] = detail
+        del response.data['detail']
+
+    return response

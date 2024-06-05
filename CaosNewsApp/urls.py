@@ -34,6 +34,8 @@ urlpatterns = [
     path('admin/perfil/', views.admin_view_profile, name='admin_perfil'),
     path('admin/usuarios/', views.admin_user_priv, name='admin_user_priv'),
 
+    #Rutas API REST
+    path('api/publicidad/', views.create_noticia, name='create_noticia'),
 
     #Ruta de testing
     path('test', views.test, name='test'),

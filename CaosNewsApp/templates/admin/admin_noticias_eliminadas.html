@@ -7,7 +7,7 @@
       <h2>Lista de noticias eliminadas</h2>
     </div>
     <div class="col-12 table-responsive">
-      
+
 
       <table class="table table-striped">
         <thead>
@@ -32,10 +32,10 @@
             <td>{{ noticia.titulo_noticia }}</td>
             <td class="text-center">{{ noticia.id_categoria }}</td>
             <td class="text-center">
-              {% if noticia.primer_imagen %}
-                  <img src="{{ noticia.primer_imagen.imagen.url }}" alt="Imagen" width="50">
+              {% if noticia.primer_imagen and noticia.primer_imagen.imagen and noticia.primer_imagen.imagen.url %}
+                <img src="{{ noticia.primer_imagen.imagen.url }}" alt="Imagen" width="50">
               {% else %}
-                  Sin imagen
+                Sin imagen
               {% endif %}
             </td>
             <td class="text-center">
@@ -55,7 +55,7 @@
               <td class="text-center">
                 <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}">
                   <i class="fa-solid fa-pen-to-square"></i>
-                </a>  
+                </a>
                 {% if noticia.eliminado %}
                   <i class="fa-solid fa-trash text-danger"></i>
                   {% else %}
