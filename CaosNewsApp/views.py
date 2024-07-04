@@ -408,24 +408,18 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 @require_http_methods(["POST"])
 def webpay_plus_create(request):
-    print("Webpay Plus Transaction.create")
     buy_order = str(random.randrange(1000000, 99999999))
     session_id = str(random.randrange(1000000, 99999999))
     amount = request.POST.get('amount')
     subscription_type = request.POST.get('subscription_type')
     return_url = request.build_absolute_uri(reverse('webpay-plus-commit'))
-
     create_request = {
         "buy_order": buy_order,
         "session_id": session_id,
         "amount": amount,
         "return_url": return_url
     }
-
     response = (Transaction()).create(buy_order, session_id, amount, return_url)
-
-    print(response)
-
     return render(request, 'webpay/plus/create.html', {
         'request': create_request,
         'response': response,
@@ -437,14 +431,10 @@ def webpay_plus_create(request):
 @require_http_methods(["GET"])
 def webpay_plus_commit(request):
     token = request.GET.get('token_ws') or request.GET.get('TBK_TOKEN')
-    print("commit for token: {}".format(token))
     try:
         response = (Transaction()).commit(token=token)
-        print("response: {}".format(response))
     except TransactionCommitError as e:
-        print("Error al confirmar la transacción: {}".format(e))
         return render(request, 'webpay/plus/error.html', {'message': str(e)})
-
     return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
 
 #API REST
@@ -452,6 +442,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from .serializers import NoticiaSerializer
 from rest_framework.response import Response
+from rest_framework.views import exception_handler
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -461,8 +452,6 @@ def create_noticia(request):
         serializer.save()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
-
-from rest_framework.views import exception_handler
 
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
