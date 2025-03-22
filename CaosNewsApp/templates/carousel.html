@@ -1,12 +1,12 @@
 {% load static %}
-<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" style="max-width: 1200px; margin: auto;">
     <ol class="carousel-indicators">
         <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
         {% for noticia in noticias_destacadas %}
         <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter }}"></li>
         {% endfor %}
     </ol>
-    <div class="carousel-inner carousel-container p-4">
+    <div class="carousel-inner carousel-container p-4" style="height: 400px; overflow: hidden;">
         <div class="carousel-item active">
           <div class="d-flex flex-nowrap overflow-hidden">
             <div class="col-md justify-content-start">
@@ -48,12 +48,12 @@
         {% endfor %}
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-      data-bs-slide="prev">
+      data-bs-slide="prev" style="margin-left: -50px;">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-      data-bs-slide="next">
+      data-bs-slide="next" style="margin-right: -50px;">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>

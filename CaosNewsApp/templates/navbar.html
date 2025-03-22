@@ -11,7 +11,7 @@
           <a class="nav-link active" aria-current="page" href="/"><i class="fa-solid fa-house"></i></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-danger" href="{% url 'noticias' categoria='Ultima Hora' %}">ULTIMA HORA</a>
+          <a class="nav-link text-nowrap text-danger" href="{% url 'noticias' categoria='Ultima Hora' %}">ULTIMA HORA</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'shop' %}">PLANES</a>
@@ -33,9 +33,6 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'noticias' categoria='Mundo' %}">MUNDO</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'contacto' %}">CONTACTO</a>
         </li>
       </ul>
       <form class="d-flex" method="GET" action="{% url 'busqueda' %}">
