@@ -1,16 +1,84 @@
-# Ignore all cache files
-__pycache__/
-CaosNews/__pycache__/
-CaosNewsApp/__pycache__/
-
-# Ignore all .pyc files
+# Django #
+*.log
+*.pot
 *.pyc
+__pycache__/
+local_settings.py
 
-# Ignore environment file
+# Base de datos y media - comentados para mantener datos de ejemplo
+# db.sqlite3
+# db.sqlite3-journal
+# media/
+
+# Si más adelante deseas excluir estos archivos, descomenta las líneas anteriores
+
+# Sqlite database files
+# *.sqlite3
+
+# SonarQube / SonarLint
+.scannerwork/
+.sonarlint/
+
+# Environment files
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv
 
-# Ignore all .DS_Store files
+# Python virtual environments
+venv/
+env/
+ENV/
+virtualenv/
+.python-version
+
+# Python distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
 .DS_Store
 
-# Ignore folder where the virtual environment is located
-venv/**
+# Coverage / testing
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+coverage/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+cover/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pytest
+pytest_cache/
+.pytest_cache/
+
+# Translations
+*.mo

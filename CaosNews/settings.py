@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'rest_framework.authtoken',
+	'csp',
     'CaosNewsApp',
 ]
 
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'CaosNews.urls'
@@ -143,3 +145,17 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'CaosNewsApp.views.custom_exception_handler'
 }
+
+CONTENT_SECURITY_POLICY = {'DIRECTIVES': {
+    'default-src': ["'self'"],
+    'script-src': ["'self'", "https://trusted-scripts.example.com"],
+    'style-src': ["'self'", "https://trusted-styles.example.com"],
+    'img-src': ["'self'", "https://trusted-images.example.com"],
+    'font-src': ["'self'", "https://trusted-fonts.example.com"],
+    'connect-src': ["'self'", "https://api.example.com"],
+    'frame-src': ["'self'", "https://trusted-frames.example.com"],
+    'media-src': ["'self'", "https://trusted-media.example.com"],
+    'object-src': ["'none'"],
+    'base-uri': ["'self'"],
+    'form-action': ["'self'"],
+}}
