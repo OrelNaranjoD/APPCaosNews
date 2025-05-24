@@ -5,11 +5,11 @@ $(function () {
     event.stopPropagation()
 
     var form = $(this)
-    var errorContainer = $('#errorContainer')
+    var messageContainer = $('#messageContainer')
     var emailError = $('#emailError')
     var passwordError = $('#passwordError')
 
-    errorContainer.empty()
+    messageContainer.empty()
     emailError.empty()
     passwordError.empty()
 
@@ -24,18 +24,21 @@ $(function () {
         if (data.valid) {
           console.log('Inicio de sesión exitoso')
           var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
-          errorContainer.html(successMessage)
+          messageContainer.html(successMessage)
           setTimeout(function () {
-            successMessage.fadeOut(300, function () {
+            successMessage.fadeOut(1000, function () {
               $(this).remove()
             })
-          }, 500)
-          location.reload();
+            // Retrasar la recarga de la página para garantizar que el mensaje sea visible
+            setTimeout(function () {
+              location.reload()
+            }, 2000) // Esperar 2 segundos adicionales antes de recargar
+          }, 3000) // Mostrar el mensaje durante 3 segundos
         } else {
           console.log('Error en el inicio de sesión:', data.error_message)
           if (data.error_message) {
             var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>')
-            errorContainer.html(errorMessage)
+            messageContainer.html(errorMessage)
           }
         }
       },
@@ -44,7 +47,7 @@ $(function () {
         var errorMessage = $(
           '<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>',
         )
-        errorContainer.html(errorMessage)
+        messageContainer.html(errorMessage)
       },
     })
     return false
@@ -84,10 +87,10 @@ $(function () {
           var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
           errorContainer.html(successMessage)
           setTimeout(function () {
-            successMessage.fadeOut(300, function () {
+            successMessage.fadeOut(1000, function () {
               $(this).remove()
             })
-          }, 500)
+          }, 3000)
           location.reload();
         } else {
           if (data.error_message) {
