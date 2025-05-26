@@ -28,7 +28,7 @@ class Noticia(models.Model):
     fecha_modificacion = models.DateTimeField(auto_now=True)
     id_usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='id_usuario')
     eliminado = models.BooleanField(("Borrado"), default=False)
-    
+
     def __str__(self):
         return self.titulo_noticia
 
@@ -48,7 +48,7 @@ class DetalleNoticia(models.Model):
     def __str__(self):
         return f'Detalle {self.id_detalle} - Noticia: {self.noticia.titulo_noticia}'
 
-    
+
 @receiver(post_save, sender=Noticia)
 def create_detalle_noticia(sender, instance, created, **kwargs):
     if created:
@@ -65,7 +65,7 @@ class ImagenNoticia(models.Model):
 class Pais(models.Model):
     id_pais = models.AutoField(db_column='id_pais', primary_key=True)
     pais = models.CharField(max_length=20, blank=True, null=False)
-    
+
     def __str__(self):
         return self.pais
 
@@ -75,6 +75,12 @@ class Categoria(models.Model):
 
     def __str__(self):
         return str(self.nombre_categoria)
+
+
+
+
+
+
 
 
 class Usuario(AbstractUser):

@@ -102,7 +102,7 @@ class UserAPITestCase(APITestCase):
 
     def test_get_user_profile(self):
         """Prueba obtener el perfil de usuario - usando admin_perfil como alternativa"""
-        url = reverse("admin_perfil")  # Corregido para coincidir con el nombre correcto de la URL
+        url = reverse("admin_perfil")
         response = self.client.get(url)
         self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_302_FOUND])
         if response.status_code == status.HTTP_302_FOUND:
