@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -8,14 +8,17 @@ from rest_framework.test import APITestCase
 from PIL import Image
 import io
 from CaosNewsApp.models import Noticia, Categoria, Pais
+from ..test_constants import TEST_PASSWORDS, TEST_DATA
+
+User = get_user_model()
 
 class CategoryTestCase(TestCase):
     """Crea un conjunto de pruebas para el modelo Categoria"""
 
     def test_category_creation(self):
         """Prueba la creación de una categoría"""
-        category = Categoria.objects.create(nombre_categoria="Prueba")
-        self.assertEqual(category.nombre_categoria, "Prueba")
+        category = Categoria.objects.create(nombre_categoria=TEST_DATA['categoria_nombre'])
+        self.assertEqual(category.nombre_categoria, TEST_DATA['categoria_nombre'])
         self.assertTrue(isinstance(category, Categoria))
         self.assertEqual(str(category), category.nombre_categoria)
 
@@ -25,8 +28,8 @@ class CountryTestCase(TestCase):
 
     def test_country_creation(self):
         """Prueba la creación de un país"""
-        country = Pais.objects.create(pais="Chile")
-        self.assertEqual(country.pais, "Chile")
+        country = Pais.objects.create(pais=TEST_DATA['pais_nombre'])
+        self.assertEqual(country.pais, TEST_DATA['pais_nombre'])
         self.assertTrue(isinstance(country, Pais))
         self.assertEqual(str(country), country.pais)
 
@@ -36,23 +39,23 @@ class NewsTestCase(TestCase):
 
     def setUp(self):
         """Configura las pruebas"""
-        self.category = Categoria.objects.create(nombre_categoria="Prueba")
-        self.country = Pais.objects.create(pais="Chile")
+        self.category = Categoria.objects.create(nombre_categoria=TEST_DATA['categoria_nombre'])
+        self.country = Pais.objects.create(pais=TEST_DATA['pais_nombre'])
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="password123"
+            username="testuser", email="test@example.com", password=TEST_PASSWORDS['simple_password']  # Django hashea automáticamente
         )
 
     def test_news_creation(self):
         """Prueba la creación de una noticia"""
         news = Noticia.objects.create(
-            titulo_noticia="Título de prueba",
-            cuerpo_noticia="Cuerpo de la noticia de prueba",
+            titulo_noticia=TEST_DATA['noticia_titulo'],
+            cuerpo_noticia=TEST_DATA['noticia_cuerpo'],
             id_categoria=self.category,
             id_usuario=self.user,
             id_pais=self.country
         )
-        self.assertEqual(news.titulo_noticia, "Título de prueba")
-        self.assertEqual(news.cuerpo_noticia, "Cuerpo de la noticia de prueba")
+        self.assertEqual(news.titulo_noticia, TEST_DATA['noticia_titulo'])
+        self.assertEqual(news.cuerpo_noticia, TEST_DATA['noticia_cuerpo'])
         self.assertEqual(news.id_categoria, self.category)
         self.assertEqual(news.id_usuario, self.user)
         self.assertEqual(news.id_pais, self.country)
@@ -68,22 +71,22 @@ class UserTestCase(TestCase):
     def setUp(self):
         """Configura las pruebas"""
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="password123"
+            username="testuser", email="test@example.com", password=TEST_PASSWORDS['simple_password']  # Django hashea automáticamente
         )
 
     def test_user_creation(self):
         """Prueba la creación de un usuario"""
         self.assertEqual(self.user.username, "testuser")
         self.assertEqual(self.user.email, "test@example.com")
-        self.assertTrue(self.user.check_password("password123"))
+        self.assertTrue(self.user.check_password(TEST_PASSWORDS['simple_password']))  # Verificar contraseña hasheada
         another_user = User.objects.create_user(
             username="testusuario",
             email="test2@example.com",
-            password="password456"
+            password=TEST_PASSWORDS['another_password']  # Django hashea automáticamente
         )
         self.assertEqual(another_user.username, "testusuario")
         self.assertEqual(another_user.email, "test2@example.com")
-        self.assertTrue(another_user.check_password("password456"))
+        self.assertTrue(another_user.check_password(TEST_PASSWORDS['another_password']))  # Verificar contraseña hasheada
         self.assertTrue(isinstance(another_user, User))
         self.assertEqual(str(another_user), another_user.username)
 
@@ -95,7 +98,7 @@ class UserAPITestCase(APITestCase):
         """Configura las pruebas"""
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="password123"
+            username="testuser", email="test@example.com", password=TEST_PASSWORDS['simple_password']  # Django hashea automáticamente
         )
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)

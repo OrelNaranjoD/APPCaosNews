@@ -16,10 +16,9 @@ class TestRF301CrearNoticia:
     @pytest.mark.django_db
     def test_create_news(
         self,
-        live_server,
+        test_server_url,
         create_test_journalist,
         authenticated_journalist_browser,
-        populate_categories_and_countries,
     ):
         """Test que verifica la creación de una noticia por un periodista"""
         driver = authenticated_journalist_browser
@@ -28,7 +27,7 @@ class TestRF301CrearNoticia:
 
         # 1. Navegar a creación de noticias
         print("1. Navegando a página de creación...")
-        driver.get(f"{live_server.url}/admin/noticias/crear/")
+        driver.get(f"{test_server_url}/admin/noticias/crear/")
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "titulo_noticia"))
         )
@@ -81,12 +80,36 @@ class TestRF301CrearNoticia:
         print(f"   URL inicial: {url_inicial}")
         print(f"   URL final: {url_final}")
 
-        # 7. Verificar en base de datos
-        print("7. Verificando en base de datos...")
-        from CaosNewsApp.models import Noticia
+        # 7. Verificar creación exitosa
+        print("7. Verificando creación exitosa...")
 
-        # Buscar noticia creada
-        noticia = Noticia.objects.filter(
-            titulo_noticia="Recta final de los Premios Regionales de Aysén 2023"
-        ).first()
-        assert noticia is not None, "La noticia no fue creada correctamente"
+        # Verificación 1: La URL cambió a la página de borradores (indica éxito)
+        assert "/admin/noticias/borradores/" in url_final, f"La redirección no fue correcta. URL final: {url_final}"
+        print("   ✅ Redirección exitosa a borradores")
+
+        # Verificación 2: Buscar la noticia en la página de borradores
+        print("   Verificando que la noticia aparece en la lista de borradores...")
+        try:
+            # Buscar el título de la noticia en la página actual
+            titulo_noticia = "Recta final de los Premios Regionales de Aysén 2023"
+            noticia_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, f"//td[contains(text(), '{titulo_noticia}')]"))
+            )
+            print("   ✅ Noticia encontrada en la lista de borradores")
+
+            # Verificación 3: Comprobar que está en la tabla de borradores
+            tabla_borradores = driver.find_element(By.CLASS_NAME, "table-striped")
+            assert titulo_noticia in tabla_borradores.text, "La noticia no está visible en la tabla de borradores"
+            print("   ✅ Noticia visible en la tabla de borradores")
+
+        except Exception as e:
+            print(f"   ❌ Error verificando la noticia en la interfaz: {e}")
+            # Intentar obtener el contenido de la página para debug
+            page_content = driver.page_source
+            if titulo_noticia in page_content:
+                print("   ℹ️  La noticia SÍ está en el HTML de la página")
+            else:
+                print("   ❌ La noticia NO está en el HTML de la página")
+            raise AssertionError(f"No se pudo verificar la creación de la noticia: {e}")
+
+        print("   ✅ Noticia creada y verificada exitosamente")

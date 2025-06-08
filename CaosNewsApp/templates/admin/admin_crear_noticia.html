@@ -8,7 +8,6 @@
       <h2>Crear Noticia</h2>
       <form method="POST" action="{% url 'admin_crear_noticia' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="hidden" id="id_usuario" name="id_usuario" value="{{ request.user.id }}">
         <div class="row mb-3">
           <div class="col-3">
             <label for="titulo_noticia" class="form-label">Título de la Noticia:</label>
@@ -44,7 +43,7 @@
           </div>
           <div class="col">
             <select id="id_pais" name="id_pais" class="form-select">
-              <option value="" selected disabled>Seleccione un país</option>
+              <option value="">Seleccione un país (opcional)</option>
               {% for pais in paises %}
                 <option value="{{ pais.id_pais }}">{{ pais.pais }}</option>
               {% endfor %}

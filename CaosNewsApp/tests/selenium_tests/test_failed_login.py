@@ -7,13 +7,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from ..test_constants import TEST_PASSWORDS, QA_USER_CREDENTIALS
 
 
 class TestFailedLogin:
     """Prueba de fallo de inicio de sesión"""
 
     @pytest.mark.django_db
-    def test_failed_login(self, live_server, create_test_user, create_sample_news, browser):
+    def test_failed_login(self, live_server_url, create_test_user, create_sample_news, browser):
         """Test de fallo de inicio de sesión con credenciales incorrectas"""
 
         # El usuario ya es creado por el fixture create_test_user
@@ -26,8 +27,8 @@ class TestFailedLogin:
         driver = browser
 
         # Navegar a la página principal
-        print(f"Navegando a: {live_server.url}")
-        driver.get(live_server.url)
+        print(f"Navegando a: {live_server_url.url}")
+        driver.get(live_server_url.url)
 
         # Verificar que la página carga
         assert "Caos News" in driver.title or "Caos" in driver.title
@@ -50,13 +51,13 @@ class TestFailedLogin:
         print("✍️ Llenando campo de email con credenciales incorrectas")
         username_field = driver.find_element(By.ID, "id_identifier")
         username_field.clear()
-        username_field.send_keys("wronguser@test.cl")
+        username_field.send_keys(QA_USER_CREDENTIALS['admin']['email'])  # Usuario existente pero contraseña incorrecta
         time.sleep(1)  # Pausa para visualización
 
         print("🔒 Llenando campo de contraseña incorrecta")
         password_field = driver.find_element(By.ID, "id_password")
         password_field.clear()
-        password_field.send_keys("wrongpassword")
+        password_field.send_keys(TEST_PASSWORDS['invalid_password'])  # Contraseña incorrecta desde constantes
         time.sleep(1)  # Pausa para visualización
 
         # Enviar formulario
@@ -65,45 +66,22 @@ class TestFailedLogin:
         submit_button.click()
         time.sleep(2)  # Pausa para ver el resultado
 
-        # Esperar mensaje de error - esto es lo que debe pasar con credenciales incorrectas
-        try:
-            # Buscar mensaje de error en diferentes lugares posibles
-            error_detected = False
+        # Verificar que el login falló - debe mostrar error o mantener el modal visible
+        print("🔍 Verificando que el login falló...")
 
-            # Opción 1: Mensaje de error en contenedor específico
-            try:
-                error_message = WebDriverWait(driver, 5).until(
-                    EC.visibility_of_element_located((By.XPATH, "//div[contains(@class, 'alert-danger') or contains(@class, 'error') or contains(text(), 'error') or contains(text(), 'incorrecto')]"))
-                )
-                print(f"❌ Mensaje de error detectado: {error_message.text}")
-                error_detected = True
-            except TimeoutException:
-                pass
+        # El modal debe seguir visible porque hubo error
+        modal = driver.find_element(By.ID, "login")
+        assert modal.is_displayed(), "El modal de login debería seguir visible después de credenciales incorrectas"
 
-            # Opción 2: El modal sigue visible (no se cerró porque hubo error)
-            if not error_detected:
-                try:
-                    modal_still_visible = driver.find_element(By.ID, "login")
-                    if modal_still_visible.is_displayed():
-                        print("❌ Modal de login sigue visible - login falló correctamente")
-                        error_detected = True
-                except:
-                    pass
+        # Verificar que no hay redirección al admin
+        current_url = driver.current_url
+        assert "/admin/" not in current_url, f"No debería redirigir al admin con credenciales incorrectas. URL actual: {current_url}"
 
-            # Opción 3: No hay redirección exitosa
-            if not error_detected:
-                current_url = driver.current_url
-                if "/admin/" not in current_url and "logout" not in driver.page_source:
-                    print("❌ No hubo redirección exitosa - login falló correctamente")
-                    error_detected = True
+        # Verificar que no aparece enlace de logout (señal de login exitoso)
+        logout_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/logout')]")
+        assert len(logout_links) == 0, "No debería aparecer enlace de logout con credenciales incorrectas"
 
-            if error_detected:
-                print("✅ Test de fallo de login completado exitosamente")
-            else:
-                print("⚠️ No se detectó claramente el fallo de login")
-
-        except Exception as e:
-            print(f"❌ Error durante la verificación: {str(e)}")
+        print("✅ Test de fallo de login completado exitosamente - el login falló correctamente")
 
         # Pausa final para visualizar el resultado
         time.sleep(2)

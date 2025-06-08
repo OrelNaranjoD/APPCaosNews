@@ -8,7 +8,12 @@ from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+# Configuración del servidor QA
+QA_SERVER_URL = "http://127.0.0.1:8001"
+
+User = get_user_model()
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -17,6 +22,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.base import ContentFile
 from io import BytesIO
 from PIL import Image
+from .test_constants import TEST_USER_CREDENTIALS, QA_USER_CREDENTIALS
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -30,11 +36,11 @@ def pytest_runtest_makereport(item, call):
 def create_test_user(db):
     """Fixture para crear un usuario de prueba administrador"""
     user = User.objects.create_user(
-        username="juanperez",
-        email="juanperez@duocuc.cl",
-        password="PassSegura123",
-        first_name="Juan",
-        last_name="Perez",
+        username=TEST_USER_CREDENTIALS['username'],
+        email=TEST_USER_CREDENTIALS['email'],
+        password=TEST_USER_CREDENTIALS['password'],  # Django hashea automáticamente
+        first_name=TEST_USER_CREDENTIALS['first_name'],
+        last_name=TEST_USER_CREDENTIALS['last_name'],
     )
     user.is_staff = True
     user.is_superuser = True
@@ -49,63 +55,88 @@ def create_test_user(db):
 
 @pytest.fixture
 def create_test_journalist(db):
-    """Fixture para crear un usuario periodista"""
-    from django.contrib.auth.models import User, Group
+    """Fixture para obtener o crear un usuario periodista"""
+    from django.contrib.auth.models import Group
+
+    # Para pruebas con servidor QA, usar credenciales QA
+    qa_creds = QA_USER_CREDENTIALS['periodista']
 
     try:
-        journalist_user = User.objects.get(username="juanperez")
+        # Intentar obtener el usuario QA existente
+        journalist_user = User.objects.get(username=qa_creds['username'])
+        print(f"✅ Usuario QA periodista encontrado: {journalist_user.username}")
     except User.DoesNotExist:
+        # Si no existe (en tests unitarios), crear uno temporal
         journalist_user = User.objects.create_user(
-            username="juanperez",
-            email="juanperez@duocuc.cl",
-            password="PassSegura123",
-            first_name="Juan",
-            last_name="Perez",
+            username=qa_creds['username'],
+            email=qa_creds['email'],
+            password=qa_creds['password'],
+            first_name=qa_creds['first_name'],
+            last_name=qa_creds['last_name'],
         )
+        journalist_user.is_staff = True
+
         # Añadir al grupo Periodista
         periodista_group, _ = Group.objects.get_or_create(name="Periodista")
         journalist_user.groups.add(periodista_group)
         journalist_user.save()
+        print(f"✅ Usuario periodista creado temporalmente: {journalist_user.username}")
 
-    print(f"✅ Usuario periodista creado/encontrado: {journalist_user.username}")
     return journalist_user
 
 
 @pytest.fixture
-def authenticated_journalist_browser(browser, test_server_url, create_test_journalist):
+def authenticated_journalist_browser(browser, create_test_journalist, test_server_url):
     """Fixture que proporciona un navegador con sesión de periodista ya iniciada"""
-    from django.test import Client
-    from django.contrib.sessions.backends.db import SessionStore
 
-    # Crear un cliente de Django para manejar la autenticación
-    client = Client()
-    client.login(username="juanperez", password="PassSegura123")
+    # Usar el servidor QA externo
+    base_url = test_server_url
+    login_url = f"{base_url}/adminDJango/login/?next=/admin/noticias/crear/"
+    print(f"🔐 Iniciando sesión en el servidor QA: {login_url}")
+    browser.get(login_url)
 
-    # Obtener la cookie de sesión
-    session_key = client.session.session_key
-
-    # Navegar a la página inicial en Selenium
-    browser.get(test_server_url)
-
-    # Agregar la cookie de sesión al navegador
-    browser.add_cookie(
-        {"name": "sessionid", "value": session_key, "path": "/", "domain": "localhost"}
-    )
-
-    # NUEVO: Obtener también el token CSRF del cliente Django
-    # Hacer una petición GET para obtener el token CSRF
-    response = client.get('/admin/')
-    if 'csrftoken' in client.cookies:
-        csrf_token = client.cookies['csrftoken'].value
-        browser.add_cookie(
-            {"name": "csrftoken", "value": csrf_token, "path": "/", "domain": "localhost"}
+    try:
+        # Esperar el campo de username
+        username_field = WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.NAME, "username"))
         )
-        print(f"✅ Token CSRF añadido: {csrf_token[:20]}...")
 
-    # Refrescar la página para aplicar la sesión
-    browser.refresh()
+        # Llenar credenciales (usar credenciales de QA)
+        qa_creds = QA_USER_CREDENTIALS['periodista']
+        username_field.send_keys(qa_creds['username'])
 
-    print("✅ Sesión de periodista aplicada automáticamente")
+        password_field = browser.find_element(By.NAME, "password")
+        password_field.send_keys(qa_creds['password'])
+
+        # Hacer clic en el botón de login
+        login_button = browser.find_element(By.XPATH, "//input[@type='submit']")
+        login_button.click()
+
+        # Esperar redirección exitosa
+        WebDriverWait(browser, 10).until(
+            lambda driver: "/admin/noticias/crear/" in driver.current_url or "/admin/" in driver.current_url
+        )
+
+        # Debug: Verificar la URL actual y título de la página
+        print(f"📍 URL después del login: {browser.current_url}")
+        print(f"📝 Título de página: {browser.title}")
+
+        # Verificar si necesitamos navegar manualmente a la página de creación
+        if "/admin/noticias/crear/" not in browser.current_url:
+            print("🔄 Navegando manualmente a la página de creación de noticias...")
+            browser.get(f"{base_url}/admin/noticias/crear/")
+            # Esperar a que la página cargue
+            time.sleep(2)
+            print(f"📍 URL después de navegación manual: {browser.current_url}")
+
+        print("✅ Sesión de periodista iniciada correctamente en servidor QA")
+
+    except Exception as auth_error:
+        print(f"❌ Error al iniciar sesión: {auth_error}")
+        print(f"URL actual: {browser.current_url}")
+        print(f"Título de página: {browser.title}")
+        raise
+
     return browser
 
 
@@ -420,12 +451,29 @@ def fast_test_server():
 
 
 @pytest.fixture
-def test_server_url(live_server):
+def test_server_url():
     """
-    Fixture optimizado que proporciona la URL del servidor de pruebas.
+    Fixture que proporciona la URL del servidor QA externo.
+    Este servidor debe estar ejecutándose previamente en http://127.0.0.1:8001
     """
-    print(f"✅ Servidor de pruebas iniciado en {live_server.url}")
-    return live_server.url
+    print(f"🎯 Usando servidor QA externo en {QA_SERVER_URL}")
+    return QA_SERVER_URL
+
+@pytest.fixture
+def live_server_url():
+    """
+    Fixture de compatibilidad que mapea al servidor QA.
+    Reemplaza el live_server estándar de Django con nuestro servidor QA.
+    """
+    print(f"🔗 Redirigiendo live_server a servidor QA: {QA_SERVER_URL}")
+
+    # Crear un objeto mock que simule live_server.url
+    class MockLiveServer:
+        @property
+        def url(self):
+            return QA_SERVER_URL
+
+    return MockLiveServer()
 
 
 @pytest.fixture(scope="function")

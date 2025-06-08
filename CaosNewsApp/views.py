@@ -12,7 +12,6 @@ from .forms import (
     DetalleNoticiaForm,
 )
 from django.http import JsonResponse
-from django.contrib.auth.models import User
 import requests, sys, os
 from django.forms.models import model_to_dict
 from django.contrib.auth.decorators import login_required
@@ -220,7 +219,7 @@ def login_view(request):
                     "error_message": "Por favor, complete todos los campos.",
                 }
             )
-        user = User.objects.filter(Q(email=identifier) | Q(username=identifier)).first()
+        user = Usuario.objects.filter(Q(email=identifier) | Q(username=identifier)).first()
         if user is not None:
             if user.check_password(password):
                 login(request, user)
@@ -253,7 +252,7 @@ def register_view(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
-        if User.objects.filter(username=username).exists():
+        if Usuario.objects.filter(username=username).exists():
             return JsonResponse(
                 {
                     "valid": False,
@@ -261,7 +260,7 @@ def register_view(request):
                 }
             )
 
-        if User.objects.filter(email=email).exists():
+        if Usuario.objects.filter(email=email).exists():
             return JsonResponse(
                 {
                     "valid": False,
@@ -274,7 +273,7 @@ def register_view(request):
                 {"valid": False, "error_message": "Las contraseñas no coinciden."}
             )
 
-        user = User.objects.create_user(
+        user = Usuario.objects.create_user(
             username=username, email=email, password=password
         )
         user.first_name = first_name
@@ -412,15 +411,31 @@ def admin_crear_noticia(request):
     paises = Pais.objects.all()
 
     if request.method == "POST":
+        print(f"📝 POST data received: {request.POST}")
         form = NoticiaForm(request.POST, request.FILES)
+        print(f"📋 Form is valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"❌ Form errors: {form.errors}")
+
         if form.is_valid():
             noticia = form.save(commit=False)
             noticia.id_usuario = request.user
-            noticia.save()
-            for imagen in request.FILES.getlist("imagenes"):
-                ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
-            form.save_m2m()
-            return redirect("admin_noticias_borradores")
+            print(f"👤 Usuario asignado: {noticia.id_usuario}")
+            print(f"📁 Categoría: {noticia.id_categoria}")
+            print(f"🌍 País: {noticia.id_pais}")
+            print(f"📰 Título: {noticia.titulo_noticia}")
+
+            try:
+                noticia.save()
+                print("✅ Noticia guardada exitosamente")
+                for imagen in request.FILES.getlist("imagenes"):
+                    ImagenNoticia.objects.create(noticia=noticia, imagen=imagen)
+                form.save_m2m()
+                return redirect("admin_noticias_borradores")
+            except Exception as e:
+                print(f"❌ Error al guardar noticia: {e}")
+                import traceback
+                traceback.print_exc()
     else:
         form = NoticiaForm()
 

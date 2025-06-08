@@ -9,6 +9,19 @@ Write-Host "============================================" -ForegroundColor Green
 $projectPath = Split-Path -Parent $PSScriptRoot
 Set-Location $projectPath
 
+# Activar entorno virtual
+Write-Host "Activando entorno virtual..." -ForegroundColor Yellow
+if (Test-Path "venv\Scripts\Activate.ps1") {
+    & "venv\Scripts\Activate.ps1"
+    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+} elseif (Test-Path ".venv\Scripts\Activate.ps1") {
+    & ".venv\Scripts\Activate.ps1"
+    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+} else {
+    Write-Host "⚠️  Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
+    Write-Host "   Asegúrese de tener las dependencias instaladas" -ForegroundColor Yellow
+}
+
 Write-Host "Configurando entorno de desarrollo..." -ForegroundColor Yellow
 $env:DJANGO_SETTINGS_MODULE = "CaosNews.settings.settings_dev"
 python manage.py setup_dev

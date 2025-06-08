@@ -52,7 +52,10 @@ class DetalleNoticia(models.Model):
 @receiver(post_save, sender=Noticia)
 def create_detalle_noticia(sender, instance, created, **kwargs):
     if created:
-        DetalleNoticia.objects.create(noticia=instance)
+        DetalleNoticia.objects.create(
+            noticia=instance,
+            id_usuario=None  # Explícitamente establecer como None
+        )
 
 class ImagenNoticia(models.Model):
     id_imagen = models.AutoField(db_column='id_imagen', primary_key=True)
