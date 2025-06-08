@@ -26,7 +26,7 @@ $(function () {
           var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
           messageContainer.html(successMessage)
           setTimeout(function () {
-            successMessage.fadeOut(1000, function () {
+            successMessage.fadeOut(5000, function () {
               $(this).remove()
             })
             // Retrasar la recarga de la página para garantizar que el mensaje sea visible
@@ -87,7 +87,7 @@ $(function () {
           var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
           errorContainer.html(successMessage)
           setTimeout(function () {
-            successMessage.fadeOut(1000, function () {
+            successMessage.fadeOut(5000, function () {
               $(this).remove()
             })
           }, 3000)

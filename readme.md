@@ -59,12 +59,12 @@ Asegúrate de tener instalados los siguientes programas antes de comenzar:
 
 Para acceder al panel de administración de Django, necesitas crear un superusuario. Ejecuta el siguiente comando y sigue las instrucciones:
 
-    ```bash
-    python manage.py createsuperuser
-    ```
+```bash
+python manage.py createsuperuser
+```
 
 Para ejecutar Sonar Scanner
 
-    ```bash
-    C:\SonarQube\sonar-scanner\bin\sonar-scanner.bat
-    ```
+```bash
+C:\SonarQube\sonar-scanner\bin\sonar-scanner.bat
+```
