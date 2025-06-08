@@ -73,6 +73,35 @@ cache_clima = {}
 
 
 def obtener_tiempo_chile():
+    from django.conf import settings
+    es_modo_prueba = (
+        'test' in sys.argv or
+        hasattr(settings, 'TESTING') and settings.TESTING or
+        getattr(settings, 'DISABLE_EXTERNAL_APIS', False)
+    )
+
+    if es_modo_prueba:
+        resultados_prueba = [
+            {
+                "ciudad": "Santiago",
+                "temperatura": 18.5,
+                "temperatura_min": 12.0,
+                "temperatura_max": 24.0,
+                "tiempo": "cielo claro",
+                "icono": "test-icon",
+            },
+            {
+                "ciudad": "Antofagasta",
+                "temperatura": 22.0,
+                "temperatura_min": 18.0,
+                "temperatura_max": 26.0,
+                "tiempo": "pocas nubes",
+                "icono": "test-icon",
+            },
+        ]
+        print("🧪 Usando datos de clima de prueba (APIs externas deshabilitadas)")
+        return resultados_prueba
+
     url = "http://api.openweathermap.org/data/2.5/weather?"
     api_key = "cda050505a9bfed7a75a0663acda7e5a"
     ciudades_chile = ["Santiago", "Antofagasta", "Vina del Mar", "Concepcion", "Temuco"]

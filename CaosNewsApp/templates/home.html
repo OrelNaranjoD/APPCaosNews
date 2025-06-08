@@ -19,7 +19,7 @@
                       <a href="{% url 'noticias' categoria=noticia.id_categoria.nombre_categoria %}">
                         {{ noticia.id_categoria.nombre_categoria }}
                       </a>
-                       - {{ noticia.fecha_creacion|date:"d/m/Y" }} - 
+                       - {{ noticia.fecha_creacion|date:"d/m/Y" }} -
                       <a href="{% url 'busqueda' %}?q={{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}">
                         {{ noticia.id_usuario.first_name }} {{ noticia.id_usuario.last_name }}
                       </a>
@@ -63,8 +63,13 @@
                       <div class="row align-items-center">
                         <div class="col">
                           <div class="row text-center">
-                            <img src="https://openweathermap.org/img/wn/{{ resultado.icono }}@2x.png" alt=""
-                              class="weather-icon">
+                            {% if resultado.icono == 'test-icon' %}
+                              <div class="weather-icon-placeholder" style="width: 64px; height: 64px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-sun" style="font-size: 24px; color: #ffa500;"></i>
+                              </div>
+                            {% else %}
+                              <img src="https://openweathermap.org/img/wn/{{ resultado.icono }}@2x.png" alt="" class="weather-icon">
+                            {% endif %}
                           </div>
                         </div>
                         <div class="col">
