@@ -83,6 +83,15 @@ pytest_cache/
 # Translations
 *.mo
 
+# Development Environment files and directories
+db_dev.sqlite3
+db_dev.sqlite3-journal
+media_dev/
+dev_debug.log
+dev_debug.log.*
+dev_emails/
+htmlcov_dev/
+
 # QA Environment files and directories
 db_qa.sqlite3
 db_qa.sqlite3-journal

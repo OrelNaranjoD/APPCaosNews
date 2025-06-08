@@ -133,9 +133,9 @@ CONTENT_SECURITY_POLICY = {
         'default-src': ("'self'",),
         'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'"),
         'style-src': ("'self'", "'unsafe-inline'"),
-        'img-src': ("'self'", "data:", "blob:", "*"),
+        'img-src': ("'self'", "data:", "blob:", "*", "https://openweathermap.org"),
         'font-src': ("'self'", "data:"),
-        'connect-src': ("'self'",),
+        'connect-src': ("'self'", "https://api.openweathermap.org"),
         'frame-src': ("'self'",),
         'media-src': ("'self'",),
         'object-src': ("'none'",),
@@ -143,6 +143,17 @@ CONTENT_SECURITY_POLICY = {
         'form-action': ("'self'",),
     }
 }
+
+# Para desarrollo: Configuraciones adicionales de CSP menos restrictivas
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+CSP_IMG_SRC = ("'self'", "data:", "blob:", "*", "https://openweathermap.org")
+CSP_FONT_SRC = ("'self'", "data:")
+CSP_CONNECT_SRC = ("'self'", "https://api.openweathermap.org")
+
+# Para desarrollo: CSP en modo reporte únicamente (no bloquear)
+CSP_REPORT_ONLY = True
 
 # Email backend para desarrollo (envía a consola)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
