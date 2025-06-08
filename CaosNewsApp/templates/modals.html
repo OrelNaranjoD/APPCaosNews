@@ -1,116 +1,120 @@
 <!-- ========== Modal Login ========== -->
 <div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header pb-0 pt-3">
-                <h5>Iniciar Sesión</h5>
-                <button type="button" class="btn-close mb-1" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginLabel">Iniciar Sesión</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm" method="post" action="{% url 'login' %}" class="d-flex flex-column gap-3">
+          {% csrf_token %}
+
+          <div>
+            <label for="id_identifier" class="form-label">Nombre de Usuario o Correo Electrónico:</label>
+            <input type="text" id="id_identifier" name="identifier" class="form-control" autocomplete="username" required />
+            <div id="emailError" class="invalid-feedback"></div>
+          </div>
+
+          <div>
+            <label for="id_password" class="form-label">Contraseña:</label>
+            <div class="input-group">
+              <input type="password" id="id_password" name="password" class="form-control" autocomplete="current-password" required />
+              <button class="btn btn-outline-secondary toggle-password" type="button">
+                <i class="fa fa-eye"></i>
+              </button>
             </div>
-            <div class="modal-body">
-                <div class="px-4">
-                    <form id="loginForm" method="post" action="{% url 'login' %}">
-                        {% csrf_token %}
-                        <div class="row py-1">
-                            <label for="id_identifier" class="ps-0">Nombre de Usuario o Correo Electrónio:</label>
-                        </div>
-                        <div class="row">
-                            <input type="text" id="id_identifier" name="identifier" required>
-                            <div id="emailError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_password" class="ps-0">Contraseña:</label>
-                        </div>
-                        <div class="row">
-                            <input type="password" id="id_password" name="password" required>
-                            <div id="passwordError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="row w-50">
-                            <input type="submit" class="btn btn-primary ms-auto mt-2" value="Iniciar Sesión">
-                        </div>
-                        <div class="row mt-2">
-                            <div id="messageContainer"></div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="row text-end d-none">
-                    <h6>¿No recuerda su contraseña?</h6>
-                    <a href="registro.html" class="link-two" onclick="restablecerContrasena()">Restablecer Contraseña</a>
-                </div>
-                <div class="row text-end">
-                    <h6>¿No tienes una cuenta?</h6>
-                    <a href="#register" class="link-two" data-bs-toggle="modal" data-bs-dismiss="modal">Registrarse</a>
-                </div>
-            </div>
-        </div>
+            <div id="passwordError" class="invalid-feedback"></div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+          </div>
+
+          <div id="messageContainer"></div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-end">
+        <h6 class="mb-1">¿No tienes una cuenta?</h6>
+        <a href="#register" class="link-two" data-bs-toggle="modal" data-bs-dismiss="modal">Crear cuenta aquí</a>
+      </div>
     </div>
+  </div>
 </div>
 <!-- ========== Fin Modal Login ========== -->
 
 <!-- ========== Modal Register ========== -->
-<div class="modal fade" id="register" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="loginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header pb-0 pt-3">
-                <h5>Nuevo Usuario</h5>
+<div
+  class="modal fade"
+  id="register"
+  tabindex="-1"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  aria-labelledby="registerLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerLabel">Registro</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="registerForm" method="post" action="{% url 'register' %}" class="d-flex flex-column gap-3">
+          {% csrf_token %}
+
+          <div>
+            <label for="id_first_name" class="form-label">Nombre:</label>
+            <input type="text" id="id_first_name" name="first_name" class="form-control" autocomplete="given-name" required />
+          </div>
+
+          <div>
+            <label for="id_last_name" class="form-label">Apellido:</label>
+            <input type="text" id="id_last_name" name="last_name" class="form-control" autocomplete="family-name" required />
+          </div>
+
+          <div>
+            <label for="id_username_reg" class="form-label">Nombre de usuario:</label>
+            <input type="text" id="id_username_reg" name="username" class="form-control" autocomplete="username" required />
+            <div id="regUsernameError" class="invalid-feedback"></div>
+          </div>
+
+          <div>
+            <label for="id_email" class="form-label">Correo electrónico:</label>
+            <input type="email" id="id_email" name="email" class="form-control" autocomplete="email" required />
+            <div id="regEmailError" class="invalid-feedback"></div>
+          </div>
+
+          <div>
+            <label for="id_password_reg" class="form-label">Contraseña:</label>
+            <div class="input-group">
+              <input type="password" id="id_password_reg" name="password" class="form-control" autocomplete="new-password" required />
+              <button class="btn btn-outline-secondary toggle-password" type="button">
+                <i class="fa fa-eye"></i>
+              </button>
             </div>
-            <div class="modal-body">
-                <div class="px-4">
-                    <form id="registerForm" method="post" action="{% url 'register' %}">
-                        {% csrf_token %}
-                        <div class="row py-1">
-                            <label for="id_first_name" class="ps-0">Nombre:</label>
-                        </div>
-                        <div class="row">
-                            <input type="text" id="id_first_name" name="first_name" required>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_last_name" class="ps-0">Apellido:</label>
-                        </div>
-                        <div class="row">
-                            <input type="text" id="id_last_name" name="last_name" required>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_username_reg" class="ps-0">Nombre de usuario:</label>
-                        </div>
-                        <div class="row">
-                            <input type="text" id="id_username_reg" name="username" required>
-                            <div id="regUsernameError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_email" class="ps-0">Correo electrónico:</label>
-                        </div>
-                        <div class="row">
-                            <input type="email" id="id_email" name="email" required>
-                            <div id="regEmailError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_password_reg" class="ps-0">Contraseña:</label>
-                        </div>
-                        <div class="row">
-                            <input type="password" id="id_password_reg" name="password" required>
-                        </div>
-                        <div class="row py-1">
-                            <label for="id_confirm_password" class="ps-0">Confirmar contraseña:</label>
-                        </div>
-                        <div class="row">
-                            <input type="password" id="id_confirm_password" name="confirm_password" required>
-                            <div id="regPasswordError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="row mt-2">
-                            <div id="registerErrorContainer"></div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="w-100 text-end">
-                                <button type="submit" class="btn btn-primary">Registrarse</button>
-                                <a class="btn btn-primary" data-bs-toggle="modal" href="#login" role="button">Volver</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+          </div>
+
+          <div>
+            <label for="id_confirm_password" class="form-label">Confirmar contraseña:</label>
+            <div class="input-group">
+              <input type="password" id="id_confirm_password" name="confirm_password" class="form-control" autocomplete="new-password" required />
+              <button class="btn btn-outline-secondary toggle-password" type="button">
+                <i class="fa fa-eye"></i>
+              </button>
             </div>
-        </div>
+            <div id="regPasswordError" class="invalid-feedback"></div>
+          </div>
+
+          <div id="registerErrorContainer"></div>
+
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#login" data-bs-dismiss="modal">Volver</button>
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 <!-- ========== Fin Modal Register ========== -->

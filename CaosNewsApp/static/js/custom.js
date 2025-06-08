@@ -53,15 +53,14 @@ $(function () {
     return false
   })
 
-  $(document).ajaxStart(function() {
+  $(document).ajaxStart(function () {
     console.log('Inicio de la solicitud AJAX')
   })
 
-  $(document).ajaxStop(function() {
+  $(document).ajaxStop(function () {
     console.log('Fin de la solicitud AJAX')
   })
 })
-
 
 $(function () {
   /* ********* Mensajes Registro de usuario ********* */
@@ -91,7 +90,7 @@ $(function () {
               $(this).remove()
             })
           }, 3000)
-          location.reload();
+          location.reload()
         } else {
           if (data.error_message) {
             var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>')
@@ -125,22 +124,25 @@ document.addEventListener('DOMContentLoaded', function () {
   var telefonoInput = document.getElementById('telefono')
   var mensajeInput = document.getElementById('mensaje')
 
-  // Agregar un evento de escucha al enviar el formulario
-  form.addEventListener('submit', function (event) {
-    // Detener el envío del formulario
-    event.preventDefault()
+  // Verificar si el formulario existe antes de agregar eventos
+  if (form && nombreInput && correoInput && telefonoInput && mensajeInput) {
+    // Agregar un evento de escucha al enviar el formulario
+    form.addEventListener('submit', function (event) {
+      // Detener el envío del formulario
+      event.preventDefault()
 
-    // Validar los campos del formulario
-    var nombreValido = validarNombre()
-    var correoValido = validarCorreo()
-    var telefonoValido = validarTelefono()
-    var mensajeValido = validarMensaje()
+      // Validar los campos del formulario
+      var nombreValido = validarNombre()
+      var correoValido = validarCorreo()
+      var telefonoValido = validarTelefono()
+      var mensajeValido = validarMensaje()
 
-    // Verificar si todos los campos son válidos antes de enviar el formulario
-    if (nombreValido && correoValido && telefonoValido && mensajeValido) {
-      enviarFormulario()
-    }
-  })
+      // Verificar si todos los campos son válidos antes de enviar el formulario
+      if (nombreValido && correoValido && telefonoValido && mensajeValido) {
+        enviarFormulario()
+      }
+    })
+  }
 
   // Función para validar el campo de nombre
   function validarNombre() {
@@ -207,11 +209,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function enviarFormulario() {
     // Mostrar la ventana emergente de éxito
     var successModal = document.getElementById('success-modal')
-    var modal = new bootstrap.Modal(successModal)
-    modal.show()
+    if (successModal) {
+      var modal = new bootstrap.Modal(successModal)
+      modal.show()
+    }
 
     // Reiniciar el formulario
-    form.reset()
+    if (form) {
+      form.reset()
+    }
   }
 })
 
@@ -224,8 +230,16 @@ function validarEmail(email) {
 }
 
 function validarlogin() {
-  var email = document.getElementById('email').value
-  var password = document.getElementById('password').value
+  var emailElement = document.getElementById('email')
+  var passwordElement = document.getElementById('password')
+
+  // Verificar que los elementos existan
+  if (!emailElement || !passwordElement) {
+    return false
+  }
+
+  var email = emailElement.value
+  var password = passwordElement.value
 
   // Validar que el correo electrónico no esté vacío
   if (email == '') {
@@ -271,47 +285,88 @@ function validarEmail(email) {
 //VALIDACIONES DEL REGISTRO
 
 function validarRegistro() {
-  var nombre = document.getElementById('nombre').value
-  var email = document.getElementById('email').value
-  var password = document.getElementById('password').value
-  var passwordConfirm = document.getElementById('password-confirm').value
+  var nombreElement = document.getElementById('nombre')
+  var emailElement = document.getElementById('email')
+  var passwordElement = document.getElementById('password')
+  var passwordConfirmElement = document.getElementById('password-confirm')
   var errorNombre = document.getElementById('error-nombre')
   var errorEmail = document.getElementById('error-email')
   var errorPassword = document.getElementById('error-password')
   var errorPasswordConfirm = document.getElementById('error-password-confirm')
 
+  // Verificar que los elementos principales existan
+  if (!nombreElement || !emailElement || !passwordElement || !passwordConfirmElement) {
+    return false
+  }
+
+  var nombre = nombreElement.value
+  var email = emailElement.value
+  var password = passwordElement.value
+  var passwordConfirm = passwordConfirmElement.value
+
   // Validar que el campo "Nombre completo" no esté vacío
   if (nombre == '') {
-    errorNombre.innerHTML = 'El campo nombre es obligatorio.'
+    if (errorNombre) errorNombre.innerHTML = 'El campo nombre es obligatorio.'
     return false
   } else {
-    errorNombre.innerHTML = ''
+    if (errorNombre) errorNombre.innerHTML = ''
   }
 
   // Validar que el campo "Email" tenga un formato válido
   if (!/\S+@\S+\.\S+/.test(email)) {
-    errorEmail.innerHTML = 'Ingrese un correo electrónico válido.'
+    if (errorEmail) errorEmail.innerHTML = 'Ingrese un correo electrónico válido.'
     return false
   } else {
-    errorEmail.innerHTML = ''
+    if (errorEmail) errorEmail.innerHTML = ''
   }
 
   // Validar que el campo "Contraseña" tenga al menos 8 caracteres
   if (password.length < 8) {
-    errorPassword.innerHTML = 'La contraseña debe tener al menos 8 caracteres.'
+    if (errorPassword) errorPassword.innerHTML = 'La contraseña debe tener al menos 8 caracteres.'
     return false
   } else {
-    errorPassword.innerHTML = ''
+    if (errorPassword) errorPassword.innerHTML = ''
   }
 
   // Validar que los campos "Contraseña" y "Confirmar contraseña" coincidan
   if (password != passwordConfirm) {
-    errorPasswordConfirm.innerHTML = 'Las contraseñas no coinciden.'
+    if (errorPasswordConfirm) errorPasswordConfirm.innerHTML = 'Las contraseñas no coinciden.'
     return false
   } else {
-    errorPasswordConfirm.innerHTML = ''
+    if (errorPasswordConfirm) errorPasswordConfirm.innerHTML = ''
   }
 
   // Si todas las validaciones pasan, se envía el formulario
   return true
 }
+// Toggle password visibility
+document.querySelectorAll('.toggle-password').forEach((button) => {
+  button.addEventListener('click', function () {
+    let input = this.previousElementSibling
+    let icon = this.querySelector('i')
+
+    if (input.type === 'password') {
+      input.type = 'text'
+      icon.classList.remove('fa-eye')
+      icon.classList.add('fa-eye-slash')
+    } else {
+      input.type = 'password'
+      icon.classList.remove('fa-eye-slash')
+      icon.classList.add('fa-eye')
+    }
+  })
+})
+
+// Solucionar problemas de accesibilidad con modales
+$(document).ready(function () {
+  // Manejar eventos de modal para accesibilidad
+  $('.modal').on('shown.bs.modal', function () {
+    // Remover aria-hidden cuando el modal se muestra
+    $(this).removeAttr('aria-hidden')
+  })
+
+  $('.modal').on('hidden.bs.modal', function () {
+    // Restaurar aria-hidden cuando el modal se oculta
+    $(this).attr('aria-hidden', 'true')
+  })
+})
