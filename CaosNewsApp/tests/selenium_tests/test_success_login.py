@@ -65,7 +65,7 @@ class TestSuccessLogin:
 
         # Enviar formulario
         print("🚀 Enviando formulario de login")
-        submit_button = driver.find_element(By.XPATH, "//input[@type='submit' and @value='Iniciar Sesión']")
+        submit_button = driver.find_element(By.XPATH, "//button[@type='submit' and text()='Iniciar Sesión']")
         submit_button.click()
         time.sleep(1)  # Pausa más larga para ver el resultado y las noticias
 

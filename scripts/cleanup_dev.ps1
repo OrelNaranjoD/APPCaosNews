@@ -171,6 +171,7 @@ function Clean-DevEnvironment {
     # 4. Limpiar archivos de desarrollo temporales
     Write-ColorOutput ""
     Write-ColorOutput "Limpiando archivos temporales de desarrollo..." "Cyan"
+    Remove-DevFile "$projectPath\caosnews_dev.log" "Archivo de logs de desarrollo"
 
     # Buscar y eliminar archivos .pyc y __pycache__ recursivamente
     if (-not $DryRun) {

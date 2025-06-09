@@ -1,7 +1,12 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.forms import ValidationError
-from .models import Noticia, Usuario, DetalleNoticia
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from .models import Noticia, DetalleNoticia
+
+User = get_user_model()
 
 
 class NoticiaForm(forms.ModelForm):
@@ -36,6 +41,19 @@ class RegisterForm(forms.Form):
     password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirmar contraseña', widget=forms.PasswordInput)
 
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password:
+            # Validar la contraseña usando los validadores de Django
+            from django.contrib.auth.password_validation import validate_password
+            from django.contrib.auth import get_user_model
+            user_model = get_user_model()
+            try:
+                validate_password(password, user_model())
+            except ValidationError as error:
+                raise forms.ValidationError(error.messages)
+        return password
+
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
@@ -49,8 +67,5 @@ class RegisterForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
-        model = Usuario
-        fields = ['first_name', 'last_name', 'email', 'role']
-        widgets = {
-            'role': forms.Select(choices=Usuario.ROLES)
-        }
+        model = User
+        fields = ['first_name', 'last_name', 'email']

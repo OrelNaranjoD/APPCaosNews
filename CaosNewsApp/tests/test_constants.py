@@ -6,7 +6,7 @@ Constantes para pruebas de CaosNews
 TEST_USER_CREDENTIALS = {
     'username': 'juanperez',
     'email': 'juanperez@duocuc.cl',
-    'password': 'PassSegura123',  # Esta contraseña será hasheada automáticamente por Django
+    'password': 'PassSegura123?',  # Esta contraseña será hasheada automáticamente por Django
     'first_name': 'Juan',
     'last_name': 'Perez',
 }

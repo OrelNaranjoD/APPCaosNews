@@ -1,108 +1,60 @@
-$(function () {
-  /* ********* Mensajes Inicio de sesión ********* */
-  $('#loginForm').on('submit', function (event) {
+document.addEventListener('DOMContentLoaded', function () {
+  function handleFormSubmission(event, formId, messageContainerId) {
     event.preventDefault()
-    event.stopPropagation()
 
-    var form = $(this)
-    var messageContainer = $('#messageContainer')
-    var emailError = $('#emailError')
-    var passwordError = $('#passwordError')
+    let form = document.getElementById(formId)
+    let formData = new FormData(form)
+    let messageContainer = document.getElementById(messageContainerId)
 
-    messageContainer.empty()
-    emailError.empty()
-    passwordError.empty()
+    clearMessages(messageContainer)
 
-    console.log('Enviando solicitud de inicio de sesión...')
+    console.log(`Enviando solicitud de ${formId}...`)
 
-    $.ajax({
-      url: form.attr('action'),
+    fetch(form.action, {
       method: 'POST',
-      data: form.serialize(),
-      success: function (data) {
-        console.log('Respuesta recibida:', data)
-        if (data.valid) {
-          console.log('Inicio de sesión exitoso')
-          var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
-          messageContainer.html(successMessage)
-          setTimeout(function () {
-            successMessage.fadeOut(5000, function () {
-              $(this).remove()
-            })
-            // Retrasar la recarga de la página para garantizar que el mensaje sea visible
-            setTimeout(function () {
-              location.reload()
-            }, 2000) // Esperar 2 segundos adicionales antes de recargar
-          }, 3000) // Mostrar el mensaje durante 3 segundos
-        } else {
-          console.log('Error en el inicio de sesión:', data.error_message)
-          if (data.error_message) {
-            var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>')
-            messageContainer.html(errorMessage)
-          }
-        }
-      },
-      error: function () {
-        console.log('Error en la solicitud AJAX')
-        var errorMessage = $(
-          '<div class="alert alert-danger text-center">Ocurrió un error en el inicio de sesión. Inténtalo de nuevo más tarde.</div>',
-        )
-        messageContainer.html(errorMessage)
-      },
+      body: formData,
     })
-    return false
-  })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(`Respuesta recibida (${formId}):`, data)
 
-  $(document).ajaxStart(function () {
-    console.log('Inicio de la solicitud AJAX')
-  })
-
-  $(document).ajaxStop(function () {
-    console.log('Fin de la solicitud AJAX')
-  })
-})
-
-$(function () {
-  /* ********* Mensajes Registro de usuario ********* */
-  $('#registerForm').on('submit', function (event) {
-    event.preventDefault()
-    var form = $(this)
-    var errorContainer = $('#registerErrorContainer')
-    var usernameError = $('#regUsernameError')
-    var emailError = $('#regEmailError')
-    var passwordError = $('#regPasswordError')
-
-    errorContainer.empty()
-    usernameError.empty()
-    emailError.empty()
-    passwordError.empty()
-
-    $.ajax({
-      url: form.attr('action'),
-      method: 'POST',
-      data: form.serialize(),
-      success: function (data) {
         if (data.valid) {
-          var successMessage = $('<div id="successAlert" class="alert alert-success text-center">' + data.success_message + '</div>')
-          errorContainer.html(successMessage)
-          setTimeout(function () {
-            successMessage.fadeOut(5000, function () {
-              $(this).remove()
-            })
-          }, 3000)
-          location.reload()
-        } else {
-          if (data.error_message) {
-            var errorMessage = $('<div class="alert alert-danger text-center">' + data.error_message + '</div>')
-            errorContainer.html(errorMessage)
-          }
+          showMessage(messageContainer, 'success', data.success_message)
+          setTimeout(() => {
+            location.reload()
+          }, 4000)
+        } else if (data.error_message) {
+          showMessage(messageContainer, 'danger', data.error_message)
         }
-      },
-      error: function () {
-        var errorMessage = $('<div class="alert alert-danger text-center">Ocurrió un error en el registro. Inténtalo de nuevo más tarde.</div>')
-        errorContainer.html(errorMessage)
-      },
-    })
+      })
+      .catch(() => {
+        showMessage(messageContainer, 'danger', 'Ocurrió un error. Inténtalo de nuevo más tarde.')
+      })
+  }
+
+  function showMessage(container, type, text) {
+    let message = document.createElement('div')
+    message.classList.add('alert', `alert-${type}`, 'text-center', 'fade-message')
+    message.textContent = text
+    container.appendChild(message)
+    setTimeout(() => {
+      message.style.opacity = '0'
+    }, 2000)
+    setTimeout(() => {
+      message.remove()
+    }, 2500)
+  }
+
+  function clearMessages(container) {
+    container.innerHTML = ''
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function (event) {
+    handleFormSubmission(event, 'loginForm', 'messageContainer')
+  })
+
+  document.getElementById('registerForm').addEventListener('submit', function (event) {
+    handleFormSubmission(event, 'registerForm', 'registerErrorContainer')
   })
 })
 
@@ -112,8 +64,12 @@ function getFecha() {
   const Day = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
   const date = new Date()
 
-  document.getElementById('current_date').innerHTML =
-    Day[date.getDay()] + ' ' + date.getDate() + ' de ' + Month[date.getMonth()] + ' de ' + date.getFullYear()
+  const dateElement = document.getElementById('current_date')
+  if (dateElement) {
+    dateElement.innerHTML = Day[date.getDay()] + ' ' + date.getDate() + ' de ' + Month[date.getMonth()] + ' de ' + date.getFullYear()
+  } else {
+    console.error('Elemento current_date no encontrado')
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

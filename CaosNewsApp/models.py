@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from datetime import datetime
-from django.contrib.auth.models import AbstractUser, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -54,7 +53,7 @@ def create_detalle_noticia(sender, instance, created, **kwargs):
     if created:
         DetalleNoticia.objects.create(
             noticia=instance,
-            id_usuario=None  # Explícitamente establecer como None
+            id_usuario=instance.id_usuario  # Asignar el mismo usuario que creó la noticia
         )
 
 class ImagenNoticia(models.Model):
@@ -78,28 +77,3 @@ class Categoria(models.Model):
 
     def __str__(self):
         return str(self.nombre_categoria)
-
-
-
-
-
-
-
-
-class Usuario(AbstractUser):
-    ROLES = (
-        ('administrador', 'Administrador'),
-        ('editor', 'Editor'),
-        ('periodista', 'Periodista'),
-        ('lector', 'Lector'),
-    )
-
-    role = models.CharField(max_length=15, choices=ROLES, default='lector')
-
-    def __str__(self):
-        return self.username
-
-    class Meta:
-        swappable = 'AUTH_USER_MODEL'
-        verbose_name = 'Usuario'
-        verbose_name_plural = 'Usuarios'

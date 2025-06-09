@@ -62,7 +62,7 @@ class TestFailedLogin:
 
         # Enviar formulario
         print("🚀 Enviando formulario de login con credenciales incorrectas")
-        submit_button = driver.find_element(By.XPATH, "//input[@type='submit' and @value='Iniciar Sesión']")
+        submit_button = driver.find_element(By.XPATH, "//button[@type='submit' and text()='Iniciar Sesión']")
         submit_button.click()
         time.sleep(2)  # Pausa para ver el resultado
 

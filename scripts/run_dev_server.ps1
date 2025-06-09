@@ -13,22 +13,22 @@ Set-Location $projectPath
 Write-Host "Activando entorno virtual..." -ForegroundColor Yellow
 if (Test-Path "venv\Scripts\Activate.ps1") {
     & "venv\Scripts\Activate.ps1"
-    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } elseif (Test-Path ".venv\Scripts\Activate.ps1") {
     & ".venv\Scripts\Activate.ps1"
-    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
-    Write-Host "   Asegúrese de tener las dependencias instaladas" -ForegroundColor Yellow
+    Write-Host "[WARNING] Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
+    Write-Host "   Asegurese de tener las dependencias instaladas" -ForegroundColor Yellow
 }
 
 Write-Host "Configurando entorno de desarrollo..." -ForegroundColor Yellow
 $env:DJANGO_SETTINGS_MODULE = "CaosNews.settings.settings_dev"
 
-Write-Host "Verificando configuración de Django..." -ForegroundColor Yellow
+Write-Host "Verificando configuracion de Django..." -ForegroundColor Yellow
 python manage.py check
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Error en la configuración de Django" -ForegroundColor Red
+    Write-Host "[ERROR] Error en la configuracion de Django" -ForegroundColor Red
     pause
     exit 1
 }
@@ -38,15 +38,15 @@ python manage.py setup_dev
 Write-Host "Aplicando migraciones..." -ForegroundColor Yellow
 python manage.py migrate
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Migraciones aplicadas correctamente" -ForegroundColor Green
+    Write-Host "[OK] Migraciones aplicadas correctamente" -ForegroundColor Green
 } else {
-    Write-Host "❌ Error al aplicar migraciones" -ForegroundColor Red
-    Write-Host "💡 Sugerencias:" -ForegroundColor Yellow
+    Write-Host "[ERROR] Error al aplicar migraciones" -ForegroundColor Red
+    Write-Host "Sugerencias:" -ForegroundColor Yellow
     Write-Host "   - Verificar la integridad de la base de datos" -ForegroundColor Yellow
     Write-Host "   - Hacer backup y recrear la BD si es necesario" -ForegroundColor Yellow
     Write-Host "   - Usar: python manage.py migrate --fake-initial" -ForegroundColor Yellow
 
-    $choice = Read-Host "¿Continuar sin migraciones? (s/N)"
+    $choice = Read-Host "Continuar sin migraciones? (s/N)"
     if ($choice -ne "s" -and $choice -ne "S") {
         exit 1
     }

@@ -1,194 +1,26 @@
 """
 Configuración para el entorno de PRODUCCIÓN
+- DEBUG False (puede ser True para desarrollo local de producción)
+- Base de datos SQLite principal
+- CSP estricta pero permite APIs externas necesarias
+- Email a consola (cambiar en servidor real)
+- Logging con archivos
 """
 
-from pathlib import Path
+# Importar todas las configuraciones base
+from .settings_base import *
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Secret key para producción local (en servidor real usar variable de entorno)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'local-prod-key-change-in-real-server')
 
-# Secret key desde variable de entorno
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-in-production')
+# DEBUG False para producción real, True para desarrollo local de producción
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-# DEBUG False en producción
-DEBUG = False
+# Hosts permitidos - incluir local para testing y producción
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'caosnews.com', 'www.caosnews.com']
 
-ALLOWED_HOSTS = ['caosnews.com', 'www.caosnews.com']
-
-# Application definition
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'csp',
-    'CaosNewsApp',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware',
-]
-
-ROOT_URLCONF = 'CaosNews.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-# Internationalization
-LANGUAGE_CODE = 'es-cl'
-TIME_ZONE = 'America/Santiago'
-USE_TZ = True
-
-# Static files para producción
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-STATIC_ROOT = '/var/www/caosnews/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'CaosNewsApp' / 'static',
-]
-MEDIA_ROOT = '/var/www/caosnews/media/'
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = 'auth.User'
-
-# Django REST Framework configuration
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-}
-
-# Content Security Policy estricta para producción
-CONTENT_SECURITY_POLICY = {
-    'DIRECTIVES': {
-        'default-src': ["'self'"],
-        'script-src': ["'self'"],
-        'style-src': ["'self'"],
-        'img-src': ["'self'"],
-        'font-src': ["'self'"],
-        'connect-src': ["'self'"],
-        'frame-src': ["'self'"],
-        'media-src': ["'self'"],
-        'object-src': ["'none'"],
-        'base-uri': ["'self'"],
-        'form-action': ["'self'"],
-    }
-}
-
-# Email SMTP para producción
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', '')
-
-# Configuración de seguridad para producción
-SECURE_SSL_REDIRECT = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-X_FRAME_OPTIONS = 'DENY'
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cp!yxye71r9g#18f!o#-nkil@sip_z#924*-gzlt)2959acye%'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'rest_framework',
-    'rest_framework.authtoken',
-	'csp',
-    'CaosNewsApp',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware',
-]
-
-ROOT_URLCONF = 'CaosNews.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'CaosNews.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# Database para producción
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -196,74 +28,14 @@ DATABASES = {
     }
 }
 
+# Media files - directorio principal para producción
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+# Email configuration - usar console backend para desarrollo local
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'es-cl'
-
-TIME_ZONE = 'America/Santiago'
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = 'auth.User'
-
-# API REST
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'EXCEPTION_HANDLER': 'CaosNewsApp.views.custom_exception_handler'
-}
-
-CONTENT_SECURITY_POLICY = {'DIRECTIVES': {
-    'default-src': ["'self'"],
-    'script-src': ["'self'", "https://trusted-scripts.example.com"],
-    'style-src': ["'self'", "https://trusted-styles.example.com"],
-    'img-src': ["'self'", "https://trusted-images.example.com"],
-    'font-src': ["'self'", "https://trusted-fonts.example.com"],
-    'connect-src': ["'self'", "https://api.example.com"],
-    'frame-src': ["'self'", "https://trusted-frames.example.com"],
-    'media-src': ["'self'", "https://trusted-media.example.com"],
-    'object-src': ["'none'"],
-    'base-uri': ["'self'"],
-    'form-action': ["'self'"],
-}}
+# Logging para producción
+LOGGING = get_logging_config(
+    log_level='INFO',
+    log_file=BASE_DIR / 'caosnews.log'
+)

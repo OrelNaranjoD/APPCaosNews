@@ -21,6 +21,8 @@ def login_view(request):
         user = user_model.objects.filter(Q(email=identifier) | Q(username=identifier)).first()
         if user is not None:
             if user.check_password(password):
+                # Especificar el backend para evitar errores cuando hay múltiples backends
+                user.backend = 'CaosNewsApp.backends.EmailOrUsernameModelBackend'
                 login(request, user)
                 return JsonResponse(
                     {"valid": True, "success_message": "Inicio de sesión exitoso."}
@@ -82,12 +84,14 @@ def register_view(request):
         user.last_name = last_name
         user.save()
 
+        # Especificar el backend para evitar errores cuando hay múltiples backends
+        user.backend = 'CaosNewsApp.backends.EmailOrUsernameModelBackend'
         login(request, user)
 
         return JsonResponse(
             {
                 "valid": True,
-                "success_message": "Registro exitoso. Inicie sesión para continuar.",
+                "success_message": "Registro exitoso.",
             }
         )
 

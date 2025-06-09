@@ -33,3 +33,16 @@ def custom_exception_handler(exc, context):
         del response.data["detail"]
 
     return response
+
+
+def api_root(request):
+    """Raíz de la API"""
+    return Response(
+        {
+            "status": "API is running",
+            "endpoints": {
+                "create_noticia": request.build_absolute_uri("/api/publicidad/"),
+                "other_endpoints": "Add more endpoints here as needed",
+            },
+        }
+    )

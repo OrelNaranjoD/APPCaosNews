@@ -14,19 +14,19 @@ Set-Location $projectPath
 Write-Host "Activando entorno virtual..." -ForegroundColor Yellow
 if (Test-Path "venv\Scripts\Activate.ps1") {
     & "venv\Scripts\Activate.ps1"
-    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } elseif (Test-Path ".venv\Scripts\Activate.ps1") {
     & ".venv\Scripts\Activate.ps1"
-    Write-Host "✅ Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
-    Write-Host "   Asegúrese de tener las dependencias instaladas" -ForegroundColor Yellow
+    Write-Host "[WARNING] Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
+    Write-Host "   Asegurese de tener las dependencias instaladas" -ForegroundColor Yellow
 }
 
 Write-Host "Configurando entorno de QA..." -ForegroundColor Yellow
 $env:DJANGO_SETTINGS_MODULE = "CaosNews.settings.settings_qa"
 
-Write-Host "Clonando base de datos de producción y configurando usuarios de prueba..." -ForegroundColor Yellow
+Write-Host "Clonando base de datos de produccion y configurando usuarios de prueba..." -ForegroundColor Yellow
 python manage.py setup_qa
 
 if ($LASTEXITCODE -ne 0) {
@@ -39,12 +39,12 @@ Write-Host "============================================" -ForegroundColor Green
 Write-Host " ENTORNO QA CONFIGURADO CORRECTAMENTE" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "📊 Datos disponibles:" -ForegroundColor Cyan
-Write-Host "  • Base de datos clonada de producción" -ForegroundColor White
-Write-Host "  • Usuarios de prueba agregados" -ForegroundColor White
-Write-Host "  • Archivos media copiados" -ForegroundColor White
+Write-Host "Datos disponibles:" -ForegroundColor Cyan
+Write-Host "  - Base de datos clonada de produccion" -ForegroundColor White
+Write-Host "  - Usuarios de prueba agregados" -ForegroundColor White
+Write-Host "  - Archivos media copiados" -ForegroundColor White
 Write-Host ""
-Write-Host "🧪 Para ejecutar pruebas (comando separado):" -ForegroundColor Yellow
+Write-Host "Para ejecutar pruebas (comando separado):" -ForegroundColor Yellow
 Write-Host "  python manage.py run_qa_tests" -ForegroundColor White
 Write-Host "  python manage.py run_qa_tests --verbose --coverage" -ForegroundColor White
 Write-Host ""

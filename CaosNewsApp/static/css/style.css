@@ -226,3 +226,8 @@ body {
 .modal-body {
   padding: calc(2 * var(--bs-modal-padding));
 }
+
+.fade-message {
+  transition: opacity 1s ease-out;
+  opacity: 1;
+}

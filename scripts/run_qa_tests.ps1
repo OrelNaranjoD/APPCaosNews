@@ -1,10 +1,9 @@
-﻿# filepath: c:\Akira\APPCaosNews\scripts\run_qa_tests.ps1
-# Script para ejecutar pruebas pytest en el entorno QA
+﻿# Script para ejecutar pruebas pytest en el entorno QA
 # PowerShell version
 
 Write-Host "============================================" -ForegroundColor Magenta
 Write-Host " CaosNews - Pruebas QA" -ForegroundColor Magenta
-Write-Host " (Ejecutar después de iniciar el entorno QA)" -ForegroundColor Cyan
+Write-Host " (Ejecutar despues de iniciar el entorno QA)" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Magenta
 
 # Cambiar al directorio del proyecto
@@ -15,16 +14,16 @@ Set-Location $projectPath
 Write-Host "Activando entorno virtual..." -ForegroundColor Yellow
 if (Test-Path "venv\Scripts\Activate.ps1") {
     & "venv\Scripts\Activate.ps1"
-    Write-Host " Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } elseif (Test-Path ".venv\Scripts\Activate.ps1") {
     & ".venv\Scripts\Activate.ps1"
-    Write-Host " Entorno virtual activado" -ForegroundColor Green
+    Write-Host "[OK] Entorno virtual activado" -ForegroundColor Green
 } else {
-    Write-Host "  Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
-    Write-Host "   Asegúrese de tener las dependencias instaladas" -ForegroundColor Yellow
+    Write-Host "[WARNING] Entorno virtual no encontrado. Continuando..." -ForegroundColor Yellow
+    Write-Host "   Asegurese de tener las dependencias instaladas" -ForegroundColor Yellow
 }
 
-# Verificar que el entorno QA esté configurado
+# Verificar que el entorno QA este configurado
 Write-Host "Verificando entorno QA..." -ForegroundColor Yellow
 $env:DJANGO_SETTINGS_MODULE = "CaosNews.settings.settings_qa"
 
@@ -40,17 +39,17 @@ Write-Host ""
 
 # Bucle principal del menú
 do {
-    # Mostrar opciones de ejecución
+    # Mostrar opciones de ejecucion
     Write-Host " Opciones de prueba:" -ForegroundColor Cyan
     Write-Host "1. Pruebas unitarias (solo units/)" -ForegroundColor White
     Write-Host "2. Pruebas selenium (solo selenium_tests/)" -ForegroundColor White
     Write-Host "3. Pruebas con coverage (todas)" -ForegroundColor White
-    Write-Host "4. Pruebas específicas (por archivo)" -ForegroundColor White
+    Write-Host "4. Pruebas especificas (por archivo)" -ForegroundColor White
     Write-Host "5. Salir" -ForegroundColor White
     Write-Host ""
 
-    # Leer opción del usuario
-    $opcion = Read-Host "Seleccione una opción (1-5)"
+    # Leer opcion del usuario
+    $opcion = Read-Host "Seleccione una opcion (1-5)"
 
     switch ($opcion) {
         "1" {
@@ -86,7 +85,7 @@ do {
             Start-Sleep -Seconds 2
         }        "4" {
             Write-Host ""
-            Write-Host " Pruebas específicas disponibles:" -ForegroundColor Yellow
+            Write-Host " Pruebas especificas disponibles:" -ForegroundColor Yellow
             Write-Host ""
 
             # Lista de archivos de test disponibles
@@ -110,7 +109,7 @@ do {
             $selection = Read-Host "Seleccione un archivo de pruebas (0-$($testFiles.Length)) o Enter para cancelar"
 
             if ([string]::IsNullOrWhiteSpace($selection)) {
-                Write-Host "Operación cancelada. Volviendo al menú..." -ForegroundColor Yellow
+                Write-Host "Operacion cancelada. Volviendo al menu..." -ForegroundColor Yellow
                 Write-Host ""
                 Start-Sleep -Seconds 1
             }
@@ -119,7 +118,7 @@ do {
                 $testFile = Read-Host "Ingrese la ruta completa del archivo de pruebas"
 
                 if ([string]::IsNullOrWhiteSpace($testFile)) {
-                    Write-Host "Ruta de pruebas vacía. Volviendo al menú..." -ForegroundColor Yellow
+                    Write-Host "Ruta de pruebas vacia. Volviendo al menu..." -ForegroundColor Yellow
                     Write-Host ""
                     Start-Sleep -Seconds 1
                 }
@@ -153,7 +152,7 @@ do {
                 Start-Sleep -Seconds 2
             }
             else {
-                Write-Host "Selección inválida. Debe ser un número entre 0-$($testFiles.Length)." -ForegroundColor Red
+                Write-Host "Seleccion invalida. Debe ser un numero entre 0-$($testFiles.Length)." -ForegroundColor Red
                 Write-Host ""
                 Start-Sleep -Seconds 2
             }
@@ -169,7 +168,7 @@ do {
             break
         }
         default {
-            Write-Host "Opción no válida. Por favor seleccione una opción entre 1-5." -ForegroundColor Red
+            Write-Host "Opcion no valida. Por favor seleccione una opcion entre 1-5." -ForegroundColor Red
             Write-Host ""
             Start-Sleep -Seconds 2
         }

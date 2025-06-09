@@ -10,7 +10,6 @@ import shutil
 from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
@@ -64,17 +63,10 @@ class Command(BaseCommand):
                 self.style.WARNING('⏭️  Omitiendo copia de archivos media')
             )
 
-        # 3. Migrar datos de auth_user a CaosNewsApp_usuario si es necesario
-        self.migrate_auth_users()
-
-        # 4. Ejecutar migraciones en la base de datos QA
-        self.stdout.write('🔄 Ejecutando migraciones en QA...')
-        call_command('migrate', '--run-syncdb', verbosity=0)
-
-        # 5. Crear usuarios de prueba
+        # 3. Crear usuarios de prueba en auth_user (compatibles con BD clonada)
         self.create_test_users()
 
-        # 5. Crear directorios necesarios
+        # 4. Crear directorios necesarios
         self.create_directories()
 
         self.stdout.write(
@@ -142,64 +134,11 @@ class Command(BaseCommand):
             qa_media.mkdir(exist_ok=True)
 
     @transaction.atomic
-    def migrate_auth_users(self):
-        """
-        Migra datos de auth_user a CaosNewsApp_usuario antes de aplicar migraciones
-        """
-        from django.db import connection
-
-        self.stdout.write('🔄 Migrando usuarios de auth_user a CaosNewsApp_usuario...')
-
-        try:
-            with connection.cursor() as cursor:
-                # Verificar si existen usuarios en auth_user que no están en CaosNewsApp_usuario
-                cursor.execute("SELECT COUNT(*) FROM auth_user")
-                auth_user_count = cursor.fetchone()[0]
-
-                cursor.execute("SELECT COUNT(*) FROM CaosNewsApp_usuario")
-                custom_user_count = cursor.fetchone()[0]
-
-                self.stdout.write(f'📊 Usuarios en auth_user: {auth_user_count}')
-                self.stdout.write(f'📊 Usuarios en CaosNewsApp_usuario: {custom_user_count}')
-
-                if auth_user_count > 0:
-                    # Migrar usuarios usando INSERT OR IGNORE para evitar conflictos
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO CaosNewsApp_usuario
-                        (id, username, email, first_name, last_name, password, last_login,
-                         is_superuser, is_staff, is_active, date_joined, role)
-                        SELECT id, username, email, first_name, last_name, password, last_login,
-                               is_superuser, is_staff, is_active, date_joined, 'administrador'
-                        FROM auth_user
-                        WHERE id NOT IN (SELECT id FROM CaosNewsApp_usuario)
-                    """)
-
-                    migrated_count = cursor.rowcount
-
-                    if migrated_count > 0:
-                        self.stdout.write(f'✅ {migrated_count} usuarios migrados con IDs preservados')
-                    else:
-                        self.stdout.write('✅ Todos los usuarios ya están migrados')
-                else:
-                    self.stdout.write('ℹ️  No hay usuarios en auth_user para migrar')
-
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'❌ Error en migración de usuarios: {e}')
-            )
-            import traceback
-            traceback.print_exc()
-            # No fallar el setup, continuar con la esperanza de que las migraciones lo arreglen
-            self.stdout.write('⚠️  Continuando con migraciones automáticas...')
-
-    @transaction.atomic
     def create_test_users(self):
-        """Crea usuarios de prueba para QA"""
-        from django.contrib.auth.models import Group, Permission
+        """Crea usuarios de prueba para QA en auth_user"""
+        from django.contrib.auth.models import User, Group, Permission
         from django.contrib.contenttypes.models import ContentType
         from CaosNewsApp.models import Noticia
-
-        User = get_user_model()
 
         self.stdout.write('👥 Creando usuarios de prueba...')
 
@@ -256,22 +195,29 @@ class Command(BaseCommand):
         for user_data in test_users:
             username = user_data['username']
 
+            # Filtrar campos que no pertenecen al modelo auth_user
+            auth_user_data = {
+                'username': user_data['username'],
+                'email': user_data['email'],
+                'first_name': user_data['first_name'],
+                'last_name': user_data['last_name'],
+                'is_staff': user_data['is_staff'],
+                'is_superuser': user_data['is_superuser'],
+            }
+
             # Verificar si el usuario ya existe
             if User.objects.filter(username=username).exists():
                 # Actualizar usuario existente
                 user = User.objects.get(username=username)
-                for field, value in user_data.items():
-                    if field == 'password':
-                        user.set_password(value)  # Django hashea automáticamente la contraseña
-                    else:
-                        setattr(user, field, value)
+                for field, value in auth_user_data.items():
+                    setattr(user, field, value)
+                user.set_password(user_data['password'])  # Django hashea automáticamente la contraseña
                 user.save()
                 self.stdout.write(f'🔄 Usuario actualizado: {username}')
             else:
                 # Crear nuevo usuario
-                password = user_data.pop('password')
-                user = User.objects.create(**user_data)
-                user.set_password(password)  # Django hashea automáticamente la contraseña
+                user = User.objects.create(**auth_user_data)
+                user.set_password(user_data['password'])  # Django hashea automáticamente la contraseña
                 user.save()
                 self.stdout.write(f'✅ Usuario creado: {username}')
 
@@ -395,4 +341,9 @@ class Command(BaseCommand):
         self.stdout.write('\n' + '='*60)
         self.stdout.write('🌐 URL Admin: http://127.0.0.1:8001/adminDJango/')
         self.stdout.write('🌐 URL Sitio: http://127.0.0.1:8001/')
+        self.stdout.write('\n💡 DATOS DISPONIBLES:')
+        self.stdout.write('   📊 Base de datos clonada de producción (datos reales)')
+        self.stdout.write('   👥 Usuarios de prueba agregados para testing')
+        self.stdout.write('   📁 Archivos media copiados de producción')
+        self.stdout.write('   ✅ Entorno listo para pruebas manuales y automatizadas')
         self.stdout.write('='*60 + '\n')
