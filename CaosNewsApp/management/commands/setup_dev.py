@@ -63,13 +63,6 @@ class Command(BaseCommand):
                 self.style.WARNING('⏭️  Omitiendo copia de archivos media')
             )
 
-        # 3. Migrar datos de auth_user a CaosNewsApp_usuario si es necesario
-        self.migrate_auth_users()
-
-        # 4. Ejecutar migraciones en la base de datos DEV
-        self.stdout.write('🔄 Ejecutando migraciones en desarrollo...')
-        call_command('migrate', '--run-syncdb', verbosity=0)
-
         # 5. Crear usuarios esenciales de desarrollo
         self.create_dev_users()
 
@@ -139,57 +132,6 @@ class Command(BaseCommand):
             )
             # Crear directorio vacío si falla la copia
             dev_media.mkdir(exist_ok=True)
-
-    @transaction.atomic
-    def migrate_auth_users(self):
-        """
-        Migra datos de auth_user a CaosNewsApp_usuario antes de aplicar migraciones
-        """
-        from django.db import connection
-
-        self.stdout.write('🔄 Migrando usuarios de auth_user a CaosNewsApp_usuario...')
-
-        try:
-            with connection.cursor() as cursor:
-                # Verificar si existen usuarios en auth_user que no están en CaosNewsApp_usuario
-                cursor.execute("SELECT COUNT(*) FROM auth_user")
-                auth_user_count = cursor.fetchone()[0]
-
-                cursor.execute("SELECT COUNT(*) FROM CaosNewsApp_usuario")
-                custom_user_count = cursor.fetchone()[0]
-
-                self.stdout.write(f'📊 Usuarios en auth_user: {auth_user_count}')
-                self.stdout.write(f'📊 Usuarios en CaosNewsApp_usuario: {custom_user_count}')
-
-                if auth_user_count > 0:
-                    # Migrar usuarios usando INSERT OR IGNORE para evitar conflictos
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO CaosNewsApp_usuario
-                        (id, username, email, first_name, last_name, password, last_login,
-                         is_superuser, is_staff, is_active, date_joined, role)
-                        SELECT id, username, email, first_name, last_name, password, last_login,
-                               is_superuser, is_staff, is_active, date_joined, 'administrador'
-                        FROM auth_user
-                        WHERE id NOT IN (SELECT id FROM CaosNewsApp_usuario)
-                    """)
-
-                    migrated_count = cursor.rowcount
-
-                    if migrated_count > 0:
-                        self.stdout.write(f'✅ {migrated_count} usuarios migrados con IDs preservados')
-                    else:
-                        self.stdout.write('✅ Todos los usuarios ya están migrados')
-                else:
-                    self.stdout.write('ℹ️  No hay usuarios en auth_user para migrar')
-
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'❌ Error en migración de usuarios: {e}')
-            )
-            import traceback
-            traceback.print_exc()
-            # No fallar el setup, continuar con la esperanza de que las migraciones lo arreglen
-            self.stdout.write('⚠️  Continuando con migraciones automáticas...')
 
     @transaction.atomic
     def create_dev_users(self):

@@ -183,12 +183,8 @@ function Clean-QAEnvironment {
     Remove-QAFile "$projectPath\.coverage" "Archivo cobertura pytest"
     Remove-QAFile "$projectPath\.pytest_cache" "Cache de pytest"
 
-    # 4. Eliminar scripts obsoletos (si aun existen)
-    Write-ColorOutput ""
-    Write-ColorOutput "Verificando scripts obsoletos..." "Cyan"
-
-    Remove-QAFile "$projectPath\scripts\qa.ps1" "Script qa.ps1"
-    Remove-QAFile "$projectPath\scripts\manage_qa.ps1" "Script manage_qa.ps1"
+    # 4. Eliminar logs
+    Remove-QAFile "$projectPath\caosnews_qa.log" "Log de QA"
 }
 
 function Show-Summary {

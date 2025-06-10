@@ -1,10 +1,25 @@
 ﻿# Script para ejecutar servidor en modo QA con datos clonados de producción
 # PowerShell version
+#
+# Uso:
+#   .\run_qa_server.ps1           - Ejecuta con configuración completa de datos
+#   .\run_qa_server.ps1 -SkipData - Ejecuta sin configurar datos (usa BD existente)
 
-Write-Host "============================================" -ForegroundColor Magenta
-Write-Host " CaosNews - Servidor de QA" -ForegroundColor Magenta
-Write-Host " (Base de datos clonada de producción)" -ForegroundColor Cyan
-Write-Host "============================================" -ForegroundColor Magenta
+param(
+    [switch]$SkipData
+)
+
+if ($SkipData) {
+    Write-Host "============================================" -ForegroundColor Magenta
+    Write-Host " CaosNews - Servidor de QA" -ForegroundColor Magenta
+    Write-Host " (Usando base de datos existente)" -ForegroundColor Yellow
+    Write-Host "============================================" -ForegroundColor Magenta
+} else {
+    Write-Host "============================================" -ForegroundColor Magenta
+    Write-Host " CaosNews - Servidor de QA" -ForegroundColor Magenta
+    Write-Host " (Base de datos clonada de producción)" -ForegroundColor Cyan
+    Write-Host "============================================" -ForegroundColor Magenta
+}
 
 # Cambiar al directorio del proyecto
 $projectPath = Split-Path -Parent $PSScriptRoot
@@ -26,8 +41,13 @@ if (Test-Path "venv\Scripts\Activate.ps1") {
 Write-Host "Configurando entorno de QA..." -ForegroundColor Yellow
 $env:DJANGO_SETTINGS_MODULE = "CaosNews.settings.settings_qa"
 
-Write-Host "Clonando base de datos de produccion y configurando usuarios de prueba..." -ForegroundColor Yellow
-python manage.py setup_qa
+if (-not $SkipData) {
+    Write-Host "Clonando base de datos de produccion y configurando usuarios de prueba..." -ForegroundColor Yellow
+    python manage.py setup_qa
+} else {
+    Write-Host "Clonando base de datos de produccion y copiando archivos media (sin usuarios de prueba)..." -ForegroundColor Yellow
+    python manage.py setup_qa --skip-data
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Error configurando el entorno QA" -ForegroundColor Red
@@ -39,10 +59,18 @@ Write-Host "============================================" -ForegroundColor Green
 Write-Host " ENTORNO QA CONFIGURADO CORRECTAMENTE" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Datos disponibles:" -ForegroundColor Cyan
-Write-Host "  - Base de datos clonada de produccion" -ForegroundColor White
-Write-Host "  - Usuarios de prueba agregados" -ForegroundColor White
-Write-Host "  - Archivos media copiados" -ForegroundColor White
+
+if (-not $SkipData) {
+    Write-Host "Datos disponibles:" -ForegroundColor Cyan
+    Write-Host "  - Base de datos clonada de produccion" -ForegroundColor White
+    Write-Host "  - Usuarios de prueba agregados" -ForegroundColor White
+    Write-Host "  - Archivos media copiados" -ForegroundColor White
+} else {
+    Write-Host "Datos disponibles:" -ForegroundColor Cyan
+    Write-Host "  - Base de datos clonada de produccion" -ForegroundColor White
+    Write-Host "  - Archivos media copiados" -ForegroundColor White
+    Write-Host "  - Usuarios de prueba omitidos (usar usuarios existentes)" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "Para ejecutar pruebas (comando separado):" -ForegroundColor Yellow
 Write-Host "  python manage.py run_qa_tests" -ForegroundColor White

@@ -31,6 +31,11 @@ class Command(BaseCommand):
             action='store_true',
             help='Omite la copia de archivos media',
         )
+        parser.add_argument(
+            '--skip-data',
+            action='store_true',
+            help='Omite la creación de datos de prueba',
+        )
 
     def handle(self, *args, **options):
         self.stdout.write(
@@ -64,7 +69,12 @@ class Command(BaseCommand):
             )
 
         # 3. Crear usuarios de prueba en auth_user (compatibles con BD clonada)
-        self.create_test_users()
+        if not options['skip_data']:
+            self.create_test_users()
+        else:
+            self.stdout.write(
+                self.style.WARNING('⏭️  Omitiendo creación de usuarios de prueba')
+            )
 
         # 4. Crear directorios necesarios
         self.create_directories()
@@ -72,7 +82,10 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS('✅ Entorno de QA configurado correctamente!')
         )
-        self.display_test_users_info()
+
+        if not options['skip_data']:
+            self.stdout.write('📋 Información de usuarios de prueba:')
+            self.display_test_users_info()
 
     def clone_production_database(self, prod_db, qa_db):
         """Clona la base de datos de producción para QA"""

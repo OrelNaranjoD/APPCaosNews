@@ -1,0 +1,70 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+@font-face {
+  font-family: 'Exo';
+  src: url(CaosNewsApp/static/webfonts/Exo-Regular.ttf) format('truerype');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Exo';
+  src: url(CaosNewsApp/static/webfonts/Exo-Bold.ttf) format('truerype');
+  font-weight: bold;
+}
+
+.profile-image {
+  max-width: 150px;
+  height: auto;
+}
+
+.logo {
+  max-width: 200px;
+  height: auto;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Exo', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  background-color: gainsboro;
+}
+
+/* Asegurar que el main ocupe todo el espacio disponible */
+main {
+  flex: 1;
+  display: flex;
+}
+
+/* Asegurar que el container también use todo el espacio */
+main .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asegurar que la fila principal use todo el espacio */
+main .container .row {
+  flex: 1;
+  min-height: 0; /* Permite que los elementos flex se contraigan */
+}
+
+/* El área de contenido debe ocupar todo el espacio disponible */
+.col.bg-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar/Navbar debe ocupar toda la altura disponible */
+.col-auto {
+  display: flex;
+  flex-direction: column;
+}
+
+.col-auto nav {
+  flex: 1;
+  min-height: 100%;
+}

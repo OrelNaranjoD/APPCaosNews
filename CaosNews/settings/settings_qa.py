@@ -5,7 +5,7 @@ Configuración para el entorno de QA/TESTING
 - CSP permisiva para testing
 - Email a consola para depuración
 - APIs externas configurables
-- Logging detallado para debugging
+- Logging nivel INFO para QA
 - Ideal para: pytest con datos reales, testing manual, integración
 """
 
@@ -15,7 +15,7 @@ from .settings_base import *
 # Secret key para QA
 SECRET_KEY = 'qa-secret-key-for-testing-environment'
 
-# DEBUG habilitado para QA
+# DEBUG deshabilitado para QA
 DEBUG = True
 
 # Hosts permitidos para QA
@@ -46,6 +46,6 @@ TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # Logging para QA
 LOGGING = get_logging_config(
-    log_level='DEBUG',
+    log_level='INFO',
     log_file=BASE_DIR / 'caosnews_qa.log'
 )

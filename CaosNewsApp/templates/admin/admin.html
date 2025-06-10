@@ -1,51 +1,47 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- ========== Favicon ========== -->
-    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" sizes="any" />
     <!-- ========== CSS FontAwesome ========== -->
     <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/solid.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/brands.min.css' %}" />
     <!-- ========== CSS Bootstrap ========== -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <!-- ========== CSS Personalizado ========== -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
-<body>
-  <div class="container">
-    <header>
-      <div class="container bg-light p-4">
-        <!-- ========== Logotipo ========== -->
-        <div class="col">
-            <a href="{% url 'home' %}">
-              <img src="{% static 'images/logotipo.webp' %}" class="img-fluid w-50" alt="Caos News">
-            </a>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <!-- ========== CSS Admin Panel ========== -->
+    <link rel="stylesheet" href="{% static 'css/admin-style.css' %}" />
+    <title>{% block title %}Caos News, La voz de todos.{% endblock %}</title>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <!-- ========== Header ========== -->
+    {% include 'admin/header.html' %}
+
+    <!-- ========== Main Content ========== -->
+    <main class="flex-grow-1">
+      <div class="container">
+        <div class="row">
+          <!-- ========== Sidebar Navigation ========== -->
+          <div class="col-auto p-0">{% include 'admin/navbar.html' %}</div>
+
+          <!-- ========== Content Area ========== -->
+          <div class="col bg-body p-4">{% block body %}{% endblock %}</div>
         </div>
-        <div class="col-auto">
-        </div>
-      </div>
-    </header>
-    <main>
-      <div class="row d-flex">
-        <!-- ========== Barra de navegación ========== -->
-        {% include 'admin/navbar.html' %}
-        <!-- ========== Cuerpo ========== -->
-        {% block body %}{% endblock %}
       </div>
     </main>
-      <!-- ========== Pie de pagina ========== -->
-      {% include 'admin/footer.html' %}
-    </div>
-  <!-- ========== JS Bootstrap ========== -->
-  <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
-  <script src="{% static 'js/popper.min.js' %}"></script>
-  <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  <!-- ========== JS Personalizado ========== -->
-  <script src="{% static 'js/custom.js' %}"></script>
-</body>
+
+    <!-- ========== Footer ========== -->
+    {% include 'admin/footer.html' %}
+
+    <!-- ========== JS Libraries ========== -->
+    <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- ========== JS Personalizado ========== -->
+    <script src="{% static 'js/custom.js' %}"></script>
+  </body>
 </html>
