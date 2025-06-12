@@ -7,8 +7,7 @@
       <h2>Lista de noticias rechazadas</h2>
     </div>
     <div class="col-12 table-responsive">
-      
-
+      {% if noticias %}
       <table class="table table-striped">
         <thead>
           <tr>
@@ -49,7 +48,7 @@
               <td class="text-center">
                 <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}">
                   <i class="fa-solid fa-pen-to-square"></i>
-                </a>  
+                </a>
                 {% if noticia.eliminado %}
                   <i class="fa-solid fa-trash text-danger"></i>
                   {% else %}
@@ -78,6 +77,21 @@
         {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <div class="alert alert-danger text-center" role="alert">
+        <i class="fa-solid fa-times-circle fa-2x mb-3 text-danger"></i>
+        <h4>No hay noticias rechazadas</h4>
+        {% for group in request.user.groups.all %}
+          {% if group.name == 'Administrador' %}
+            <p class="mb-3">No hay noticias rechazadas en el sistema.</p>
+            <p class="mb-0">Las noticias rechazadas aparecerán aquí cuando sean denegadas durante la revisión.</p>
+          {% else %}
+            <p class="mb-3">No tienes noticias rechazadas.</p>
+            <p class="mb-0">Las noticias que no cumplan con los estándares aparecerán aquí para que puedas editarlas.</p>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

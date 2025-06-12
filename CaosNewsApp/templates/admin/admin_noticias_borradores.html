@@ -7,8 +7,7 @@
       <h2>Lista de noticias por aprobar</h2>
     </div>
     <div class="col-12 table-responsive">
-
-
+      {% if noticias %}
       <table class="table table-striped">
         <thead>
           <tr>
@@ -80,6 +79,27 @@
         {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <div class="alert alert-warning text-center" role="alert">
+        <i class="fa-solid fa-edit fa-2x mb-3 text-warning"></i>
+        <h4>No hay noticias por aprobar</h4>
+        {% for group in request.user.groups.all %}
+          {% if group.name == 'Administrador' %}
+            <p class="mb-3">No hay noticias pendientes de aprobación en el sistema.</p>
+            <p class="mb-0">Las noticias en borrador aparecerán aquí cuando los usuarios las envíen.</p>
+          {% else %}
+            <p class="mb-3">No tienes noticias pendientes de aprobación.</p>
+            <p class="mb-0">Tus borradores aparecerán aquí cuando los envíes para revisión.</p>
+          {% endif %}
+        {% endfor %}
+        <div class="mt-3">
+          <a href="{% url 'admin_crear_noticia' %}" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-2"></i>
+            Crear nueva noticia
+          </a>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

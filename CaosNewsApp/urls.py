@@ -48,6 +48,11 @@ urlpatterns = [
         name="admin_eliminar_noticia",
     ),
     path(
+        "admin/noticias/restaurar/<int:noticia_id>/",
+        views.admin_restaurar_noticia,
+        name="admin_restaurar_noticia",
+    ),
+    path(
         "admin/noticias/delete/<int:noticia_id>/",
         views.admin_delete_noticia,
         name="admin_delete_noticia",

@@ -1,9 +1,182 @@
 {% extends './admin.html' %}
 {% load static %}
 {% block body %}
-    <div class="col py-3">
-        <p>Bienvenido {{ user.first_name }} {{ user.last_name }} actualmente estas en el panel de administración.</p>
-        <p>Noticias publicadas son: {{ num_noticias_publicadas }}</p>
-        <p>Noticias pendientes de revision: {{ num_noticias_pendientes }}</p>
+<div class="col py-3">
+    <!-- Bienvenida -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="fa-solid fa-tachometer-alt me-2"></i>
+                Dashboard {% if es_administrador %}de Administración{% else %}Personal{% endif %}
+            </h2>
+            <p class="lead text-muted">
+                Bienvenido {{ user.first_name }} {{ user.last_name }}, aquí tienes un resumen {% if es_administrador %}del sistema{% else %}de tus noticias{% endif %}.
+            </p>
+        </div>
     </div>
+
+    <!-- Estadísticas principales -->
+    <div class="row mb-4">
+        <!-- Noticias Publicadas -->
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="card-title text-success mb-1">{{ num_noticias_publicadas }}</h4>
+                            <p class="card-text text-muted mb-0">Publicadas</p>
+                        </div>
+                        <i class="fa-solid fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Noticias Pendientes -->
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="card-title text-warning mb-1">{{ num_noticias_pendientes }}</h4>
+                            <p class="card-text text-muted mb-0">Pendientes</p>
+                        </div>
+                        <i class="fa-solid fa-clock fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Noticias Rechazadas -->
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="card-title text-danger mb-1">{{ num_noticias_rechazadas }}</h4>
+                            <p class="card-text text-muted mb-0">Rechazadas</p>
+                        </div>
+                        <i class="fa-solid fa-times-circle fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas secundarias -->
+    <div class="row mb-4">
+        <!-- Noticias Inactivas -->
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-secondary mb-1">{{ num_noticias_inactivas }}</h5>
+                            <small class="card-text text-muted">Inactivas</small>
+                        </div>
+                        <i class="fa-solid fa-eye-slash fa-lg text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Noticias Eliminadas -->
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-dark">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-dark mb-1">{{ num_noticias_eliminadas }}</h5>
+                            <small class="card-text text-muted">Eliminadas</small>
+                        </div>
+                        <i class="fa-solid fa-trash fa-lg text-dark"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-primary mb-1">{{ total_noticias }}</h5>
+                            <small class="card-text text-muted">Total Activas</small>
+                        </div>
+                        <i class="fa-solid fa-newspaper fa-lg text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Autores Activos (solo para administradores) -->
+        {% if es_administrador and num_autores_activos %}
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-info mb-1">{{ num_autores_activos }}</h5>
+                            <small class="card-text text-muted">Autores Activos</small>
+                        </div>
+                        <i class="fa-solid fa-users fa-lg text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-bolt me-2"></i>
+                        Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <a href="{% url 'admin_crear_noticia' %}" class="btn btn-success w-100">
+                                <i class="fa-solid fa-plus me-2"></i>
+                                Nueva Noticia
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <a href="{% url 'admin_noticias_borradores' %}" class="btn btn-warning w-100">
+                                <i class="fa-solid fa-list me-2"></i>
+                                Ver Borradores
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <a href="{% url 'admin_noticias' %}" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-check-circle me-2"></i>
+                                Ver Publicadas
+                            </a>
+                        </div>
+                        {% if es_administrador %}
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <a href="{% url 'admin_user_priv' %}" class="btn btn-info w-100">
+                                <i class="fa-solid fa-users-cog me-2"></i>
+                                Gestionar Usuarios
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="col-md-3 col-sm-6 mb-2">
+                            <a href="{% url 'admin_perfil' %}" class="btn btn-info w-100">
+                                <i class="fa-solid fa-user me-2"></i>
+                                Mi Perfil
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

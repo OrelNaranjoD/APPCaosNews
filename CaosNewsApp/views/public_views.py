@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.core.paginator import Paginator
 from ..models import Noticia
 from .utils import obtener_tiempo_chile
 
@@ -21,7 +22,7 @@ def noticias(request, categoria):
                 eliminado=False, activo=True, detalle__publicada=True
             )
             .exclude(id_categoria=14)
-            .order_by("-fecha_creacion")[:10]
+            .order_by("-fecha_creacion")
         )
     else:
         noticias = Noticia.objects.filter(
@@ -30,9 +31,17 @@ def noticias(request, categoria):
             activo=True,
             detalle__publicada=True,
         ).order_by("-fecha_creacion")
+
+    # Configurar paginación
+    paginator = Paginator(noticias, 9)  # 9 noticias por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "noticias": noticias,
+        "noticias": page_obj,
         "categoria": categoria,
+        "page_obj": page_obj,
+        "paginator": paginator,
     }
     return render(request, "noticia.html", context)
 
@@ -81,24 +90,50 @@ def home(request):
 
 def busqueda(request):
     """Vista para búsqueda de noticias"""
-    query = request.GET.get("q")
-    terms = query.split()
+    query = request.GET.get("q", "").strip()
 
-    q_objects = Q()
+    # Si no hay query o está vacío, mostrar todas las noticias
+    if not query:
+        noticias = Noticia.objects.filter(
+            activo=True,
+            eliminado=False,
+            detalle__publicada=True
+        ).order_by('-fecha_creacion')
+    else:
+        # Realizar búsqueda específica
+        terms = query.split()
+        q_objects = Q()
 
-    for term in terms:
-        q_objects |= Q(id_usuario__first_name__icontains=term) | Q(
-            id_usuario__last_name__icontains=term
+        for term in terms:
+            q_objects |= Q(id_usuario__first_name__icontains=term) | Q(
+                id_usuario__last_name__icontains=term
+            )
+
+        q_objects |= (
+            Q(id_categoria__nombre_categoria__icontains=query)
+            | Q(titulo_noticia__icontains=query)
+            | Q(cuerpo_noticia__icontains=query)
         )
 
-    q_objects |= (
-        Q(id_categoria__nombre_categoria__icontains=query)
-        | Q(titulo_noticia__icontains=query)
-        | Q(cuerpo_noticia__icontains=query)
-    )
+        # Filtrar solo noticias activas, publicadas y no eliminadas
+        noticias = Noticia.objects.filter(
+            q_objects,
+            activo=True,
+            eliminado=False,
+            detalle__publicada=True
+        ).order_by('-fecha_creacion')
 
-    noticias = Noticia.objects.filter(q_objects)
-    context = {"query": query, "noticias": noticias}
+    # Configurar paginación
+    paginator = Paginator(noticias, 9)  # 9 noticias por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "query": query,
+        "noticias": page_obj,
+        "page_obj": page_obj,
+        "paginator": paginator,
+    }
     return render(request, "busqueda.html", context)
 
 

@@ -1,0 +1,85 @@
+{% comment %}
+Componente reutilizable de paginación
+
+Parámetros esperados:
+- page_obj: objeto de paginación de Django
+- query: parámetro de búsqueda opcional (para páginas de búsqueda)
+- context_info: información adicional del contexto (ej: "en {{ categoria }}" o "para {{ query }}")
+
+Uso:
+{% include 'components/paginator.html' with page_obj=page_obj query=query context_info="en Deportes" %}
+{% include 'components/paginator.html' with page_obj=page_obj query=query context_info="para búsqueda" %}
+{% endcomment %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<!-- Paginación -->
+<div class="row mt-4">
+    <div class="col-12">
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page=1" aria-label="Primera">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;&laquo;</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo;</span>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">&raquo;&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Información de paginación -->
+<div class="row">
+    <div class="col-12 text-center">
+        <small class="text-muted">
+            Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} noticias
+            {% if context_info %}{{ context_info }}{% endif %}
+        </small>
+    </div>
+</div>
+{% endif %}

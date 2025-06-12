@@ -23,25 +23,94 @@ def es_admin_periodista_o_editor(user):
 def admin_home(request):
     """Panel principal del administrador"""
     if request.user.groups.filter(name="Administrador").exists():
+        # Estadísticas para administrador (todas las noticias)
         num_noticias_publicadas = Noticia.objects.filter(
-            activo=True, detalle__publicada=True
+            activo=True,
+            eliminado=False,
+            detalle__publicada=True,
+            detalle__estado="A"
         ).count()
+
         num_noticias_pendientes = Noticia.objects.filter(
-            detalle__publicada=False, detalle__estado__isnull=True
+            eliminado=False,
+            detalle__publicada=False,
+            detalle__estado__isnull=True
         ).count()
+
+        num_noticias_rechazadas = Noticia.objects.filter(
+            eliminado=False,
+            detalle__estado="R"
+        ).count()
+
+        num_noticias_eliminadas = Noticia.objects.filter(
+            eliminado=True
+        ).count()
+
+        num_noticias_inactivas = Noticia.objects.filter(
+            activo=False,
+            eliminado=False
+        ).count()
+
+        # Total de noticias (no eliminadas)
+        total_noticias = Noticia.objects.filter(eliminado=False).count()
+
+        # Estadísticas adicionales
+        num_autores_activos = Noticia.objects.filter(
+            eliminado=False,
+            detalle__publicada=True
+        ).values('id_usuario').distinct().count()
+
     else:
+        # Estadísticas para periodistas/editores (solo sus noticias)
         num_noticias_publicadas = Noticia.objects.filter(
-            id_usuario=request.user, activo=True, detalle__publicada=True
+            id_usuario=request.user,
+            activo=True,
+            eliminado=False,
+            detalle__publicada=True,
+            detalle__estado="A"
         ).count()
+
         num_noticias_pendientes = Noticia.objects.filter(
             id_usuario=request.user,
+            eliminado=False,
             detalle__publicada=False,
             detalle__estado__isnull=True,
         ).count()
 
+        num_noticias_rechazadas = Noticia.objects.filter(
+            id_usuario=request.user,
+            eliminado=False,
+            detalle__estado="R"
+        ).count()
+
+        num_noticias_eliminadas = Noticia.objects.filter(
+            id_usuario=request.user,
+            eliminado=True
+        ).count()
+
+        num_noticias_inactivas = Noticia.objects.filter(
+            id_usuario=request.user,
+            activo=False,
+            eliminado=False
+        ).count()
+
+        # Total de noticias del usuario (no eliminadas)
+        total_noticias = Noticia.objects.filter(
+            id_usuario=request.user,
+            eliminado=False
+        ).count()
+
+        num_autores_activos = None  # No relevante para no administradores
+
     context = {
         "num_noticias_publicadas": num_noticias_publicadas,
         "num_noticias_pendientes": num_noticias_pendientes,
+        "num_noticias_rechazadas": num_noticias_rechazadas,
+        "num_noticias_eliminadas": num_noticias_eliminadas,
+        "num_noticias_inactivas": num_noticias_inactivas,
+        "total_noticias": total_noticias,
+        "num_autores_activos": num_autores_activos,
+        "es_administrador": request.user.groups.filter(name="Administrador").exists(),
     }
     return render(request, "admin/admin_home.html", context)
 
@@ -64,7 +133,7 @@ def admin_noticias(request):
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
 
-        context = {"noticias": noticias}
+    context = {"noticias": noticias}
     return render(request, "admin/admin_noticias.html", context)
 
 
@@ -91,6 +160,12 @@ def admin_noticias_eliminadas(request):
     """Vista para noticias eliminadas"""
     if request.user.groups.filter(name="Administrador").exists():
         noticias = Noticia.objects.filter(eliminado=True)
+    else:
+        noticias = Noticia.objects.filter(
+            id_usuario=request.user.id,
+            eliminado=True
+        )
+
     for noticia in noticias:
         noticia.primer_imagen = noticia.imagenes.first()
 
@@ -274,3 +349,19 @@ def admin_user_priv(request):
         "lista_usuarios": lista_usuarios,
     }
     return render(request, "admin/admin_user_priv.html", context)
+
+
+@user_passes_test(es_admin_periodista_o_editor, login_url="home")
+def admin_restaurar_noticia(request, noticia_id):
+    """Vista para restaurar noticia eliminada"""
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+
+    # Verificar que el usuario tiene permisos para restaurar esta noticia
+    if not request.user.groups.filter(name="Administrador").exists():
+        # Si no es administrador, verificar que es el autor de la noticia
+        if noticia.id_usuario != request.user:
+            return redirect("admin_noticias_eliminadas")
+
+    noticia.eliminado = False
+    noticia.save()
+    return redirect("admin_noticias_eliminadas")

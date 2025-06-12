@@ -40,13 +40,13 @@
           <li class="nav-item">
             <a href="{% url 'admin_noticias_borradores' %}" class="nav-link text-light small"> <i class="fa-solid fa-list me-2"></i>Borradores </a>
           </li>
-          {% for group in request.user.groups.all %} {% if group.name == 'Administrador' %}
-          <li class="nav-item">
-            <a href="{% url 'admin_noticias_eliminadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-trash me-2"></i>Eliminadas </a>
-          </li>
           <li class="nav-item">
             <a href="{% url 'admin_noticias_rechazadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-times me-2"></i>Rechazadas </a>
           </li>
+          <li class="nav-item">
+            <a href="{% url 'admin_noticias_eliminadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-trash me-2"></i>Eliminadas </a>
+          </li>
+          {% for group in request.user.groups.all %} {% if group.name == 'Administrador' %}
           {% endif %} {% endfor %}
         </ul>
       </div>

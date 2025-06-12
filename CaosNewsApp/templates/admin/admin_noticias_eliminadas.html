@@ -7,8 +7,7 @@
       <h2>Lista de noticias eliminadas</h2>
     </div>
     <div class="col-12 table-responsive">
-
-
+      {% if noticias %}
       <table class="table table-striped">
         <thead>
           <tr>
@@ -18,11 +17,7 @@
             <th scope="col" class="text-center">Imagen</th>
             <th scope="col" class="text-center">Comentario</th>
             <th scope="col" class="text-center">Aprobada por</th>
-            {% for group in request.user.groups.all %}
-              {% if group.name == 'Administrador' %}
-                <th scope="col" class="w-action text-center">Acciones</th>
-              {% endif %}
-            {% endfor %}
+            <th scope="col" class="w-action text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -50,42 +45,75 @@
                     {{ noticia.detalle.id_usuario.first_name }} {{ noticia.detalle.id_usuario.last_name }}
                 {% endif %}
             </td>
-            {% for group in request.user.groups.all %}
-              {% if group.name == 'Administrador' %}
-              <td class="text-center">
-                <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </a>
-                {% if noticia.eliminado %}
-                  <i class="fa-solid fa-trash text-danger"></i>
-                  {% else %}
-                  <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#confirmacionModal{{noticia.id_noticia}}"><i class="fa-solid fa-trash"></i></a>
-                {% endif %}
-                <!-- Modal de Confirmación -->
-                <div class="modal fade" id="confirmacionModal{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="confirmacionModal{{noticia.id_noticia}}Label" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="confirmacionModal{{noticia.id_noticia}}Label">Confirmar Eliminación</h5>
-                      </div>
-                      <div class="modal-body">
-                        ¿Estás seguro de que deseas eliminar la noticia "{{ noticia.titulo_noticia }}"?
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <a class="btn btn-danger" href="{% url 'admin_eliminar_noticia' noticia.id_noticia %}">Eliminar</a>
-                      </div>
+            <td class="text-center">
+              <!-- Botón para restaurar noticia -->
+              <a class="table-link me-2" href="#" data-bs-toggle="modal" data-bs-target="#restaurarModal{{noticia.id_noticia}}" title="Restaurar noticia">
+                <i class="fa-solid fa-arrow-rotate-left text-success"></i>
+              </a>
+              <!-- Botón para eliminar definitivamente -->
+              <a class="table-link" href="#" data-bs-toggle="modal" data-bs-target="#eliminarModal{{noticia.id_noticia}}" title="Eliminar definitivamente">
+                <i class="fa-solid fa-trash text-danger"></i>
+              </a>
+
+              <!-- Modal para Restaurar -->
+              <div class="modal fade" id="restaurarModal{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="restaurarModal{{noticia.id_noticia}}Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="restaurarModal{{noticia.id_noticia}}Label">Confirmar Restauración</h5>
+                    </div>
+                    <div class="modal-body">
+                      ¿Estás seguro de que deseas restaurar la noticia "{{ noticia.titulo_noticia }}"?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <a class="btn btn-success" href="{% url 'admin_restaurar_noticia' noticia.id_noticia %}">Restaurar</a>
                     </div>
                   </div>
                 </div>
-                <!-- Fin Modal de Confirmación -->
-              </td>
-              {% endif %}
-            {% endfor %}
+              </div>
+
+              <!-- Modal para Eliminar Definitivamente -->
+              <div class="modal fade" id="eliminarModal{{noticia.id_noticia}}" tabindex="-1" role="dialog" aria-labelledby="eliminarModal{{noticia.id_noticia}}Label" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="eliminarModal{{noticia.id_noticia}}Label">Confirmar Eliminación Definitiva</h5>
+                    </div>
+                    <div class="modal-body">
+                      <div class="alert alert-warning" role="alert">
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                      </div>
+                      ¿Estás seguro de que deseas eliminar definitivamente la noticia "{{ noticia.titulo_noticia }}"?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <a class="btn btn-danger" href="{% url 'admin_delete_noticia' noticia.id_noticia %}">Eliminar Definitivamente</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <div class="alert alert-secondary text-center" role="alert">
+        <i class="fa-solid fa-trash fa-2x mb-3 text-secondary"></i>
+        <h4>No hay noticias eliminadas</h4>
+        {% for group in request.user.groups.all %}
+          {% if group.name == 'Administrador' %}
+            <p class="mb-3">No hay noticias eliminadas en el sistema.</p>
+            <p class="mb-0">Las noticias eliminadas aparecerán aquí y podrán ser restauradas o eliminadas definitivamente.</p>
+          {% else %}
+            <p class="mb-3">No tienes noticias en la papelera de reciclaje.</p>
+            <p class="mb-0">Tus noticias eliminadas aparecerán aquí y podrás restaurarlas o eliminarlas definitivamente.</p>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

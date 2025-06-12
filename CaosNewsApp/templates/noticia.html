@@ -7,6 +7,8 @@
         <h2>Noticias de {{ categoria }}</h2>
     </div>
 </div>
+
+{% if noticias %}
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for noticia in noticias %}
         {% if noticia.activo %}
@@ -18,7 +20,10 @@
                         <img src="{{ imagen_noticia.imagen.url }}" class="img-fluid rounded-top" alt="{{ noticia.titulo_noticia }}">
                         {% endwith %}
                     {% else %}
-                        <p>No hay imagen para esta noticia.</p>
+                        <div class="bg-light p-4 text-center text-muted">
+                            <i class="fa-solid fa-image fa-2x"></i>
+                            <p class="mt-2 mb-0">Sin imagen</p>
+                        </div>
                     {% endif %}
                 </a>
                 <div class="card-body">
@@ -42,4 +47,19 @@
         {% endif %}
     {% endfor %}
 </div>
+
+<!-- Paginación usando componente reutilizable -->
+{% include 'components/paginator.html' with page_obj=page_obj context_info=' en '|add:categoria %}
+
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fa-solid fa-newspaper fa-2x mb-3 text-info"></i>
+            <h4>No hay noticias en {{ categoria }}</h4>
+            <p class="mb-0">Actualmente no hay noticias publicadas en esta categoría.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

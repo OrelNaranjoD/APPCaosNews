@@ -1,62 +1,120 @@
 <div class="container bg-dark text-light">
   <footer class="p-3 mt-auto">
-    <div class="row">
-      <div class="col-6 col-md-2">
-        <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Ultima Hora' %}" class="nav-link p-0 text-muted">Ultimas Noticias</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Actualidad' %}" class="nav-link p-0 text-muted">Actualidad</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Sociedad' %}" class="nav-link p-0 text-muted">Sociedad</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Politica' %}" class="nav-link p-0 text-muted">Politica</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Entretenimiento' %}" class="nav-link p-0 text-muted">Entretenimiento</a></li>
-        </ul>
-      </div>
-
-      <div class="col-6 col-md-2">
-        <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Economia' %}" class="nav-link p-0 text-muted">Economia</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Deporte' %}" class="nav-link p-0 text-muted">Deportes</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Mundo' %}" class="nav-link p-0 text-muted">Mundo</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Nacional' %}" class="nav-link p-0 text-muted">Nacional</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Cultura' %}" class="nav-link p-0 text-muted">Cultura</a></li>
-        </ul>
-      </div>
-
-      <div class="col-6 col-md-2">
-        <ul class="nav flex-column">
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Arte' %}" class="nav-link p-0 text-muted">Arte</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Vida' %}" class="nav-link p-0 text-muted">Vida</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Cine' %}" class="nav-link p-0 text-muted">Cine</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'noticias' categoria='Tecnología' %}" class="nav-link p-0 text-muted">Tecnología</a></li>
-          <li class="nav-item pb-2"><a href="{% url 'contacto' %}" class="nav-link p-0 text-muted">Contacto</a></li>
-        </ul>
-      </div>
-
-      <div class="col-md-5 offset-md-1">
-        <form>
-          <h5>Suscríbete a nuestro boletín</h5>
-          <p>Resumen mensual de lo más nuevo y destacado de las noticias.</p>
-          <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-            <form action="">
-              <label for="newsletter1" class="visually-hidden">Email address</label>
-              <input id="newsletter1" type="email" class="form-control" placeholder="Correo electrónico" pattern="[a-zA-Z0-9._-]*@[a-zA-Z]*\.[a-zA-Z]{2,3}" required="">
-              <button class="btn btn-primary" type="submit">Subscribir</button>
-            </form>
-          </div>
-        </form>
+    <!-- Sección de Suscripción -->
+    <div class="row mb-3">
+      <div class="col-12 text-center">
+        <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
+          <h5 class="text-light mb-0"><i class="fa-solid fa-envelope-open me-2"></i>Suscríbase a nuestro boletín:</h5>
+          <form class="d-flex gap-2 align-items-center newsletter-form">
+            <input
+              id="newsletter1"
+              type="email"
+              class="form-control newsletter-input"
+              placeholder="Tu correo electrónico"
+              pattern="[a-zA-Z0-9._-]*@[a-zA-Z]*\.[a-zA-Z]{2,3}"
+              required
+            />
+            <button class="btn btn-primary newsletter-btn" type="submit"><i class="fa-solid fa-paper-plane me-2"></i>Suscribir</button>
+          </form>
+        </div>
       </div>
     </div>
 
-    <div class="d-flex flex-column flex-sm-row justify-content-between border-top py-3">
-      <p>©2024 Caos News, Todos los derechos reservados.</p>
-      <ul class="list-unstyled d-flex">
-        <li class="ms-3"><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-        <li class="ms-3"><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
-        <li class="ms-3"><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
-        <li class="ms-3"><a href="#"><i class="fa-brands fa-twitch"></i></a></li>
+    <hr class="text-muted" />
+
+    <!-- Secciones Principales -->
+    <div class="row">
+      <!-- Sección 1: Noticias Principales -->
+      <div class="col-lg-3 col-md-6 mb-2">
+        <h6 class="text-uppercase fw-bold mb-3">Noticias Principales</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item pb-1"><a href="{% url 'busqueda' %}" class="nav-link p-0 text-muted">Todas las Noticias</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Ultima Hora' %}" class="nav-link p-0 text-muted">Últimas Noticias</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Actualidad' %}" class="nav-link p-0 text-muted">Actualidad</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Nacional' %}" class="nav-link p-0 text-muted">Nacional</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Mundo' %}" class="nav-link p-0 text-muted">Mundo</a></li>
+        </ul>
+      </div>
+
+      <!-- Sección 2: Sociedad y Política -->
+      <div class="col-lg-3 col-md-6 mb-2">
+        <h6 class="text-uppercase fw-bold mb-3">Sociedad y Política</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Sociedad' %}" class="nav-link p-0 text-muted">Sociedad</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Politica' %}" class="nav-link p-0 text-muted">Política</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Economia' %}" class="nav-link p-0 text-muted">Economía</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Deporte' %}" class="nav-link p-0 text-muted">Deportes</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Tecnología' %}" class="nav-link p-0 text-muted">Tecnología</a></li>
+        </ul>
+      </div>
+
+      <!-- Sección 3: Entretenimiento -->
+      <div class="col-lg-3 col-md-6 mb-2>
+        <h6 class="text-uppercase fw-bold mb-3">Entretenimiento</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item pb-1">
+            <a href="{% url 'noticias' categoria='Entretenimiento' %}" class="nav-link p-0 text-muted">Entretenimiento</a>
+          </li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Cultura' %}" class="nav-link p-0 text-muted">Cultura</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Arte' %}" class="nav-link p-0 text-muted">Arte</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Vida' %}" class="nav-link p-0 text-muted">Vida</a></li>
+          <li class="nav-item pb-1"><a href="{% url 'noticias' categoria='Cine' %}" class="nav-link p-0 text-muted">Cine</a></li>
+        </ul>
+      </div>
+
+      <!-- Sección 4: Contacto e Información -->
+      <div class="col-lg-3 col-md-6 mb-2">
+        <h6 class="text-uppercase fw-bold mb-3">Contacto</h6>
+
+        <div class="mb-3">
+          <p class="text-muted mb-2 footer-text">
+            <i class="fa-solid fa-map-marker-alt me-2"></i>
+            <a href="#" class="text-muted text-decoration-none">Santiago, Chile</a>
+          </p>
+          <p class="text-muted mb-2 footer-text">
+            <i class="fa-solid fa-envelope me-2"></i>
+            <a href="mailto:contacto@caosnews.cl" class="text-muted text-decoration-none">contacto@caosnews.cl</a>
+          </p>
+          <p class="text-muted mb-2 footer-text">
+            <i class="fa-solid fa-phone me-2"></i>
+            <a href="tel:+56912345678" class="text-muted text-decoration-none">+56 9 1234 5678</a>
+          </p>
+          <p class="text-muted mb-2 footer-text">
+            <i class="fa-solid fa-user-tie me-2"></i>
+            <a href="#" class="text-muted text-decoration-none">Orel Naranjo - Director</a>
+          </p>
+        </div>
+
+        <div class="d-grid">
+          <a href="{% url 'contacto' %}" class="btn btn-outline-light btn-sm"> <i class="fa-solid fa-paper-plane me-2"></i>Contáctenos </a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="text-muted" />
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
+      <p class="small mb-2 mb-sm-0">©2025 Caos News, Todos los derechos reservados.</p>
+      <ul class="list-unstyled d-flex mb-0">
+        <li class="ms-3">
+          <a href="#" class="text-muted" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        </li>
+        <li class="ms-3">
+          <a href="#" class="text-muted" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        </li>
+        <li class="ms-3">
+          <a href="#" class="text-muted" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        </li>
+        <li class="ms-3">
+          <a href="#" class="text-muted" title="Twitch"><i class="fa-brands fa-twitch"></i></a>
+        </li>
       </ul>
     </div>
-    <div class="d-flex flex-column flex-sm-row justify-content-center pt-3 border-top">
-      <p class="small">Sitio Web creado por Tech&Fun.</p>
+
+    <hr class="text-muted" />
+
+    <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center">
+      <p class="small mb-0">Sitio Web creado por Orel Naranjo.</p>
     </div>
   </footer>
 </div>

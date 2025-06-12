@@ -14,7 +14,7 @@
 }
 
 .profile-image {
-  max-width: 150px;
+  max-width: 100px;
   height: auto;
 }
 
@@ -67,4 +67,68 @@ main .container .row {
 .col-auto nav {
   flex: 1;
   min-height: 100%;
+}
+
+/* Quitar subrayado de iconos en enlaces */
+a i,
+a .fa-solid,
+a .fa-regular,
+a .fa-light,
+a .fas,
+a .far,
+a .fal {
+  text-decoration: none !important;
+}
+
+/* Asegurar que los enlaces con clase table-link no tengan subrayado en iconos */
+.table-link i,
+.table-link .fa-solid,
+.table-link .fa-regular,
+.table-link .fa-light,
+.table-link .fas,
+.table-link .far,
+.table-link .fal {
+  text-decoration: none !important;
+}
+
+/* Quitar subrayado de iconos en tarjetas de noticias */
+.card a i,
+.card a .fa-solid,
+.card a .fa-regular,
+.card a .fa-light,
+.card a .fas,
+.card a .far,
+.card a .fal {
+  text-decoration: none !important;
+}
+
+/* Quitar subrayado general de enlaces que contienen solo iconos o elementos visuales */
+a:has(i),
+a:has(.fa-solid),
+a:has(.fa-regular),
+a:has(.fa-light),
+a:has(.fas),
+a:has(.far),
+a:has(.fal) {
+  text-decoration: none !important;
+}
+
+/* Fallback para navegadores que no soportan :has() */
+a.icon-link,
+a.image-link {
+  text-decoration: none !important;
+}
+
+/* Opcional: estilo general para enlaces con iconos */
+.table-link {
+  text-decoration: none;
+}
+
+.table-link:hover i {
+  opacity: 0.8;
+}
+
+/* Estilo específico para enlaces de tarjetas con iconos */
+.card a:hover i {
+  opacity: 0.8;
 }

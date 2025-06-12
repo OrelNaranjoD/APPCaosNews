@@ -7,8 +7,7 @@
       <h2>Lista de noticias publicadas</h2>
     </div>
     <div class="col-12 table-responsive">
-      
-
+      {% if noticias %}
       <table class="table table-striped">
         <thead>
           <tr>
@@ -55,7 +54,7 @@
               <td class="text-center">
                 <a class="table-link" href="{% url 'admin_editar_noticia' noticia.id_noticia %}">
                   <i class="fa-solid fa-pen-to-square"></i>
-                </a>  
+                </a>
                 {% if noticia.eliminado %}
                   <i class="fa-solid fa-trash text-danger"></i>
                   {% else %}
@@ -86,6 +85,27 @@
         {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <div class="alert alert-info text-center" role="alert">
+        <i class="fa-solid fa-newspaper fa-2x mb-3 text-info"></i>
+        <h4>No hay noticias publicadas</h4>
+        {% for group in request.user.groups.all %}
+          {% if group.name == 'Administrador' %}
+            <p class="mb-3">Aún no hay noticias publicadas en el sistema.</p>
+            <p class="mb-0">Las noticias aparecerán aquí una vez que sean aprobadas y publicadas.</p>
+          {% else %}
+            <p class="mb-3">Aún no tienes noticias publicadas.</p>
+            <p class="mb-0">Tus noticias aparecerán aquí una vez que sean aprobadas por un administrador.</p>
+          {% endif %}
+        {% endfor %}
+        <div class="mt-3">
+          <a href="{% url 'admin_crear_noticia' %}" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-2"></i>
+            Crear nueva noticia
+          </a>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
