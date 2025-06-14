@@ -1,0 +1,194 @@
+{% comment %}
+Lista de comentarios con respuestas anidadas
+
+Parámetros requeridos:
+- comentarios: queryset paginado de comentarios principales
+{% endcomment %}
+
+{% load static %}
+
+<div class="comentarios-lista">
+    {% for comentario in comentarios %}
+        <div class="comentario-item" id="comentario-{{ comentario.id_comentario }}">
+            <div class="comentario-principal">
+                <div class="row">
+                    <!-- Avatar y metadatos -->
+                    <div class="col-auto">
+                        <div class="comentario-avatar">
+                            <i class="fa-solid fa-user-circle fa-2x text-secondary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Contenido del comentario -->
+                    <div class="col">
+                        <div class="comentario-header">
+                            <strong class="comentario-autor">{{ comentario.usuario.first_name }} {{ comentario.usuario.last_name }}</strong>
+                            <small class="comentario-fecha text-muted ms-2">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                {{ comentario.fecha_creacion|timesince }} atrás
+                            </small>
+
+                            <!-- Botón de eliminar (solo para el autor) -->
+                            {% if user == comentario.usuario %}
+                                <button class="btn btn-link btn-sm text-danger ms-2 p-0 eliminar-comentario"
+                                        data-comentario-id="{{ comentario.id_comentario }}"
+                                        title="Eliminar comentario">
+                                    <i class="fa-solid fa-trash fa-sm"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        <div class="comentario-contenido mt-2">
+                            <p class="mb-2">{{ comentario.contenido|linebreaks }}</p>
+                        </div>
+
+                        <!-- Acciones del comentario -->
+                        <div class="comentario-acciones">
+                            {% if user.is_authenticated %}
+                                <button class="btn btn-link btn-sm text-primary p-0 me-3 responder-btn"
+                                        data-comentario-id="{{ comentario.id_comentario }}">
+                                    <i class="fa-solid fa-reply me-1"></i>Responder
+                                </button>
+                            {% endif %}
+
+                            {% if comentario.get_respuestas.count > 0 %}
+                                <span class="text-muted">
+                                    <i class="fa-solid fa-comments me-1"></i>
+                                    {{ comentario.get_respuestas.count }} respuesta{{ comentario.get_respuestas.count|pluralize }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Formulario de respuesta (oculto inicialmente) -->
+                        {% if user.is_authenticated %}
+                            <div class="respuesta-form-container mt-3"
+                                 id="respuesta-form-{{ comentario.id_comentario }}"
+                                 style="display: none;">
+                                {% include 'components/respuesta_form.html' with comentario_id=comentario.id_comentario %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Respuestas anidadas -->
+                {% if comentario.get_respuestas %}
+                    <div class="respuestas-container mt-3 ms-4">
+                        {% for respuesta in comentario.get_respuestas %}
+                            <div class="respuesta-item" id="respuesta-{{ respuesta.id_comentario }}">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div class="respuesta-avatar">
+                                            <i class="fa-solid fa-user-circle text-info"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="respuesta-header">
+                                            <strong class="respuesta-autor">{{ respuesta.usuario.first_name }} {{ respuesta.usuario.last_name }}</strong>
+                                            <small class="respuesta-fecha text-muted ms-2">
+                                                <i class="fa-solid fa-clock me-1"></i>
+                                                {{ respuesta.fecha_creacion|timesince }} atrás
+                                            </small>
+
+                                            <!-- Botón de eliminar respuesta (solo para el autor) -->
+                                            {% if user == respuesta.usuario %}
+                                                <button class="btn btn-link btn-sm text-danger ms-2 p-0 eliminar-comentario"
+                                                        data-comentario-id="{{ respuesta.id_comentario }}"
+                                                        title="Eliminar respuesta">
+                                                    <i class="fa-solid fa-trash fa-sm"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="respuesta-contenido mt-2">
+                                            <p class="mb-0">{{ respuesta.contenido|linebreaks }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if not forloop.last %}
+            <hr class="comentario-separator">
+        {% endif %}
+    {% endfor %}
+</div>
+
+<style>
+.comentarios-lista {
+    max-height: none;
+}
+
+.comentario-item {
+    margin-bottom: 1.5rem;
+}
+
+.comentario-principal {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.comentario-avatar, .respuesta-avatar {
+    text-align: center;
+}
+
+.comentario-header, .respuesta-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.comentario-contenido, .respuesta-contenido {
+    line-height: 1.5;
+}
+
+.comentario-acciones {
+    margin-top: 0.5rem;
+}
+
+.respuestas-container {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 1rem;
+}
+
+.respuesta-item {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e9ecef;
+}
+
+.comentario-separator {
+    border-color: #dee2e6;
+    margin: 1.5rem 0;
+}
+
+.eliminar-comentario:hover {
+    color: #dc3545 !important;
+}
+
+.responder-btn:hover {
+    color: var(--primary-color) !important;
+}
+
+@media (max-width: 768px) {
+    .comentario-principal, .respuesta-item {
+        padding: 0.75rem;
+    }
+
+    .respuestas-container {
+        margin-left: 0 !important;
+        padding-left: 0.75rem;
+    }
+
+    .comentario-header, .respuesta-header {
+        font-size: 0.9rem;
+    }
+}
+</style>

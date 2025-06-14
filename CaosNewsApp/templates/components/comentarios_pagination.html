@@ -1,0 +1,86 @@
+{% comment %}
+Paginación específica para comentarios
+
+Parámetros requeridos:
+- page_obj: objeto de paginación de comentarios
+{% endcomment %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="comentarios-pagination">
+    <nav aria-label="Navegación de comentarios">
+        <ul class="pagination pagination-sm justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link comentarios-page-link"
+                       href="#comentarios-section"
+                       data-page="1"
+                       aria-label="Primera página de comentarios">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link comentarios-page-link"
+                       href="#comentarios-section"
+                       data-page="{{ page_obj.previous_page_number }}"
+                       aria-label="Página anterior de comentarios">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                    <li class="page-item">
+                        <a class="page-link comentarios-page-link"
+                           href="#comentarios-section"
+                           data-page="{{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link comentarios-page-link"
+                       href="#comentarios-section"
+                       data-page="{{ page_obj.next_page_number }}"
+                       aria-label="Página siguiente de comentarios">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link comentarios-page-link"
+                       href="#comentarios-section"
+                       data-page="{{ page_obj.paginator.num_pages }}"
+                       aria-label="Última página de comentarios">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="text-center mt-2">
+        <small class="text-muted">
+            Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} comentarios
+        </small>
+    </div>
+</div>
+{% endif %}

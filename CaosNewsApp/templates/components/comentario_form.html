@@ -1,0 +1,133 @@
+{% comment %}
+Formulario para crear nuevos comentarios
+
+Parámetros requeridos:
+- noticia: objeto de la noticia
+- form_id: ID único del formulario (opcional, por defecto 'comentario-form')
+{% endcomment %}
+
+{% load static %}
+
+<div class="comentario-form-container">
+    <form id="{{ form_id|default:'comentario-form' }}"
+          class="comentario-form"
+          method="post"
+          action="{% url 'crear_comentario' noticia.id_noticia %}">
+        {% csrf_token %}
+
+        <div class="row align-items-start">
+            <!-- Avatar del usuario -->
+            <div class="col-auto">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user-circle fa-2x text-primary"></i>
+                </div>
+            </div>
+
+            <!-- Campo de comentario -->
+            <div class="col">
+                <div class="mb-3">
+                    <label for="id_contenido" class="form-label">
+                        <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                    </label>
+                    <textarea
+                        name="contenido"
+                        id="id_contenido"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Escribe tu comentario aquí... (máximo 500 caracteres)"
+                        maxlength="500"
+                        required></textarea>
+                    <div class="form-text">
+                        <small class="character-count">0/500 caracteres</small>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="comentario-guidelines">
+                        <small class="text-muted">
+                            <i class="fa-solid fa-info-circle me-1"></i>
+                            Mantén un lenguaje respetuoso y constructivo
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm me-2" id="limpiar-comentario">
+                            <i class="fa-solid fa-eraser me-1"></i>Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm" id="enviar-comentario">
+                            <i class="fa-solid fa-paper-plane me-1"></i>Comentar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área para mostrar mensajes de error -->
+        <div class="comentario-messages mt-2" style="display: none;"></div>
+    </form>
+</div>
+
+<style>
+.comentario-form-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.user-avatar {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.character-count {
+    float: right;
+}
+
+.comentario-guidelines {
+    flex-grow: 1;
+}
+
+.form-actions {
+    white-space: nowrap;
+}
+
+.comentario-messages {
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-top: 0.5rem;
+}
+
+.comentario-messages.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.comentario-messages.success {
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+    color: #0f5132;
+}
+
+@media (max-width: 768px) {
+    .comentario-form-container {
+        padding: 1rem;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .comentario-guidelines {
+        order: 2;
+    }
+
+    .form-actions {
+        order: 1;
+        align-self: flex-end;
+    }
+}
+</style>

@@ -77,3 +77,31 @@ class Categoria(models.Model):
 
     def __str__(self):
         return str(self.nombre_categoria)
+
+class Comentario(models.Model):
+    id_comentario = models.AutoField(db_column='id_comentario', primary_key=True)
+    noticia = models.ForeignKey(Noticia, on_delete=models.CASCADE, related_name='comentarios')
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='id_usuario')
+    contenido = models.TextField(max_length=500, blank=False, null=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+    activo = models.BooleanField(default=True)
+    # Soporte para comentarios anidados (respuestas)
+    comentario_padre = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='respuestas')
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = 'Comentario'
+        verbose_name_plural = 'Comentarios'
+
+    def __str__(self):
+        return f'Comentario de {self.usuario.first_name} {self.usuario.last_name} en {self.noticia.titulo_noticia}'
+
+    @property
+    def es_respuesta(self):
+        """Retorna True si este comentario es una respuesta a otro comentario"""
+        return self.comentario_padre is not None
+
+    def get_respuestas(self):
+        """Obtiene todas las respuestas activas a este comentario"""
+        return self.respuestas.filter(activo=True).order_by('fecha_creacion')

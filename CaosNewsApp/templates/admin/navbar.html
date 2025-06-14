@@ -15,48 +15,98 @@
   <hr class="text-light my-3" />
 
   <ul class="nav nav-pills flex-column mb-auto">
-    <li class="nav-item mb-1">
-      <a class="nav-link text-light" href="{% url 'admin_home' %}"> <i class="fa-solid fa-house me-2"></i>Inicio </a>
-    </li>
+    <!-- Solo mostrar navegación de administración para usuarios autorizados -->
+    {% for group in request.user.groups.all %}
+      {% if group.name == 'Administrador' or group.name == 'Periodista' or group.name == 'Editor' %}
+        <li class="nav-item mb-1">
+          <a class="nav-link text-light" href="{% url 'admin_home' %}"> <i class="fa-solid fa-house me-2"></i>Inicio </a>
+        </li>
 
-    <li class="nav-item mb-1">
-      <button
-        class="nav-link text-light btn btn-link w-100 text-start"
-        data-bs-toggle="collapse"
-        data-bs-target="#dropnoticias"
-        aria-expanded="true"
-        aria-controls="dropnoticias"
-      >
-        <i class="fa-solid fa-newspaper me-2"></i>Noticias
-      </button>
-      <div class="collapse show" id="dropnoticias">
-        <ul class="nav nav-pills flex-column ms-3">
-          <li class="nav-item">
-            <a href="{% url 'admin_crear_noticia' %}" class="nav-link text-light small"> <i class="fa-solid fa-plus me-2"></i>Nueva </a>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'admin_noticias' %}" class="nav-link text-light small"> <i class="fa-solid fa-list me-2"></i>Publicadas </a>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'admin_noticias_borradores' %}" class="nav-link text-light small"> <i class="fa-solid fa-list me-2"></i>Borradores </a>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'admin_noticias_rechazadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-times me-2"></i>Rechazadas </a>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'admin_noticias_eliminadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-trash me-2"></i>Eliminadas </a>
-          </li>
-          {% for group in request.user.groups.all %} {% if group.name == 'Administrador' %}
-          {% endif %} {% endfor %}
-        </ul>
-      </div>
-    </li>
+        <li class="nav-item mb-1">
+          <button
+            class="nav-link text-light btn btn-link w-100 text-start"
+            data-bs-toggle="collapse"
+            data-bs-target="#dropnoticias"
+            aria-expanded="true"
+            aria-controls="dropnoticias"
+          >
+            <i class="fa-solid fa-newspaper me-2"></i>Noticias
+          </button>
+          <div class="collapse show" id="dropnoticias">
+            <ul class="nav nav-pills flex-column ms-3">
+              <li class="nav-item">
+                <a href="{% url 'admin_crear_noticia' %}" class="nav-link text-light small"> <i class="fa-solid fa-plus me-2"></i>Nueva </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'admin_noticias' %}" class="nav-link text-light small"> <i class="fa-solid fa-list me-2"></i>Publicadas </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'admin_noticias_borradores' %}" class="nav-link text-light small"> <i class="fa-solid fa-list me-2"></i>Borradores </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'admin_noticias_rechazadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-times me-2"></i>Rechazadas </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'admin_noticias_eliminadas' %}" class="nav-link text-light small"> <i class="fa-solid fa-trash me-2"></i>Eliminadas </a>
+              </li>
+            </ul>
+          </div>
+        </li>
 
-    {% for group in request.user.groups.all %} {% if group.name == 'Administrador' %}
-    <li class="nav-item mb-1">
-      <a class="nav-link text-light" href="{% url 'admin_user_priv' %}"> <i class="fa-solid fa-gear me-2"></i>Configuración </a>
-    </li>
-    {% endif %} {% endfor %}
+        <!-- Gestión de Comentarios (solo para Administradores) -->
+        {% if group.name == 'Administrador' %}
+          <li class="nav-item mb-1">
+            <a class="nav-link text-light" href="{% url 'admin_comentarios' %}">
+              <i class="fa-solid fa-comments me-2"></i>Comentarios
+            </a>
+          </li>
+        {% endif %}
+
+        {% if group.name == 'Administrador' %}
+          <li class="nav-item mb-1">
+            <a class="nav-link text-light" href="{% url 'admin_user_priv' %}"> <i class="fa-solid fa-gear me-2"></i>Configuración </a>
+          </li>
+        {% endif %}
+
+      {% endif %}
+    {% endfor %}
+
+    <!-- Navegación para usuarios normales (sin privilegios administrativos) -->
+    {% if not request.user.groups.all %}
+      <li class="nav-item mb-1">
+        <div class="text-center text-light py-3">
+          <i class="fa-solid fa-user-circle fa-3x mb-2"></i>
+          <h6>Panel de Usuario</h6>
+          <small class="text-muted">Gestiona tu perfil</small>
+        </div>
+      </li>
+    {% else %}
+      <!-- Verificar si solo tiene grupos de usuario normal -->
+      {% for group in request.user.groups.all %}
+        {% if group.name == 'Usuario' or group.name == 'Lector' %}
+          {% if forloop.first %}
+            <li class="nav-item mb-1">
+              <div class="text-center text-light py-3">
+                <i class="fa-solid fa-user-circle fa-3x mb-2"></i>
+                <h6>Panel de Usuario</h6>
+                <small class="text-muted">Gestiona tu perfil</small>
+              </div>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <!-- Usuario sin grupos de administración - solo perfil para usuarios sin privilegios -->
+    {% if not request.user.groups.exists %}
+      <li class="nav-item mb-1">
+        <div class="text-center text-light py-3">
+          <i class="fa-solid fa-user-circle fa-3x mb-2"></i>
+          <h6>Panel de Usuario</h6>
+          <small class="text-muted">Gestiona tu perfil</small>
+        </div>
+      </li>
+    {% endif %}
 
     <li class="nav-item mb-1">
       <a class="nav-link text-light" href="{% url 'admin_perfil' %}"> <i class="fa-solid fa-user me-2"></i>Mi Perfil </a>

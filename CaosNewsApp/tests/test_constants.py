@@ -73,8 +73,11 @@ TEST_PASSWORDS = {
 
 # Datos de prueba para modelos
 TEST_DATA = {
-    'categoria_nombre': 'Prueba',
+    'categoria_nombre': 'Actualidad',
     'pais_nombre': 'Chile',
-    'noticia_titulo': 'Título de prueba',
-    'noticia_cuerpo': 'Cuerpo de la noticia de prueba',
+    'titulo_noticia': 'Muere Tommy Rey, el padre de la cumbia chilena',
+    'cuerpo_noticia': 'El legendario cantante Tommy Rey, considerado el padre de la cumbia en Chile, ha muerto a sus 80 años. Su legado musical perdurará por siempre.',
+    'fecha_publicacion': '2023-10-01T12:00:00Z',
+    'imagen_nombre': 'tommy.jpg',
+    'usuario_autor': 'juanperez',
 }

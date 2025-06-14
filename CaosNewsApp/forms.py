@@ -4,7 +4,7 @@ from django.forms import ValidationError
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from .models import Noticia, DetalleNoticia
+from .models import Noticia, DetalleNoticia, Comentario, Comentario
 
 User = get_user_model()
 
@@ -69,3 +69,53 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+
+class ComentarioForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ['contenido']
+        widgets = {
+            'contenido': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Escribe tu comentario aquí...',
+                'maxlength': 500
+            })
+        }
+        labels = {
+            'contenido': 'Comentario'
+        }
+
+    def clean_contenido(self):
+        contenido = self.cleaned_data.get('contenido')
+        if not contenido or not contenido.strip():
+            raise forms.ValidationError('El comentario no puede estar vacío.')
+        if len(contenido.strip()) < 5:
+            raise forms.ValidationError('El comentario debe tener al menos 5 caracteres.')
+        return contenido.strip()
+
+
+class RespuestaComentarioForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ['contenido']
+        widgets = {
+            'contenido': forms.Textarea(attrs={
+                'class': 'form-control form-control-sm',
+                'rows': 2,
+                'placeholder': 'Escribe tu respuesta...',
+                'maxlength': 500
+            })
+        }
+        labels = {
+            'contenido': ''
+        }
+
+    def clean_contenido(self):
+        contenido = self.cleaned_data.get('contenido')
+        if not contenido or not contenido.strip():
+            raise forms.ValidationError('La respuesta no puede estar vacía.')
+        if len(contenido.strip()) < 3:
+            raise forms.ValidationError('La respuesta debe tener al menos 3 caracteres.')
+        return contenido.strip()

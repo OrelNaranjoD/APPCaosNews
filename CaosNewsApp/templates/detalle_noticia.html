@@ -48,4 +48,18 @@
   </div>
   <div class="col-md-1"></div>
 </div>
+
+<!-- Sistema de Comentarios -->
+<div class="row mt-5">
+  <div class="col-md-1"></div>
+  <div class="col-md-10">
+    {% include 'components/comentarios.html' with noticia=noticia comentarios=comentarios %}
+  </div>
+  <div class="col-md-1"></div>
+</div>
+{% endblock %}
+
+<!-- Scripts específicos para comentarios -->
+{% block extra_js %}
+<script src="{% static 'js/comentarios.js' %}"></script>
 {% endblock %}

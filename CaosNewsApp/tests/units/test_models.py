@@ -48,14 +48,14 @@ class NewsTestCase(TestCase):
     def test_news_creation(self):
         """Prueba la creación de una noticia"""
         news = Noticia.objects.create(
-            titulo_noticia=TEST_DATA['noticia_titulo'],
-            cuerpo_noticia=TEST_DATA['noticia_cuerpo'],
+            titulo_noticia=TEST_DATA['titulo_noticia'],
+            cuerpo_noticia=TEST_DATA['cuerpo_noticia'],
             id_categoria=self.category,
             id_usuario=self.user,
             id_pais=self.country
         )
-        self.assertEqual(news.titulo_noticia, TEST_DATA['noticia_titulo'])
-        self.assertEqual(news.cuerpo_noticia, TEST_DATA['noticia_cuerpo'])
+        self.assertEqual(news.titulo_noticia, TEST_DATA['titulo_noticia'])
+        self.assertEqual(news.cuerpo_noticia, TEST_DATA['cuerpo_noticia'])
         self.assertEqual(news.id_categoria, self.category)
         self.assertEqual(news.id_usuario, self.user)
         self.assertEqual(news.id_pais, self.country)

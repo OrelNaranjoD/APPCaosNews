@@ -1,0 +1,67 @@
+{% comment %}
+Formulario para responder a comentarios
+
+Parámetros requeridos:
+- comentario_id: ID del comentario al que se responde
+{% endcomment %}
+
+<div class="respuesta-form">
+    <form class="respuesta-form-element"
+          method="post"
+          action="{% url 'crear_respuesta' comentario_id %}">
+        {% csrf_token %}
+
+        <div class="row align-items-start">
+            <div class="col-auto">
+                <i class="fa-solid fa-user-circle text-info"></i>
+            </div>
+            <div class="col">
+                <div class="mb-2">
+                    <textarea
+                        name="contenido"
+                        class="form-control form-control-sm"
+                        rows="2"
+                        placeholder="Escribe tu respuesta..."
+                        maxlength="500"
+                        required></textarea>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Máximo 500 caracteres</small>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm me-2 cancelar-respuesta">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-reply me-1"></i>Responder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.respuesta-form {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+}
+
+.respuesta-form textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+@media (max-width: 768px) {
+    .respuesta-form {
+        padding: 0.75rem;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>

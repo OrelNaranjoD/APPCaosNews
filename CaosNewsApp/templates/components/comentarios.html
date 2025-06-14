@@ -1,0 +1,63 @@
+{% load static %}
+{% comment %}
+Componente principal del sistema de comentarios
+
+Parámetros requeridos:
+- noticia: objeto de la noticia
+- comentarios: queryset paginado de comentarios
+- user: usuario actual (para formularios)
+
+Uso:
+{% include 'components/comentarios.html' with noticia=noticia comentarios=comentarios %}
+{% endcomment %}
+
+<div class="comentarios-section mt-5" id="comentarios-section">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">
+                        <i class="fa-solid fa-comments me-2"></i>
+                        Comentarios
+                        <span class="badge bg-primary ms-2">{{ total_comentarios|default:0 }}</span>
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <!-- Formulario para nuevo comentario (solo usuarios autenticados) -->
+                    {% if user.is_authenticated %}
+                        <div class="nuevo-comentario-section mb-4">
+                            {% include 'components/comentario_form.html' with noticia=noticia %}
+                        </div>
+                        <hr>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fa-solid fa-info-circle me-2"></i>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#login">Inicia sesión</a>
+                            para participar en la conversación.
+                        </div>
+                    {% endif %}
+
+                    <!-- Lista de comentarios -->
+                    <div id="comentarios-lista" class="comentarios-lista">
+                        {% if comentarios %}
+                            {% include 'components/comentarios_lista.html' with comentarios=comentarios %}
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="fa-solid fa-comment-slash fa-2x mb-3"></i>
+                                <p class="mb-0">Sé el primero en comentar esta noticia</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Paginación de comentarios -->
+                    {% if comentarios.paginator.num_pages > 1 %}
+                        <div class="comentarios-pagination mt-4">
+                            {% include 'components/comentarios_pagination.html' with page_obj=comentarios %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

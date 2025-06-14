@@ -1,7 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
-from ..models import Noticia
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import JsonResponse
+from ..models import Noticia, Comentario
+from ..forms import ComentarioForm, RespuestaComentarioForm
 from .utils import obtener_tiempo_chile
 
 
@@ -47,12 +51,33 @@ def noticias(request, categoria):
 
 
 def mostrar_noticia(request, noticia_id):
-    """Vista para mostrar el detalle de una noticia específica"""
-    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+    """Vista para mostrar el detalle de una noticia específica con comentarios"""
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id, activo=True)
     imagenes = noticia.imagenes.all()
+
+    # Obtener comentarios principales (no respuestas) con paginación
+    comentarios_principales = Comentario.objects.filter(
+        noticia=noticia,
+        activo=True,
+        comentario_padre=None  # Solo comentarios principales
+    ).select_related('usuario').prefetch_related('respuestas__usuario')
+
+    # Configurar paginación para comentarios
+    paginator = Paginator(comentarios_principales, 5)  # 5 comentarios por página
+    page_number = request.GET.get('comentarios_page', 1)
+    comentarios_page = paginator.get_page(page_number)
+
+    # Preparar formularios
+    comentario_form = ComentarioForm()
+    respuesta_form = RespuestaComentarioForm()
+
     context = {
         "noticia": noticia,
         "imagenes": imagenes,
+        "comentarios": comentarios_page,
+        "comentario_form": comentario_form,
+        "respuesta_form": respuesta_form,
+        "total_comentarios": comentarios_principales.count(),
     }
     return render(request, "detalle_noticia.html", context)
 

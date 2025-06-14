@@ -14,7 +14,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.db import transaction
-from CaosNewsApp.tests.test_constants import QA_USER_CREDENTIALS, TEST_USER_CREDENTIALS
+from CaosNewsApp.tests.test_constants import QA_USER_CREDENTIALS, TEST_USER_CREDENTIALS, TEST_DATA
 
 
 class Command(BaseCommand):
@@ -318,6 +318,96 @@ class Command(BaseCommand):
                         self.style.ERROR(f'❌ Grupo no encontrado: {group_name} para usuario {user.username}')
                     )
 
+        # 5. Crear noticias de prueba
+        self.create_test_news()
+
+    def create_test_news(self):
+        """Crea noticias de prueba para QA"""
+        from django.utils import timezone
+        from django.core.files.base import ContentFile
+        from CaosNewsApp.models import Noticia, Categoria, Pais, DetalleNoticia, ImagenNoticia
+        from CaosNewsApp.tests.test_constants import TEST_DATA
+        from django.contrib.auth.models import User
+        import shutil
+        from pathlib import Path
+
+        self.stdout.write('📰 Creando noticias de prueba...')
+
+        try:
+            # 1. Obtener o crear categoría
+            categoria, created = Categoria.objects.get_or_create(
+                nombre_categoria=TEST_DATA['categoria_nombre']
+            )
+            if created:
+                self.stdout.write(f'✅ Categoría creada: {categoria.nombre_categoria}')
+
+            # 2. Obtener o crear país
+            pais, created = Pais.objects.get_or_create(
+                pais=TEST_DATA['pais_nombre']
+            )
+            if created:
+                self.stdout.write(f'✅ País creado: {pais.pais}')
+
+            # 3. Obtener usuario (ya creado en create_test_users)
+            usuario = User.objects.get(username=TEST_DATA['usuario_autor'])
+
+            # 4. Verificar si la noticia ya existe
+            if not Noticia.objects.filter(titulo_noticia=TEST_DATA['titulo_noticia']).exists():
+                # 5. Crear la noticia
+                noticia = Noticia.objects.create(
+                    titulo_noticia=TEST_DATA['titulo_noticia'],
+                    cuerpo_noticia=TEST_DATA['cuerpo_noticia'],
+                    id_categoria=categoria,
+                    id_pais=pais,
+                    id_usuario=usuario,
+                    activo=True,
+                    destacada=True,
+                    eliminado=False
+                )
+
+                # 6. Crear referencia de imagen de prueba
+                self.create_test_image(noticia)
+
+                # 7. Aprobar y publicar la noticia automáticamente
+                detalle = noticia.detalle
+                detalle.estado = 'A'  # Aprobado
+                detalle.publicada = True
+                detalle.publicacion = timezone.now()
+                detalle.save()
+
+                self.stdout.write(f'✅ Noticia de prueba creada: {noticia.titulo_noticia}')
+                self.stdout.write(f'📰 ID: {noticia.id_noticia} - Estado: Aprobada y publicada')
+            else:
+                self.stdout.write(f'📋 Noticia de prueba ya existe: {TEST_DATA["titulo_noticia"]}')
+
+        except Exception as e:
+            self.stdout.write(
+                self.style.WARNING(f'⚠️  Error creando noticia de prueba: {e}')
+            )
+
+    def create_test_image(self, noticia):
+        """Crea referencia de imagen de prueba para la noticia"""
+        from CaosNewsApp.models import ImagenNoticia
+        from CaosNewsApp.tests.test_constants import TEST_DATA
+
+        try:
+            # Crear registro de imagen en la base de datos
+            # La imagen ya fue copiada por copy_media_files()
+            imagen_path = f'news/{TEST_DATA["imagen_nombre"]}'
+
+            imagen_noticia = ImagenNoticia.objects.create(
+                noticia=noticia
+            )
+
+            # Asignar la imagen usando la ruta desde TEST_DATA
+            imagen_noticia.imagen.name = imagen_path
+            imagen_noticia.save()
+
+            self.stdout.write(f'✅ Referencia de imagen creada: {imagen_path}')
+
+        except Exception as e:
+            self.stdout.write(f'⚠️  Error creando referencia de imagen: {e}')
+
     def create_directories(self):
         """Crea directorios necesarios para QA"""
         base_dir = Path(settings.BASE_DIR)
@@ -358,5 +448,6 @@ class Command(BaseCommand):
         self.stdout.write('   📊 Base de datos clonada de producción (datos reales)')
         self.stdout.write('   👥 Usuarios de prueba agregados para testing')
         self.stdout.write('   📁 Archivos media copiados de producción')
+        self.stdout.write('   📰 Noticias de prueba creadas y publicadas')
         self.stdout.write('   ✅ Entorno listo para pruebas manuales y automatizadas')
         self.stdout.write('='*60 + '\n')

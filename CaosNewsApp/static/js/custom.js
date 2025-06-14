@@ -49,13 +49,20 @@ document.addEventListener('DOMContentLoaded', function () {
     container.innerHTML = ''
   }
 
-  document.getElementById('loginForm').addEventListener('submit', function (event) {
-    handleFormSubmission(event, 'loginForm', 'messageContainer')
-  })
+  // Verificar que los elementos existen antes de agregar event listeners
+  const loginForm = document.getElementById('loginForm')
+  if (loginForm) {
+    loginForm.addEventListener('submit', function (event) {
+      handleFormSubmission(event, 'loginForm', 'messageContainer')
+    })
+  }
 
-  document.getElementById('registerForm').addEventListener('submit', function (event) {
-    handleFormSubmission(event, 'registerForm', 'registerErrorContainer')
-  })
+  const registerForm = document.getElementById('registerForm')
+  if (registerForm) {
+    registerForm.addEventListener('submit', function (event) {
+      handleFormSubmission(event, 'registerForm', 'registerErrorContainer')
+    })
+  }
 })
 
 /* ********* Obtener fecha actual ********* */

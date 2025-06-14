@@ -1,84 +1,83 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- ========== Autor ========== -->
-    <meta name="author" content="Orel Naranjo">
+    <meta name="author" content="Orel Naranjo" />
     <!-- ========== Descripción ========== -->
-    <meta name="description" content="Caos News, colectivo de noticias para periodistas profesionales o amateur">
+    <meta name="description" content="Caos News, colectivo de noticias para periodistas profesionales o amateur" />
     <!-- ========== Favicon ========== -->
-    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" sizes="any" />
     <!-- ========== CSS FontAwesome ========== -->
     <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/solid.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/brands.min.css' %}" />
     <!-- ========== CSS Bootstrap ========== -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
     <!-- ========== CSS Personalizado ========== -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>{% block title %}Caos News, La voz de todos.{% endblock %} </title>
-</head>
-<body onload="getFecha()" class="d-flex flex-column min-vh-100">
-  <!-- ========== Header ========== -->
-  <header>
-    <div class="container">
-      <div class="row bg-dark py-2">
-        <div class="col">
-          <div class="text-start"><p class="text-light mb-0" id="current_date"></p></div>
-        </div>
-        <div class="col text-end">
-          {% if user.is_authenticated %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <title>{% block title %}Caos News, La voz de todos.{% endblock %}</title>
+  </head>
+  <body onload="getFecha()" class="d-flex flex-column min-vh-100">
+    <!-- ========== Header ========== -->
+    <header>
+      <div class="container">
+        <div class="row bg-dark py-2">
+          <div class="col d-flex align-items-center">
+            <div class="text-start"><p class="text-light mb-0" id="current_date"></p></div>
+          </div>
+          <div class="col text-end">
+            {% if user.is_authenticated %}
             <span class="text-white pe-2">Bienvenido, {{ user.first_name }} {{ user.last_name }}</span>
-            {% for group in request.user.groups.all %}
-              {% if not group.name == 'Lector' %}
-                <a href="{% url 'admin_home' %}" class="link">Panel de control</a>
-              {% endif %}
-            {% endfor%}
+            <a href="{% url 'admin_home' %}" class="link">Panel de control</a>
             <a href="{% url 'logout' %}" class="link">Cerrar sesión</a>
-          {% else %}
+            {% else %}
             <a href="#" class="link" data-bs-toggle="modal" data-bs-target="#login">Inicio de sesión</a>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <!-- ========== Logotipo ========== -->
-        <div class="bg-light py-3">
-          <div class="col-3">
+        <!-- ========== Logotipo y Navbar Responsive ========== -->
+        <div class="row bg-light">
+          <div class="col-12">
+            <!-- Logotipo y botón hamburguesa en la misma línea -->
+            <div class="d-flex justify-content-between align-items-center py-3">
               <a href="{% url 'home' %}">
-                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid" style="width: 250px;" alt="Caos News">
+                <img src="{% static 'images/logotipo.webp' %}" class="img-fluid logo-responsive" alt="Caos News" />
               </a>
+              <!-- Botón hamburguesa visible solo en móvil -->
+              <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </div>
           </div>
-          <div class="col-auto">
-          </div>
+        </div>
+        <div class="row">
+          <!-- ========== Barra de navegación ========== -->
+          {% include 'navbar.html' %}
         </div>
         <!-- ========== Ventanas Modales ========== -->
         {% include 'modals.html' %}
       </div>
-      <div class="row">
-        <!-- ========== Barra de navegación ========== -->
-        {% include 'navbar.html' %}
-      </div>
-    </div>
-  </header>
-  <!-- ========== Cuerpo ========== -->
-  <main>
-    <div class="container bg-body p-4" style="min-height: calc(100vh - (40px + 146.48px + 80px + 318.14px));">
-      {% block body %}
-
-      {% endblock %}
-    </div>
-  </main>
-  <!-- ========== Pie de pagina ========== -->
-  {% include 'footer.html' %}
-<!-- ========== Librerias JS jQuery ========== -->
-<script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
-<!-- ========== Librerias JS Bootstrap ========== -->
-<script src="{% static 'js/popper.min.js' %}"></script>
-<script src="{% static 'js/bootstrap.min.js' %}"></script>
-<!-- ========== Librerias JS Personalizada ========== -->
-<script src="{% static 'js/custom.js' %}"></script>
-</body>
+    </header>
+    <!-- ========== Cuerpo ========== -->
+    <main>
+      <div class="container bg-body p-4" style="min-height: calc(100vh - (40px + 146.48px + 80px + 318.14px))">{% block body %} {% endblock %}</div>
+    </main>
+    <!-- ========== Pie de pagina ========== -->
+    {% include 'footer.html' %}
+    <!-- ========== Librerias JS jQuery ========== -->
+    <script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+    <!-- ========== Librerias JS Bootstrap ========== -->
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- ========== Librerias JS Personalizada ========== -->
+    <script src="{% static 'js/custom.js' %}"></script>
+    <!-- ========== Scripts adicionales ========== -->
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>

@@ -12,16 +12,18 @@
                     <p class="card-text"><strong>Nombre:</strong> {{ request.user.first_name }}</p>
                     <p class="card-text"><strong>Apellido:</strong> {{ request.user.last_name }}</p>
                     <p class="card-text"><strong>Correo electrónico:</strong> {{ request.user.email }}</p>
-                    <p class="card-text"><strong>Privilegio:</strong>
+                    <p class="card-text"><strong>Tipo de usuario:</strong>
                         {% for group in request.user.groups.all %}
                             <span class="badge bg-secondary">{{ group.name }}</span>{% if not forloop.last %}, {% endif %}
                         {% empty %}
-                            <span class="badge bg-secondary">Sin perfil</span>
+                            <span class="badge bg-secondary">Usuario</span>
                         {% endfor %}
                     </p>
                 </div>
             </div>
-            <a href="{% url 'admin_editar_perfil' %}" class="btn btn-primary mt-2"><i class="fa-solid fa-user-pen fa-2xs icon-spacer"></i>Editar perfil</a>
+            <a href="{% url 'admin_editar_perfil' %}" class="btn btn-primary mt-2">
+                <i class="fa-solid fa-user-pen fa-2xs icon-spacer"></i>Editar perfil
+            </a>
         </div>
     </div>
 </div>

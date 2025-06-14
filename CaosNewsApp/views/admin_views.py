@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth import get_user_model
-from ..models import Noticia, Categoria, Pais, ImagenNoticia
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import JsonResponse
+from ..models import Noticia, Categoria, Pais, ImagenNoticia, Comentario
 from ..forms import NoticiaForm, UserProfileForm, DetalleNoticiaForm
 
 
@@ -303,13 +306,29 @@ def admin_delete_noticia(request, noticia_id):
 
 
 @user_passes_test(es_admin_periodista_o_editor, login_url="home")
+def admin_restaurar_noticia(request, noticia_id):
+    """Vista para restaurar noticia eliminada"""
+    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+
+    # Verificar que el usuario tiene permisos para restaurar esta noticia
+    if not request.user.groups.filter(name="Administrador").exists():
+        # Si no es administrador, verificar que es el autor de la noticia
+        if noticia.id_usuario != request.user:
+            return redirect("admin_noticias_eliminadas")
+
+    noticia.eliminado = False
+    noticia.save()
+    return redirect("admin_noticias_eliminadas")
+
+
+@user_passes_test(es_admin_periodista_o_editor, login_url="home")
 def admin_categoria(request):
     """Vista para gestión de categorías"""
     noticias = Noticia.objects.all()
     return render(request, "admin/admin_categorias.html", {"noticias": noticias})
 
 
-@user_passes_test(es_admin_periodista_o_editor, login_url="home")
+@login_required
 def admin_edit_profile(request):
     """Vista para editar perfil de usuario"""
     if request.method == "POST":
@@ -323,9 +342,9 @@ def admin_edit_profile(request):
     return render(request, "admin/admin_edit_profile.html", {"form": form})
 
 
-@user_passes_test(es_admin_periodista_o_editor, login_url="home")
+@login_required
 def admin_view_profile(request):
-    """Vista para mostrar perfil de usuario"""
+    """Vista para mostrar perfil de usuario - reutilizable para todos los tipos de usuario"""
     return render(request, "admin/admin_view_profile.html")
 
 
@@ -351,17 +370,149 @@ def admin_user_priv(request):
     return render(request, "admin/admin_user_priv.html", context)
 
 
-@user_passes_test(es_admin_periodista_o_editor, login_url="home")
-def admin_restaurar_noticia(request, noticia_id):
-    """Vista para restaurar noticia eliminada"""
-    noticia = get_object_or_404(Noticia, id_noticia=noticia_id)
+# ========== Gestión de Comentarios ==========
 
-    # Verificar que el usuario tiene permisos para restaurar esta noticia
-    if not request.user.groups.filter(name="Administrador").exists():
-        # Si no es administrador, verificar que es el autor de la noticia
-        if noticia.id_usuario != request.user:
-            return redirect("admin_noticias_eliminadas")
+@user_passes_test(es_admin, login_url="home")
+def admin_comentarios(request):
+    """Vista principal para gestión de comentarios"""
+    # Obtener parámetros de búsqueda y filtros
+    search_query = request.GET.get('search', '')
+    estado_filter = request.GET.get('estado', '')
+    tipo_filter = request.GET.get('tipo', '')  # 'comentario' o 'respuesta'
 
-    noticia.eliminado = False
-    noticia.save()
-    return redirect("admin_noticias_eliminadas")
+    # Consulta base
+    comentarios = Comentario.objects.select_related('usuario', 'noticia').all()
+
+    # Aplicar filtros
+    if search_query:
+        comentarios = comentarios.filter(
+            Q(contenido__icontains=search_query) |
+            Q(usuario__first_name__icontains=search_query) |
+            Q(usuario__last_name__icontains=search_query) |
+            Q(noticia__titulo_noticia__icontains=search_query)
+        )
+
+    if estado_filter == 'activo':
+        comentarios = comentarios.filter(activo=True)
+    elif estado_filter == 'inactivo':
+        comentarios = comentarios.filter(activo=False)
+
+    if tipo_filter == 'comentario':
+        comentarios = comentarios.filter(comentario_padre__isnull=True)
+    elif tipo_filter == 'respuesta':
+        comentarios = comentarios.filter(comentario_padre__isnull=False)
+
+    # Ordenar por fecha de creación (más recientes primero)
+    comentarios = comentarios.order_by('-fecha_creacion')
+
+    # Paginación
+    paginator = Paginator(comentarios, 15)  # 15 comentarios por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Estadísticas para el dashboard
+    stats = {
+        'total_comentarios': Comentario.objects.count(),
+        'comentarios_activos': Comentario.objects.filter(activo=True).count(),
+        'comentarios_inactivos': Comentario.objects.filter(activo=False).count(),
+        'comentarios_principales': Comentario.objects.filter(comentario_padre__isnull=True).count(),
+        'respuestas': Comentario.objects.filter(comentario_padre__isnull=False).count(),
+    }
+
+    context = {
+        'comentarios': page_obj,
+        'search_query': search_query,
+        'estado_filter': estado_filter,
+        'tipo_filter': tipo_filter,
+        'stats': stats,
+    }
+
+    return render(request, 'admin/admin_comentarios.html', context)
+
+
+@user_passes_test(es_admin, login_url="home")
+def admin_comentario_toggle_estado(request, comentario_id):
+    """Vista para activar/desactivar comentario"""
+    if request.method == 'POST':
+        comentario = get_object_or_404(Comentario, id_comentario=comentario_id)
+        comentario.activo = not comentario.activo
+        comentario.save()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'nuevo_estado': comentario.activo,
+                'mensaje': f'Comentario {"activado" if comentario.activo else "desactivado"} correctamente'
+            })
+
+        return redirect('admin_comentarios')
+
+    return redirect('admin_comentarios')
+
+
+@user_passes_test(es_admin, login_url="home")
+def admin_comentario_eliminar(request, comentario_id):
+    """Vista para eliminar comentario permanentemente"""
+    if request.method == 'POST':
+        comentario = get_object_or_404(Comentario, id_comentario=comentario_id)
+        comentario.delete()
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'mensaje': 'Comentario eliminado permanentemente'
+            })
+
+        return redirect('admin_comentarios')
+
+    return redirect('admin_comentarios')
+
+
+# ========== Panel de Usuario (No-Admin) ==========
+
+@login_required
+def user_panel(request):
+    """Panel para usuarios normales - muestra perfil y comentarios"""
+    # Obtener comentarios del usuario para mostrar en su panel
+    comentarios_usuario = Comentario.objects.filter(
+        usuario=request.user,
+        activo=True
+    ).select_related('noticia').order_by('-fecha_creacion')[:10]
+
+    context = {
+        'comentarios_usuario': comentarios_usuario
+    }
+    return render(request, "admin/user_panel.html", context)
+
+
+@login_required
+def user_edit_profile(request):
+    """Vista para que usuarios normales editen su perfil - redirige al admin profile"""
+    return redirect('admin_editar_perfil')
+
+
+@login_required
+def user_delete_comment(request, comentario_id):
+    """Vista para que usuarios eliminen sus propios comentarios"""
+    if request.method == 'POST':
+        try:
+            # Verificar que el comentario pertenece al usuario
+            comentario = get_object_or_404(Comentario, id_comentario=comentario_id, usuario=request.user)
+            comentario.delete()
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'mensaje': 'Comentario eliminado correctamente'
+                })
+
+            return redirect('user_panel')
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'mensaje': 'Error al eliminar el comentario'
+                })
+            return redirect('user_panel')
+
+    return redirect('user_panel')

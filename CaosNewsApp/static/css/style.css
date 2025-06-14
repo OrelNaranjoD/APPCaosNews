@@ -544,3 +544,66 @@ footer .d-grid .btn {
 .btn-primary:focus {
   box-shadow: 0 0 0 0.2rem rgba(197, 0, 204, 0.25);
 }
+
+.badge {
+  background-color: #b300b3 !important;
+}
+
+.badge:hover {
+  background-color: #a000a0 !important;
+}
+
+#current_date {
+  font-size: small;
+  white-space: nowrap;
+}
+
+/* ===== ESTILOS RESPONSIVE PARA LOGOTIPO ===== */
+.logo-responsive {
+  width: 170px;
+  max-width: 100%;
+}
+
+/* ===== ESTILOS PARA BOTÓN HAMBURGUESA ===== */
+.navbar-toggler {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  background-color: transparent;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.navbar-toggler-icon {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+}
+
+.d-lg-block {
+  background: white;
+}
+
+/* ===== OVERRIDE PARA MENÚ MÓVIL - ELIMINAR PADDINGS DE BOOTSTRAP ===== */
+#navbarSupportedContent.collapse,
+#navbarSupportedContent.collapsing,
+#navbarSupportedContent.show {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#navbarSupportedContent.collapse .navbar,
+#navbarSupportedContent.collapsing .navbar,
+#navbarSupportedContent.show .navbar {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
