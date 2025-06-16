@@ -81,3 +81,29 @@ TEST_DATA = {
     'imagen_nombre': 'tommy.jpg',
     'usuario_autor': 'juanperez',
 }
+
+# Datos de prueba para suscripciones (solo para QA)
+SUBSCRIPTION_TEST_DATA = {
+    'plan_qa_especial': {
+        'nombre': 'Plan QA Especial',
+        'descripcion': 'Plan especial para pruebas de QA con tiempo limitado',
+        'caracteristicas': '''Acceso completo para testing ✔️
+Todas las funcionalidades ✔️
+Datos de prueba ✔️
+Expira en 1 día ⚠️''',
+        'precios': [
+            {
+                'periodo': 'qa_test',
+                'duracion_dias': 2,  # Muy corto para pruebas
+                'precio': 1000.00,   # Precio simbólico
+            }
+        ]
+    },
+    'suscripcion_proxima_a_vencer': {
+        'plan': 'Plan QA Especial',
+        'usuario': 'juanperez',
+        'precio_periodo': 'qa_test',
+        'dias_restantes': 1,  # Expira en 1 día para probar notificaciones
+        'estado': 'A',  # Activa
+    }
+}

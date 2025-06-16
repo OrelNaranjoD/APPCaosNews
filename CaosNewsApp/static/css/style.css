@@ -607,3 +607,20 @@ footer .d-grid .btn {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
+
+/* ===== ESTILOS PARA PLANES DE SUSCRIPCIÓN ===== */
+.plan-title {
+  text-shadow: 1px 2px 3px rgb(0, 0, 0);
+}
+
+.plan-basico {
+  color: hsl(36, 98%, 44%);
+}
+
+.plan-estandar {
+  color: hsl(54, 98%, 44%);
+}
+
+.plan-premium {
+  color: hsl(81, 98%, 44%);
+}

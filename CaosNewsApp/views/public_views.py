@@ -117,7 +117,6 @@ def busqueda(request):
     """Vista para búsqueda de noticias"""
     query = request.GET.get("q", "").strip()
 
-    # Si no hay query o está vacío, mostrar todas las noticias
     if not query:
         noticias = Noticia.objects.filter(
             activo=True,
@@ -125,7 +124,6 @@ def busqueda(request):
             detalle__publicada=True
         ).order_by('-fecha_creacion')
     else:
-        # Realizar búsqueda específica
         terms = query.split()
         q_objects = Q()
 
@@ -140,7 +138,6 @@ def busqueda(request):
             | Q(cuerpo_noticia__icontains=query)
         )
 
-        # Filtrar solo noticias activas, publicadas y no eliminadas
         noticias = Noticia.objects.filter(
             q_objects,
             activo=True,
@@ -148,8 +145,7 @@ def busqueda(request):
             detalle__publicada=True
         ).order_by('-fecha_creacion')
 
-    # Configurar paginación
-    paginator = Paginator(noticias, 9)  # 9 noticias por página
+    paginator = Paginator(noticias, 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -172,6 +168,20 @@ def footer(request):
     return render(request, "footer.html")
 
 
-def shop(request):
-    """Vista de la tienda/shop"""
-    return render(request, "shop.html")
+def subscriptions(request):
+    """Vista de subscriptions - muestra los planes disponibles"""
+    from CaosNewsApp.models import Plan
+
+    planes = Plan.objects.filter(activo=True).order_by('nombre')
+
+    # Log para depuración del request.GET
+    import logging
+    logger = logging.getLogger('django')
+    logger.debug(f"[subscriptions] request.GET: {request.GET}")
+    logger.debug(f"[subscriptions] request.GET.get('q'): {request.GET.get('q', None)}")
+
+    context = {
+        'planes': planes
+    }
+
+    return render(request, "subscriptions.html", context)

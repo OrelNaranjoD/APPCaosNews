@@ -28,10 +28,11 @@ def webpay_plus_create(request):
         request,
         "webpay/plus/create.html",
         {
-            "request": create_request,
+            "webpay_request": create_request,
             "response": response,
             "amount": amount,
             "subscription_type": subscription_type,
+            "request": request,  # ahora sí es el objeto request real
         },
     )
 

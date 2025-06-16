@@ -1,37 +1,14 @@
-<nav class="navbar navbar-expand-lg navbar-light d-none d-lg-block">
+{% comment %}Navbar eliminada temporalmente para depuración de error 'q'{% endcomment %}
+<!-- NAVBAR ELIMINADA PARA DEPURACIÓN -->
+
+<nav class="navbar navbar-expand-lg navbar-light d-none d-lg-block" aria-label="Navegación principal">
   <div class="container">
     <div class="navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/"><i class="fa-solid fa-house"></i></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-nowrap text-danger" href="{% url 'noticias' categoria='Ultima Hora' %}">ULTIMA HORA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'shop' %}">PLANES</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Publicidad' %}">PUBLICIDAD</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Sociedad' %}">SOCIEDAD</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Tecnología' %}">TECNOLOGÍA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Economia' %}">ECONOMIA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Deporte' %}">DEPORTE</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Mundo' %}">MUNDO</a>
-        </li>
+        {% include 'navbar_items.html' %}
       </ul>
       <form class="d-flex" method="GET" action="{% url 'busqueda' %}">
-        <input class="form-control me-2" type="search" placeholder="Buscar noticia..." aria-label="Buscar" name="q" value="{{ request.GET.q }}">
+        <input class="form-control me-2" type="search" placeholder="Buscar noticia..." aria-label="Buscar" name="q" value="{{ q|default:'' }}">
         <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-search"></i></button>
       </form>
     </div>
@@ -40,39 +17,13 @@
 
 <!-- Navbar móvil colapsable -->
 <div class="collapse d-lg-none" id="navbarSupportedContent">
-  <nav class="navbar navbar-light bg-light border-top">
+  <nav class="navbar navbar-light bg-light border-top" aria-label="Navegación móvil">
     <div class="container-fluid px-3">
       <ul class="navbar-nav w-100">
-        <li class="nav-item">
-          <a class="nav-link" href="/"><i class="fa-solid fa-house me-2"></i>Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-danger" href="{% url 'noticias' categoria='Ultima Hora' %}">ULTIMA HORA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'shop' %}">PLANES</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Publicidad' %}">PUBLICIDAD</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Sociedad' %}">SOCIEDAD</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Tecnología' %}">TECNOLOGÍA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Economia' %}">ECONOMIA</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Deporte' %}">DEPORTE</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'noticias' categoria='Mundo' %}">MUNDO</a>
-        </li>
+        {% include 'navbar_items.html' %}
         <li class="nav-item mt-2">
           <form class="d-flex" method="GET" action="{% url 'busqueda' %}">
-            <input class="form-control me-2" type="search" placeholder="Buscar noticia..." aria-label="Buscar" name="q" value="{{ request.GET.q }}">
+            <input class="form-control me-2" type="search" placeholder="Buscar noticia..." aria-label="Buscar" name="q" value="{{ q|default:'' }}">
             <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-search"></i></button>
           </form>
         </li>
