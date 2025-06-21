@@ -68,3 +68,25 @@ Para ejecutar Sonar Scanner
 ```bash
 C:\SonarQube\sonar-scanner\bin\sonar-scanner.bat
 ```
+
+## Sistema de Notificaciones de Suscripción
+
+### Funcionalidad de Notificaciones
+
+El sistema incluye un watcher manual para revisar suscripciones próximas a vencer y enviar notificaciones por email.
+
+### Ejecución Manual
+
+```powershell
+# Revisar suscripciones próximas a vencer (3 días por defecto)
+.\scripts\check_subscriptions_manual.ps1
+
+# Modo prueba (no envía emails reales)
+.\scripts\check_subscriptions_manual.ps1 -DryRun
+
+# Revisar solo próximo día
+.\scripts\check_subscriptions_manual.ps1 -Dias 1
+
+# Ver ayuda completa
+.\scripts\check_subscriptions_manual.ps1 -Help
+```

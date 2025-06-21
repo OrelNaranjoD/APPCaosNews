@@ -64,6 +64,30 @@
         {% include 'modals.html' %}
       </div>
     </header>
+    
+    <!-- ========== Notificaciones del Usuario ========== -->
+    {% if tiene_notificaciones %}
+    <div class="container mt-2">
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-start">
+          <div class="flex-grow-1">
+            <h6 class="alert-heading mb-2">📢 Tienes {{ notificaciones_pendientes.count }} notificación{{ notificaciones_pendientes.count|pluralize:"es" }} pendiente{{ notificaciones_pendientes.count|pluralize:"s" }}:</h6>
+            {% for notificacion in notificaciones_pendientes|slice:":3" %}
+            <div class="mb-2 p-2 bg-light rounded">
+              <small class="text-muted">{{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}</small>
+              <p class="mb-0">{{ notificacion.mensaje }}</p>
+            </div>
+            {% endfor %}
+            {% if notificaciones_pendientes.count > 3 %}
+            <small class="text-muted">... y {{ notificaciones_pendientes.count|add:"-3" }} más</small>
+            {% endif %}
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
     <!-- ========== Cuerpo ========== -->
     <main>
       <div class="container bg-body p-4" style="min-height: calc(100vh - (40px + 146.48px + 80px + 318.14px))">{% block body %} {% endblock %}</div>

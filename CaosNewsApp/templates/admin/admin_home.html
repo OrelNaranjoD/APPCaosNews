@@ -128,6 +128,103 @@
         {% endif %}
     </div>
 
+    <!-- Estado de Suscripción -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="fa-solid fa-credit-card me-2"></i>
+                Estado de Suscripción
+            </h4>
+        </div>
+        
+        {% if suscripcion_activa %}
+        <div class="col-md-8 mb-3">
+            <div class="card {% if suscripcion_activa.esta_proxima_a_vencer %}border-warning{% else %}border-success{% endif %}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="card-title {% if suscripcion_activa.esta_proxima_a_vencer %}text-warning{% else %}text-success{% endif %} mb-2">
+                                <i class="fa-solid fa-check-circle me-2"></i>
+                                {{ suscripcion_activa.plan.nombre }}
+                            </h5>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-1">
+                                        <strong>Estado:</strong> 
+                                        <span class="badge {% if suscripcion_activa.esta_activa %}bg-success{% else %}bg-danger{% endif %}">
+                                            {% if suscripcion_activa.esta_activa %}Activa{% else %}Vencida{% endif %}
+                                        </span>
+                                    </p>
+                                    <p class="card-text mb-1">
+                                        <strong>Período:</strong> {{ suscripcion_activa.precio_plan.nombre_periodo }}
+                                    </p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="card-text mb-1">
+                                        <strong>Precio:</strong> ${{ suscripcion_activa.precio_plan.valor }}
+                                    </p>
+                                    <p class="card-text mb-1">
+                                        <strong>Vencimiento:</strong> {{ suscripcion_activa.fecha_fin|date:"d/m/Y" }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {% if suscripcion_activa.esta_proxima_a_vencer %}
+                            <div class="alert alert-warning mt-2 mb-0 py-2">
+                                <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                                <strong>¡Atención!</strong> Tu suscripción expira en {{ suscripcion_activa.dias_restantes }} día{{ suscripcion_activa.dias_restantes|pluralize:"s" }}.
+                                <a href="/suscripciones/" class="alert-link">Renovar ahora</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="{% if suscripcion_activa.esta_proxima_a_vencer %}text-warning{% else %}text-success{% endif %}">
+                                <i class="fa-solid fa-calendar-check fa-3x mb-2"></i>
+                                <h6 class="mb-0">{{ suscripcion_activa.dias_restantes }}</h6>
+                                <small>día{{ suscripcion_activa.dias_restantes|pluralize:"s" }} restante{{ suscripcion_activa.dias_restantes|pluralize:"s" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notificaciones de Suscripción -->
+        {% if notificaciones_suscripcion > 0 %}
+        <div class="col-md-4 mb-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-info mb-1">{{ notificaciones_suscripcion }}</h5>
+                            <small class="card-text text-muted">Notificación{{ notificaciones_suscripcion|pluralize:"es" }} Pendiente{{ notificaciones_suscripcion|pluralize:"s" }}</small>
+                        </div>
+                        <i class="fa-solid fa-bell fa-lg text-info"></i>
+                    </div>
+                    <a href="#" class="btn btn-sm btn-outline-info mt-2">Ver Notificaciones</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <!-- Sin suscripción -->
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-body text-center py-4">
+                    <i class="fa-solid fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h5 class="text-warning mb-2">Sin Suscripción Activa</h5>
+                    <p class="text-muted mb-3">No tienes una suscripción activa. Suscríbete para acceder a todas las funcionalidades.</p>
+                    <a href="/suscripciones/" class="btn btn-warning">
+                        <i class="fa-solid fa-credit-card me-2"></i>
+                        Ver Planes de Suscripción
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
     <!-- Acciones rápidas -->
     <div class="row">
         <div class="col-12">

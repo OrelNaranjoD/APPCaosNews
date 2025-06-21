@@ -50,6 +50,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'CaosNewsApp.context_processors.search_query',
+                'CaosNewsApp.context_processors.notificaciones_usuario',
             ],
         },
     },

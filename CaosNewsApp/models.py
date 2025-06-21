@@ -244,3 +244,63 @@ class Suscripcion(models.Model):
         verbose_name = 'Suscripción'
         verbose_name_plural = 'Suscripciones'
         ordering = ['-fecha_creacion']
+
+
+class Notificacion(models.Model):
+    """Modelo simple de notificaciones para usuarios"""
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notificaciones')
+    mensaje = models.TextField(blank=False, null=False)
+    leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.mensaje[:50]}...'
+
+    def marcar_como_leido(self):
+        """Marca la notificación como leída"""
+        self.leido = True
+        self.save()
+
+    class Meta:
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+        ordering = ['-fecha_creacion']
+
+
+# Métodos para agregar al modelo User dinámicamente  
+def get_notificaciones_no_leidas(self):
+    """Obtiene todas las notificaciones no leídas del usuario"""
+    return self.notificaciones.filter(leido=False)
+
+def tiene_notificaciones_pendientes(self):
+    """Verifica si el usuario tiene notificaciones sin leer"""
+    return self.notificaciones.filter(leido=False).exists()
+
+def crear_notificacion_admin(self, usuario_destino, mensaje):
+    """
+    Crea una nueva notificación para otro usuario.
+    Solo los administradores pueden crear notificaciones.
+    """
+    if not self.is_superuser and not self.is_staff:
+        raise PermissionError("Solo los administradores pueden crear notificaciones para otros usuarios")
+    
+    return Notificacion.objects.create(usuario=usuario_destino, mensaje=mensaje)
+
+def crear_notificacion_sistema(self, mensaje):
+    """
+    Crea una notificación automática del sistema para el usuario.
+    Este método es para uso interno del sistema (ej: notificaciones de suscripción).
+    """
+    return Notificacion.objects.create(usuario=self, mensaje=mensaje)
+
+def puede_crear_notificaciones(self):
+    """Verifica si el usuario puede crear notificaciones para otros usuarios"""
+    return self.is_superuser or self.is_staff
+
+# Agregar métodos al modelo User
+from django.contrib.auth.models import User
+User.add_to_class('get_notificaciones_no_leidas', get_notificaciones_no_leidas)
+User.add_to_class('tiene_notificaciones_pendientes', tiene_notificaciones_pendientes)
+User.add_to_class('crear_notificacion_admin', crear_notificacion_admin)
+User.add_to_class('crear_notificacion_sistema', crear_notificacion_sistema)
+User.add_to_class('puede_crear_notificaciones', puede_crear_notificaciones)

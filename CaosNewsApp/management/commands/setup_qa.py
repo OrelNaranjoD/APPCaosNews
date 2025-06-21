@@ -412,89 +412,100 @@ class Command(BaseCommand):
             self.stdout.write(f'⚠️  Error creando referencia de imagen: {e}')
 
     def create_test_subscriptions(self):
-        """Crea plan especial de QA y suscripción de prueba"""
+        """Crea suscripción de prueba usando un plan estándar del sistema"""
         from django.utils import timezone
         from datetime import timedelta
         from CaosNewsApp.models import Plan, Suscripcion, PrecioPlan
         from django.contrib.auth.models import User
 
-        self.stdout.write('💳 Creando plan especial de QA y suscripción de prueba...')
+        self.stdout.write('💳 Creando suscripción de prueba con plan estándar...')
 
         try:
-            # 1. Crear plan especial de QA
-            plan_data = SUBSCRIPTION_TEST_DATA['plan_qa_especial']
-            plan_qa, created = Plan.objects.get_or_create(
-                nombre=plan_data['nombre'],
-                defaults={
-                    'descripcion': plan_data['descripcion'],
-                    'caracteristicas': plan_data['caracteristicas'],
-                    'activo': True,
-                }
-            )
-
-            if created:
-                self.stdout.write(f'✅ Plan QA creado: {plan_qa.nombre}')
-
-                # Crear precio para el plan QA
-                for precio_data in plan_data['precios']:
-                    PrecioPlan.objects.create(
-                        plan=plan_qa,
-                        periodo=precio_data['periodo'],
-                        duracion_dias=precio_data['duracion_dias'],
-                        precio=precio_data['precio'],
-                        activo=True
-                    )
-                    self.stdout.write(f'✅ Precio creado: {precio_data["periodo"]} - ${precio_data["precio"]}')
-
-            # 2. Crear suscripción próxima a vencer para el usuario de prueba
+            # 1. Buscar plan estándar del sistema (Plan Premium o cualquier plan existente)
             suscripcion_data = SUBSCRIPTION_TEST_DATA['suscripcion_proxima_a_vencer']
-            usuario = User.objects.get(username=suscripcion_data['usuario'])
+            
+            plan = Plan.objects.filter(nombre=suscripcion_data['plan'], activo=True).first()
+            if not plan:
+                # Si no existe Plan Premium, usar cualquier plan activo
+                plan = Plan.objects.filter(activo=True).first()
+                if not plan:
+                    self.stdout.write('⚠️  No hay planes disponibles en el sistema')
+                    return
+                self.stdout.write(f'📋 Usando plan disponible: {plan.nombre}')
 
-            # Verificar si ya existe una suscripción activa para este usuario
+            # 2. Buscar precio estándar (Mensual o cualquier precio disponible)
+            precio_plan = PrecioPlan.objects.filter(
+                plan=plan,
+                nombre_periodo=suscripcion_data['precio_periodo'],
+                activo=True
+            ).first()
+            
+            if not precio_plan:
+                # Si no existe precio Mensual, usar cualquier precio disponible
+                precio_plan = PrecioPlan.objects.filter(plan=plan, activo=True).first()
+                if not precio_plan:
+                    self.stdout.write(f'⚠️  No hay precios disponibles para el plan {plan.nombre}')
+                    return
+                self.stdout.write(f'📋 Usando precio disponible: {precio_plan.nombre_periodo}')
+
+            # 3. Buscar usuario de prueba
+            try:
+                usuario = User.objects.get(username=suscripcion_data['usuario'])
+            except User.DoesNotExist:
+                self.stdout.write(f'⚠️  Usuario {suscripcion_data["usuario"]} no existe')
+                return
+
+            # 4. Verificar si ya existe una suscripción activa para este usuario
             suscripcion_existente = Suscripcion.objects.filter(
                 usuario=usuario,
                 estado='A'
             ).first()
 
-            if not suscripcion_existente:
-                # Obtener el precio del plan QA
-                precio_plan = PrecioPlan.objects.filter(
-                    plan=plan_qa,
-                    periodo=suscripcion_data['precio_periodo']
-                ).first()
-
-                if precio_plan:
-                    # Calcular fechas para que expire en 1 día
-                    ahora = timezone.now()
-                    dias_restantes = suscripcion_data['dias_restantes']
-                    fecha_inicio = ahora - timedelta(days=precio_plan.duracion_dias - dias_restantes)
-                    fecha_fin = ahora + timedelta(days=dias_restantes)
-
-                    suscripcion = Suscripcion.objects.create(
-                        usuario=usuario,
-                        plan=plan_qa,
-                        precio_plan=precio_plan,
-                        fecha_inicio=fecha_inicio,
-                        fecha_fin=fecha_fin,
-                        estado=suscripcion_data['estado']
-                    )
-
-                    self.stdout.write('✅ Suscripción de prueba creada:')
-                    self.stdout.write(f'   Usuario: {usuario.username}')
-                    self.stdout.write(f'   Plan: {plan_qa.nombre}')
-                    self.stdout.write(f'   Período: {precio_plan.periodo}')
-                    self.stdout.write(f'   Expira en: {suscripcion.dias_restantes} día(s)')
-                    self.stdout.write(f'   Fecha fin: {suscripcion.fecha_fin.strftime("%Y-%m-%d %H:%M")}')
-                    self.stdout.write(f'   Próxima a vencer: {"Sí" if suscripcion.esta_proxima_a_vencer else "No"}')
-                else:
-                    self.stdout.write('⚠️  No se encontró precio para el plan QA')
-            else:
-                self.stdout.write(f'📋 Suscripción ya existe para {usuario.username}')
+            if suscripcion_existente:
+                # Actualizar suscripción existente para que expire en 1 día
+                ahora = timezone.now()
+                dias_restantes = suscripcion_data['dias_restantes']
+                nueva_fecha_fin = ahora + timedelta(days=dias_restantes)
+                
+                suscripcion_existente.fecha_fin = nueva_fecha_fin
+                suscripcion_existente.save()
+                
+                self.stdout.write('✅ Suscripción existente actualizada:')
+                self.stdout.write(f'   Usuario: {usuario.username}')
                 self.stdout.write(f'   Plan: {suscripcion_existente.plan.nombre}')
+                self.stdout.write(f'   Nueva fecha fin: {nueva_fecha_fin.strftime("%Y-%m-%d %H:%M")}')
                 self.stdout.write(f'   Días restantes: {suscripcion_existente.dias_restantes}')
+                self.stdout.write(f'   Próxima a vencer: {"Sí" if suscripcion_existente.esta_proxima_a_vencer else "No"}')
+            else:
+                # Crear nueva suscripción que expire en 1 día
+                ahora = timezone.now()
+                dias_restantes = suscripcion_data['dias_restantes']
+                fecha_inicio = ahora - timedelta(days=precio_plan.duracion_dias - dias_restantes)
+                fecha_fin = ahora + timedelta(days=dias_restantes)
+
+                suscripcion = Suscripcion.objects.create(
+                    usuario=usuario,
+                    plan=plan,
+                    precio_plan=precio_plan,
+                    fecha_inicio=fecha_inicio,
+                    fecha_fin=fecha_fin,
+                    estado=suscripcion_data['estado']
+                )
+
+                self.stdout.write('✅ Suscripción de prueba creada:')
+                self.stdout.write(f'   Usuario: {usuario.username}')
+                self.stdout.write(f'   Plan: {plan.nombre}')
+                self.stdout.write(f'   Período: {precio_plan.nombre_periodo}')
+                self.stdout.write(f'   Precio: ${precio_plan.valor}')
+                self.stdout.write(f'   Fecha inicio: {fecha_inicio.strftime("%Y-%m-%d %H:%M")}')
+                self.stdout.write(f'   Fecha fin: {fecha_fin.strftime("%Y-%m-%d %H:%M")}')
+                self.stdout.write(f'   Días restantes: {suscripcion.dias_restantes}')
+                self.stdout.write(f'   Próxima a vencer: {"Sí" if suscripcion.esta_proxima_a_vencer else "No"}')
 
         except Exception as e:
-            self.stdout.write(f'⚠️  Error creando suscripciones de prueba: {e}')
+            self.stdout.write(f'⚠️  Error creando suscripción de prueba: {e}')
+            import traceback
+            traceback.print_exc()
 
     def create_directories(self):
         """Crea directorios necesarios para QA"""

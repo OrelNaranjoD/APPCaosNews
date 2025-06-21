@@ -105,6 +105,15 @@ def admin_home(request):
 
         num_autores_activos = None  # No relevante para no administradores
 
+    # Información de suscripción del usuario actual
+    suscripcion_activa = request.user.suscripciones.filter(estado='A').first()
+    
+    # Notificaciones de suscripción pendientes
+    notificaciones_suscripcion = request.user.notificaciones.filter(
+        leido=False,
+        mensaje__icontains='suscripción'
+    ).count()
+
     context = {
         "num_noticias_publicadas": num_noticias_publicadas,
         "num_noticias_pendientes": num_noticias_pendientes,
@@ -114,6 +123,8 @@ def admin_home(request):
         "total_noticias": total_noticias,
         "num_autores_activos": num_autores_activos,
         "es_administrador": request.user.groups.filter(name="Administrador").exists(),
+        "suscripcion_activa": suscripcion_activa,
+        "notificaciones_suscripcion": notificaciones_suscripcion,
     }
     return render(request, "admin/admin_home.html", context)
 
